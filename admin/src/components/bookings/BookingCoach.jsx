@@ -277,16 +277,22 @@ const Booking = () => {
   const isSlotDisabled = (coachId, slot, selectedDate) => {
     const slotLabel = typeof slot === "string" ? slot : slot.label;
     const slotKey = `${coachId}-${selectedDate}-${slotLabel}`;
-
-    // Kiểm tra nếu slot đã disabled locally
+  
+    // Bị đánh dấu đã đặt
     if (disabledSlots[slotKey]) return true;
-
-    // Kiểm tra nếu slot không available từ server
+  
+    // Không có available từ server
     if (typeof slot === "object" && slot.available === false) return true;
-
+  
+    // Nếu là hôm nay và slot đã trôi qua giờ hiện tại
+    if (selectedDate === dayjs().format("YYYY-MM-DD")) {
+      const now = dayjs();
+      const slotStartTime = dayjs(`${selectedDate} ${slot.start}`);
+      if (slotStartTime.isBefore(now)) return true;
+    }
+  
     return false;
   };
-
   return (
     <div className="booking-bg">
       <h1 className="booking-title">ĐẶT LỊCH TƯ VẤN</h1>

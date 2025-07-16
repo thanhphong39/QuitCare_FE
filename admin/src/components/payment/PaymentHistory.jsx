@@ -19,27 +19,72 @@ const HistoryPayment = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const accountId = localStorage.getItem("accountId");
   const PAGE_SIZE = 8;
-
+  const [packageStatusMap, setPackageStatusMap] = useState({});
   useEffect(() => {
-    const fetchPayments = async () => {
+    const fetchPaymentsWithMembershipStatus = async () => {
       try {
         const res = await api.get(`/v1/payments/history/account/${accountId}`);
-        // Sắp xếp theo thời gian mới nhất trước
-        const sortedPayments = res.data.sort(
+        const payments = res.data || [];
+  
+        const sortedPayments = payments.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-        setPayments(sortedPayments);
+  
+        // 🔥 Chỉ lấy những giao dịch SUCCESS
+        const successPayments = sortedPayments.filter(p => p.status === "SUCCESS");
+  
+        const uniqueMembershipIds = [
+          ...new Set(
+            successPayments
+              .map((p) => p.userMembershipId)
+              .filter((id) => id !== null && id !== undefined)
+          ),
+        ];
+  
+        // Gọi API trạng thái gói
+        const membershipStatuses = await Promise.all(
+          uniqueMembershipIds.map((id) =>
+            api
+              .get(`/user-memberships/${id}`)
+              .then((res) => ({ id, status: res.data.status }))
+              .catch((err) => {
+                console.error(`❌ Lỗi khi lấy trạng thái gói #${id}:`, err);
+                return { id, status: "UNKNOWN" };
+              })
+          )
+        );
+  
+        const statusMap = {};
+        membershipStatuses.forEach(({ id, status }) => {
+          statusMap[id] = status;
+        });
+  
+        // Gán status cho các giao dịch SUCCESS
+        const paymentsWithStatus = sortedPayments.map((payment) => {
+          const status =
+            payment.status === "SUCCESS"
+              ? statusMap[payment.userMembershipId] || "UNKNOWN"
+              : null;
+  
+          return {
+            ...payment,
+            membershipStatus: status,
+          };
+        });
+  
+        setPayments(paymentsWithStatus);
       } catch (err) {
-        console.error("Lỗi khi lấy lịch sử thanh toán:", err);
+        console.error("❌ Lỗi khi lấy lịch sử thanh toán:", err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     if (accountId) {
-      fetchPayments();
+      fetchPaymentsWithMembershipStatus();
     }
   }, [accountId]);
+  
 
   const columns = [
     {
@@ -93,6 +138,30 @@ const HistoryPayment = () => {
           {dayjs(date).format("HH:mm DD/MM/YYYY")}
         </span>
       ),
+    },
+    {
+      title: "Trạng thái gói",
+      dataIndex: "membershipStatus",
+      key: "membershipStatus",
+      render: (status) => {
+        const display =
+          status === "ACTIVE"
+            ? "Đang hoạt động"
+            : status === "INACTIVE"
+            ? "Không hoạt động"
+            : status === "EXPIRED"
+            ? "Hết hạn"
+            : "Không xác định";
+    
+        const color =
+          status === "ACTIVE"
+            ? "green"
+            : status === "EXPIRED"
+            ? "red"
+            : "gray";
+    
+        return <span style={{ color, fontWeight: 500 }}>{display}</span>;
+      },
     },
   ];
 

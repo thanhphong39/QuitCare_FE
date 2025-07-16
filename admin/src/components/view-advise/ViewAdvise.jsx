@@ -11,7 +11,6 @@ import {
   Input,
   Modal,
   Avatar,
-  Divider,
   Empty,
   message,
   Alert,
@@ -26,7 +25,6 @@ import {
   PlayCircleOutlined,
   EyeOutlined,
   SearchOutlined,
-  FilterOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -56,7 +54,6 @@ function ViewAdvise() {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ Hàm gọi API
   const fetchConsultations = async () => {
     setLoading(true);
     try {
@@ -164,23 +161,6 @@ function ViewAdvise() {
         </div>
       ),
     },
-    // {
-    //   title: "Link tư vấn",
-    //   dataIndex: "meetingLink",
-    //   render: (link, record) =>
-    //     record.status === "PENDING" ||
-    //     record.status === "IN_PROGRESS" ? (
-    //       <Button
-    //         type="primary"
-    //         icon={<LinkOutlined />}
-    //         onClick={() => joinMeeting(record)}
-    //       >
-    //         Tham gia
-    //       </Button>
-    //     ) : (
-    //       <Text type="secondary">--</Text>
-    //     ),
-    // },
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -213,7 +193,7 @@ function ViewAdvise() {
   return (
     <>
       <Navbar />
-      <div className="view-advise-page">
+      <div className="view-advise-page" style={{ maxWidth: 1000, margin: "0 auto", padding: 20 }}>
         <Card
           title={
             <div>
@@ -269,15 +249,12 @@ function ViewAdvise() {
             loading={loading}
             pagination={{ pageSize: 10 }}
             locale={{
-              emptyText: (
-                <Empty description="Chưa có buổi tư vấn nào" />
-              ),
+              emptyText: <Empty description="Chưa có buổi tư vấn nào" />,
             }}
           />
         </Card>
       </div>
 
-      {/* Modal Chi tiết */}
       <Modal
         title="Chi tiết tư vấn"
         open={detailModalVisible}
@@ -292,24 +269,14 @@ function ViewAdvise() {
           <>
             <p><strong>Coach:</strong> {selectedConsultation.coachName}</p>
             <p>
-              <strong>Ngày giờ:</strong>{" "}
-              {dayjs(selectedConsultation.date).format("DD/MM/YYYY")}{" "}
-              {selectedConsultation.time}
+              <strong>Ngày giờ:</strong> {dayjs(selectedConsultation.date).format("DD/MM/YYYY")} {selectedConsultation.time}
             </p>
             <p>
-              <strong>Trạng thái:</strong>{" "}
-              {getStatusConfig(selectedConsultation.status).text}
+              <strong>Trạng thái:</strong> {getStatusConfig(selectedConsultation.status).text}
             </p>
             {selectedConsultation.meetingLink && (
               <p>
-                <strong>Link:</strong>{" "}
-                <a
-                  href={selectedConsultation.meetingLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {selectedConsultation.meetingLink}
-                </a>
+                <strong>Link:</strong> <a href={selectedConsultation.meetingLink} target="_blank" rel="noopener noreferrer">{selectedConsultation.meetingLink}</a>
               </p>
             )}
           </>

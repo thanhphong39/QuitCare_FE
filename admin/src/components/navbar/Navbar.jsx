@@ -30,7 +30,7 @@ const Navbar = () => {
         const transactions = historyRes.data || [];
         console.log("📦 Danh sách giao dịch:", transactions);
   
-        // ✅ Lọc các giao dịch thành công
+        // Lọc các giao dịch SUCCESS
         const successTransactions = transactions.filter(tx => tx.status === "SUCCESS");
   
         if (successTransactions.length === 0) {
@@ -38,24 +38,26 @@ const Navbar = () => {
           return;
         }
   
-        // ✅ Tìm giao dịch có amountPaid lớn nhất
-        const maxTransaction = successTransactions.reduce((max, curr) =>
+        // Tìm giao dịch SUCCESS có số tiền lớn nhất
+        const maxTransaction = successTransactions.reduce((max, curr) => 
           curr.amountPaid > max.amountPaid ? curr : max
         );
         const { amountPaid } = maxTransaction;
-        console.log("💵 amountPaid lớn nhất từ giao dịch SUCCESS:", amountPaid);
   
-        // Lấy danh sách các gói
+        console.log("💵 Giao dịch có số tiền lớn nhất:", amountPaid);
+  
+        // Gọi API lấy danh sách gói
         const planRes = await api.get(`/membership-plans`);
         const allPlans = planRes.data || [];
         console.log("📋 Danh sách gói:", allPlans);
   
-        // So sánh với các gói
-        const matchedPlan = allPlans.find(plan => Math.abs(plan.price - amountPaid) < 1);
-        console.log("🎯 Gói khớp:", matchedPlan);
+        // Tìm gói nào có giá bằng với amountPaid lớn nhất và tên là Premium
+        const matchedPlan = allPlans.find(plan =>
+          Math.abs(plan.price - amountPaid) < 1 && plan.name === "Premium"
+        );
   
-        if (matchedPlan?.name === "Premium") {
-          console.log("✅ Gói là Premium → Hiện nút ĐẶT LỊCH");
+        if (matchedPlan) {
+          console.log("✅ Gói Premium đã mua, hiển thị nút ĐẶT LỊCH");
           setShowBooking(true);
         } else {
           console.log("ℹ️ Không có gói Premium tương ứng.");
@@ -68,6 +70,7 @@ const Navbar = () => {
   
     fetchMembershipPlan();
   }, [user?.id]);
+  
   
 
   // 👉 Scroll Lock cho Mobile Menu

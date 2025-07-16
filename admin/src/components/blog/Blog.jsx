@@ -7,7 +7,7 @@ import { Link } from "react-router";
 
 const knowledgePosts = [
   {
-    id: "4",
+    id: "1",
     title: "13 mẹo cai thuốc lá tốt nhất từ trước đến nay",
     date: "22/07/2024",
     category: "Kiến Thức",
@@ -17,7 +17,7 @@ const knowledgePosts = [
     url: "https://www.vinmec.com/vie/bai-viet/13-meo-cai-thuoc-la-tot-nhat-tu-truoc-den-nay-vi",
   },
   {
-    id: "5",
+    id: "2",
     title: "11 điều cần làm để cai thuốc hiệu quả và dễ dàng hơn",
     date: "31/08/2023",
     category: "Kiến Thức",
@@ -27,7 +27,7 @@ const knowledgePosts = [
     url: "https://syt.daknong.gov.vn/tin-tuc-su-kien/y-te-du-phong/de-viec-cai-thuoc-la-duoc-hieu-qua-va-de-dang-hon-can-thuc-hien-11-dieu-sau-.html",
   },
   {
-    id: "6",
+    id: "3",
     title: "Cách lập kế hoạch để bỏ hút thuốc lá",
     date: "22/07/2024",
     category: "Kiến Thức",
@@ -37,7 +37,7 @@ const knowledgePosts = [
     url: "https://www.vinmec.com/vie/bai-viet/cach-lap-ke-hoach-de-bo-hut-thuoc-la-vi",
   },
   {
-    id: "7",
+    id: "4",
     title: "Một số bí quyết giúp cai thuốc lá hiệu quả",
     date: "15/03/2017",
     category: "Kiến Thức",
@@ -47,7 +47,7 @@ const knowledgePosts = [
     url: "https://baonamdinh.vn/channel/5091/201703/phong-chong-tac-hai-cua-thuoc-la-mot-so-bi-quyet-giup-cai-thuoc-la-hieu-qua-2517330/",
   },
   {
-    id: "8",
+    id: "5",
     title: "Cai nghiện thuốc lá: dễ hay khó?",
     date: "18/12/2024",
     category: "Kiến Thức",
@@ -60,7 +60,7 @@ const knowledgePosts = [
 
 const healthyPosts = [
   {
-    id: "9",
+    id: "6",
     title: "Tập thể dục giúp ích cho việc cai nghiện thuốc lá",
     date: "27/10/2018",
     category: "Tập luyện & Sức khỏe",
@@ -71,7 +71,7 @@ const healthyPosts = [
     url: "https://baobacgiang.vn/tap-the-duc-giup-ich-cho-viec-cai-nghien-thuoc-la.bbg",
   },
   {
-    id: "18",
+    id: "7",
     title: "Tập thể dục giúp ích cho việc cai nghiện thuốc lá",
     date: "04/01/2018",
     category: "Tập luyện & Sức khỏe",
@@ -82,7 +82,7 @@ const healthyPosts = [
     url: "https://thanhnien.vn/tap-the-duc-giup-ich-cho-viec-cai-nghien-thuoc-la-185723413.htm",
   },
   {
-    id: "21",
+    id: "8",
     title: "Điều gì xảy ra sau hai tuần bỏ thuốc lá",
     date: "23/5/2025",
     category: "Tập luyện & Sức khỏe",
@@ -92,7 +92,7 @@ const healthyPosts = [
     url: "https://vnexpress.net/dieu-gi-xay-ra-sau-hai-tuan-bo-thuoc-la-4889585.html",
   },
   {
-    id: "22",
+    id: "9",
     title: "Thanh lọc phổi sau khi cai thuốc lá",
     date: "5/10/2023",
     category: "Tập luyện & Sức khỏe",
@@ -103,7 +103,7 @@ const healthyPosts = [
     url: "https://vnexpress.net/thanh-loc-phoi-sau-khi-cai-thuoc-la-4661057.html",
   },
   {
-    id: "19",
+    id: "10",
     title: "Lợi ích của việc “cai” thuốc",
     date: "02/07/2008",
     category: "Tập luyện & Sức khỏe",
@@ -114,7 +114,7 @@ const healthyPosts = [
     url: "https://dantri.com.vn/suc-khoe/loi-ich-cua-viec-cai-thuoc-1215129319.htm",
   },
   {
-    id: "12",
+    id: "11",
     title: "Thực phẩm nên ăn và tránh khi cai thuốc lá",
     date: "20/3/2024",
     category: "Tập luyện & Sức khỏe",
@@ -125,7 +125,7 @@ const healthyPosts = [
     url: "https://vnexpress.net/thuc-pham-nen-an-va-tranh-khi-cai-thuoc-la-4724384.html",
   },
   {
-    id: "13",
+    id: "12",
     title: "Tập yoga giúp cai thuốc lá dễ hơn",
     date: "11/01/2015",
     category: "Tập luyện & Sức khỏe",
@@ -139,7 +139,7 @@ const healthyPosts = [
 
 const successPosts = [
   {
-    id: "14",
+    id: "13",
     title: "Bỏ thuốc lá thành công sau 15 năm nghiện thuốc",
     date: "18/07/2022",
     category: "Câu Chuyện",
@@ -149,7 +149,7 @@ const successPosts = [
     url: "https://baothaibinh.com.vn/tin-tuc/260/154962/bo-thuoc-la-thanh-cong-sau-15-nam-nghien-thuoc",
   },
   {
-    id: "15",
+    id: "14",
     title: "Chia sẻ của người trong cuộc khi cai thuốc lá",
     date: "10/12/2018",
     category: "Câu Chuyện",
@@ -159,7 +159,7 @@ const successPosts = [
     url: "https://mic.gov.vn/cai-thuoc-la-chia-se-cua-nguoi-trong-cuoc-197138305.htm",
   },
   {
-    id: "20",
+    id: "15",
     title: "Gương cai nghiện thuốc lá",
     date: "14/11/2017",
     category: "Câu Chuyện",

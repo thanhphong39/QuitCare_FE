@@ -7,7 +7,7 @@ import api from "../../configs/axios";
 import { toast } from "react-toastify";
 
 const customDescriptions = {
-  4: `Hút thuốc lá là thói quen xấu, có hại cho sức khỏe của bạn. Do đó, hãy học cách bỏ hút thuốc lá ngay từ hôm nay để bảo vệ sức khỏe của mình và những người xung quanh. Cảm giác thèm thuốc lá có thể khiến bạn suy sụp khi bạn đang cố gắng bỏ thuốc lá. Sử dụng 13 mẹo cai thuốc lá tốt nhất từ ​​trước đến nay trong bài viết dưới đây để chống lại cảm giác thèm thuốc lá và bỏ hút thuốc lá.
+  1: `Hút thuốc lá là thói quen xấu, có hại cho sức khỏe của bạn. Do đó, hãy học cách bỏ hút thuốc lá ngay từ hôm nay để bảo vệ sức khỏe của mình và những người xung quanh. Cảm giác thèm thuốc lá có thể khiến bạn suy sụp khi bạn đang cố gắng bỏ thuốc lá. Sử dụng 13 mẹo cai thuốc lá tốt nhất từ ​​trước đến nay trong bài viết dưới đây để chống lại cảm giác thèm thuốc lá và bỏ hút thuốc lá.
 
 1. Làm sao cai được thuốc lá hay bỏ hút thuốc?
 Hầu hết những người sử dụng thuốc lá, cảm giác thèm thuốc lá hoặc thúc giục hút thuốc có thể rất mạnh. Nhưng bạn không hề có những cảm giác thèm ăn này. Khi cảm giác muốn sử dụng thuốc lá xảy ra, hãy nhớ rằng mặc dù nó có thể rất dữ dội, nhưng nó có thể sẽ trôi qua trong vòng 5 đến 10 phút cho dù bạn có hút thuốc lá hay ngậm thuốc lá hay không. Mỗi khi bạn chống lại cơn thèm thuốc lá, bạn đang tiến gần hơn một bước tới việc ngừng sử dụng thuốc lá một cách tốt đẹp.
@@ -127,7 +127,7 @@ Các loại thuốc có thể giúp cho bạn giảm cảm giác thèm thuốc, 
 
 Liệu pháp thay thế nicotine được kể đến như kẹo cai thuốc lá, miếng dán nicotine, viên ngậm bỏ thuốc lá và thuốc hít hay xịt mũi. Các sản phẩm này sẽ giúp cho bạn tiếp nạp lượng nicotine vừa đủ mà không có thêm các hoá chất độc hại và khí độc như trong thuốc lá. Sản phẩm giúp bạn giải quyết được phần nào vấn đề về nghiện tâm lý.
 `,
-  5: `Để việc cai thuốc lá được hiệu quả và dễ dàng hơn, bạn có thể thực hiện một số biện pháp hỗ trợ như tư vấn điều trị nhận thức chuyển đổi hành vi hướng dẫn người cai thuốc lá, thực hiện các kế hoạch để giải quyết những tình huống khó khăn, khó chịu khi cai thuốc; sử dụng thuốc hỗ trợ cai thuốc lá... Bên cạnh đó, bạn có thể thực hiện từ từ những hoạt động dưới đây để giúp bản thân nhanh chóng từ bỏ được thuốc lá:
+  2: `Để việc cai thuốc lá được hiệu quả và dễ dàng hơn, bạn có thể thực hiện một số biện pháp hỗ trợ như tư vấn điều trị nhận thức chuyển đổi hành vi hướng dẫn người cai thuốc lá, thực hiện các kế hoạch để giải quyết những tình huống khó khăn, khó chịu khi cai thuốc; sử dụng thuốc hỗ trợ cai thuốc lá... Bên cạnh đó, bạn có thể thực hiện từ từ những hoạt động dưới đây để giúp bản thân nhanh chóng từ bỏ được thuốc lá:
 Lên kế hoạch: Bạn cần lên kế hoạch cụ thể, xác định rõ tư tưởng cai thuốc lá không hề dễ dàng. Người cai nên có kế hoạch rõ ràng, thực hiện từng bước để cảm nhận được hiệu quả.
 
 Cắt giảm dần số lượng thuốc lá: Bỏ thuốc lá ngay lập tức rất khó, thường gây những khó chịu ban đầu như mất tập trung, cáu gắt, khó chịu... Bạn nên giảm dần số lượng thuốc mỗi ngày, giảm từ từ đến khi không còn hút nữa.
@@ -149,7 +149,7 @@ Chơi với người không hút thuốc: Thường xuyên đi chơi với bạn
 Nhai kẹo cao su không đường: Nhai kẹo cao su giúp bạn kiểm soát cơn thèm nicotine, tốt nhất là kẹo không đường.
 
 Đánh răng đều đặn: Mùi vị của kem đánh răng có thể tạm thời ngăn cản cơn thèm thuốc lá của bạn. Ngoài ra, chải răng đều đặn giúp bạn loại bỏ mảng vàng do khói thuốc lá để lại trên răng.`,
-  6: `Hút thuốc lá quá nhiều mang lại những nguy cơ nghiêm trọng tới sức khỏe. Ai cũng biết vậy nhưng việc hạn chế hoặc bỏ hẳn thuốc lá không hề dễ dàng. Tuy nhiên, với sự trợ giúp của một kế hoạch cai thuốc, có lẽ bạn sẽ dễ dàng vượt qua giai đoạn khó khăn này hơn. Dưới đây là một số ý tưởng giúp bạn lập kế hoạch cai thuốc lá chuẩn nhất.
+  3: `Hút thuốc lá quá nhiều mang lại những nguy cơ nghiêm trọng tới sức khỏe. Ai cũng biết vậy nhưng việc hạn chế hoặc bỏ hẳn thuốc lá không hề dễ dàng. Tuy nhiên, với sự trợ giúp của một kế hoạch cai thuốc, có lẽ bạn sẽ dễ dàng vượt qua giai đoạn khó khăn này hơn. Dưới đây là một số ý tưởng giúp bạn lập kế hoạch cai thuốc lá chuẩn nhất.
 
 1. Liệt kê lý do bạn muốn bỏ hút thuốc
 Chỉ bạn mới là người có thể quyết định khi nào mình đã sẵn sàng bỏ thuốc lá. Do vậy bạn cần hiểu rõ tại sao mình lại đưa ra quyết định này và điều gì sẽ thúc đẩy mình cai thuốc lá.
@@ -192,7 +192,7 @@ Giữ cho tâm trí không bị phân tâm khi cần thiết với một cuốn 
 Nhìn chung, với một kế hoạch cai thuốc bài bản và có sự chuẩn bị kỹ lưỡng, bạn sẽ có những sự hỗ trợ cần thiết trong quá trình bỏ thuốc. Càng tập hợp được nhiều nguồn lực (các nhóm hỗ trợ, biện pháp thay thế nicotine, thuốc, lời khuyên của bác sĩ...) thì bạn càng có nhiều khả năng từ bỏ được thói quen hút thuốc của mình.
 
 `,
-  7: `Khói thuốc lá chứa 7.000 hóa chất, trong đó có 69 chất là tác nhân gây ung thư. Sử dụng thuốc lá là nguyên nhân của khoảng 25 căn bệnh, trong đó có nhiều bệnh nguy hiểm như: ung thư phổi, ung thư miệng, đột quỵ, nhồi máu cơ tim, bệnh phổi tắc nghẽn mạn tính,... Cai thuốc lá giúp bảo vệ sức khỏe cho bản thân, gia đình và cộng đồng. Dưới đây là một số bí quyết hy vọng sẽ giúp bạn phần nào trong quá trình cai nghiện thuốc lá. 
+  4: `Khói thuốc lá chứa 7.000 hóa chất, trong đó có 69 chất là tác nhân gây ung thư. Sử dụng thuốc lá là nguyên nhân của khoảng 25 căn bệnh, trong đó có nhiều bệnh nguy hiểm như: ung thư phổi, ung thư miệng, đột quỵ, nhồi máu cơ tim, bệnh phổi tắc nghẽn mạn tính,... Cai thuốc lá giúp bảo vệ sức khỏe cho bản thân, gia đình và cộng đồng. Dưới đây là một số bí quyết hy vọng sẽ giúp bạn phần nào trong quá trình cai nghiện thuốc lá. 
  
 Lên kế hoạch bỏ thuốc và cam kết với bản thân: Lường trước những khó khăn của việc tự cai thuốc lá để từ bỏ thói quen xấu một cách hiệu quả. Lên một kế hoạch cụ thể ít nhất 6 tháng, nên chia cường độ giảm dần sử dụng thuốc từng tháng để cơ thể dễ dàng thích nghi. Ghi nhớ kế hoạch và kiên định với kế hoạch.
  
@@ -209,7 +209,7 @@ Không uống rượu, nước có ga: Nhiều đàn ông thường sa vào nghi
 Kiểm soát căng thẳng: Thông thường, đàn ông hay hút thuốc mỗi khi căng thẳng. Thay vào đó, mỗi khi thấy mệt mỏi, bạn nên nghe nhạc, chơi thể thao hay xem chương trình truyền hình yêu thích để cơ thể quên đi thuốc lá.
  
 Hạn chế tiếp xúc với những người hút thuốc: Thường xuyên đi chơi với bạn bè hút thuốc sẽ khiến cơn thèm thuốc của bạn trỗi dậy. Hãy kết thân với những người không hút thuốc và quyết tâm, đặt cược về chính mình, đồng thời tự thưởng cho mình sau mỗi giai đoạn bỏ thuốc lá thành công./.`,
-  8: `Theo các bác sĩ, nghiện thuốc lá được xác định là bệnh, nằm trong nhóm bệnh rối loạn tâm thần và hành vi do dùng chất hướng thần.
+  5: `Theo các bác sĩ, nghiện thuốc lá được xác định là bệnh, nằm trong nhóm bệnh rối loạn tâm thần và hành vi do dùng chất hướng thần.
 Mặc dù đã phòng chống tác hại thuốc lá bền bỉ trong hơn 10 năm qua, Việt Nam vẫn nằm trong nhóm quốc gia có tỉ lệ người hút thuốc lá cao nhất thế giới (38,9% ở nam giới trưởng thành, cả hai giới là trên 20% năm 2023).
 
 Hiện nhiều nơi quảng bá thuốc lá điện tử như một công cụ hỗ trợ cai nghiện dưới vỏ bọc góp phần kiểm soát việc hút thuốc lá.
@@ -246,7 +246,7 @@ Bên cạnh đó, để có thể cai thuốc lá được thì người nghiệ
 Tại TP.HCM từ năm 2014, với sự hỗ trợ của Quỹ Phòng chống tác hại thuốc lá (VNTCF), Sở Y tế TP.HCM mở nhiều phòng tư vấn và điều trị cai nghiện thuốc lá.
 
 Các đơn vị này nằm trải đều khắp như ở Bệnh viện quận 1, Bệnh viện TP Thủ Đức, Bệnh viện quận 11, Bệnh viện huyện Bình Chánh, Bệnh viện Phạm Ngọc Thạch, Bệnh viện Nhân dân Gia Định…`,
-  9: `(BGĐT)- Nếu bạn đang tìm kiếm phương thức để từ bỏ thuốc lá thì một trong những cách đơn giản và dễ làm nhất là tập thể dục. Theo một nghiên cứu mới, tập thể dục có thể giúp ích cho việc cai thuốc lá giúp bạn dễ dàng đối phó với các triệu chứng khó chịu khi cai thuốc như: Khó ngủ, đau đầu, nhạt miệng, tăng cân...
+  6: `(BGĐT)- Nếu bạn đang tìm kiếm phương thức để từ bỏ thuốc lá thì một trong những cách đơn giản và dễ làm nhất là tập thể dục. Theo một nghiên cứu mới, tập thể dục có thể giúp ích cho việc cai thuốc lá giúp bạn dễ dàng đối phó với các triệu chứng khó chịu khi cai thuốc như: Khó ngủ, đau đầu, nhạt miệng, tăng cân...
 Tập thể dục được biết là cách làm giảm các triệu chứng cai nghiện nicotine. Các nghiên cứu đã chỉ ra rằng thậm chí một bài tập thể dục ngắn trong 10 phút ngắn cũng có thể có những tác động tức thời trong việc làm giảm thèm muốn thuốc lá. Các bác sĩ khuyên bạn rằng, thay vì dành thời gian và tốn kém chi phí cho việc hút thuốc lá gây tổn hại sức khỏe, bạn hãy thường xuyên tập thể dục với các thiết bị tập thể dục tại nhà như máy chạy bộ điện, máy tập bụng, xe đạp tập thể dục… Bởi tập thể dục giúp tăng cường sức khỏe, sự dẻo dai của cơ thể, kích thích quá trình trao đổi chất, giúp bạn sống vui khỏe hơn, quá trình lão hóa cũng diễn ra chậm hơn.
 
 Chuẩn bị cho bài tập thể dục trong liệu trình cai thuốc lá: Bạn không nên uống cà phê ở hàng vì ở đó có rất nhiều người hút thuốc, rất dễ kích thích sự thèm thuốc của bạn. Đồng thời cà phê là chất kích thích khiến bạn thèm thuốc nhiều hơn. Không nên để thuốc lá ở trong người, hãy đoạn tuyệt với nó vì đã cai thì không lý do gì để gói thuốc tồn tại ở trong bạn.
@@ -260,7 +260,7 @@ Chuẩn bị cho bài tập thể dục trong liệu trình cai thuốc lá: B�
 Song song với việc luyện tập thì nên sử dụng thực phẩm bổ trợ, đặc biệt là những sản phẩm có nguồn gốc thảo dược thiên nhiên, thường xuyên vệ sinh răng miệng để giảm thiểu mùi thuốc lá, tránh cảm giác thèm hút. Cần chăm chỉ tập luyện thể dục, thể thao, hạn chế bia rượu, cà phê, thức uống có ga, có thể nhai kẹo cao su trong quá trình cai thuốc lá. Sau khi cai thuốc lá thành công tuy không còn thèm thuốc nhưng việc hút thuốc như là một thói quen đã ăn sâu vào tiềm thức của mình. Nên bạn cần mạnh dạn khước từ các lời mời dùng thuốc lá để không bị tái nghiện.
 
 Từ bỏ việc hút thuốc lá là mục tiêu của rất nhiều người. Không ít người đã cố gắng từ bỏ nhiều hơn một lần nhưng không thành công. Việc bỏ hẳn thuốc lá có thể mất một vài tuần hoặc lâu hơn, nhưng một khi từ bỏ thành công thì lợi ích sức khỏe bạn nhận được là hoàn toàn xứng đáng với cuộc đấu tranh khó khăn đó.`,
-  21: `Sau hai tuần bỏ thuốc lá, huyết áp, nhịp tim ổn định, khứu giác và vị giác cải thiện, cảm giác hụt hơi khi leo cầu thang giảm.
+  7: `Sau hai tuần bỏ thuốc lá, huyết áp, nhịp tim ổn định, khứu giác và vị giác cải thiện, cảm giác hụt hơi khi leo cầu thang giảm.
 
 Vị giác, khứu giác cải thiện
 
@@ -293,7 +293,7 @@ Carbon monoxide được tạo ra khi thuốc lá bị đốt cháy và người
 Khoảng vài ngày sau khi bỏ thuốc, hầu hết mọi người cảm thấy buồn bực, cáu kỉnh, đau đầu dữ dội, thèm ăn khi cơ thể điều chỉnh lại. Một số người cũng gặp vấn đề về trí nhớ, khó tập trung, đau họng, khô miệng. Tuy nhiên đây chỉ là những cảm xúc nhất thời, giảm sau hai tuần.
 
 Người cai thuốc lá nên tìm hiểu các phương pháp giảm căng thẳng mới, lành mạnh để giảm cảm giác thèm thuốc. Tập thể dục, thư giãn bằng cách massage, ngâm mình trong nước ấm, đọc sách, gặp gỡ bạn bè thân thiết... cũng giúp ích. Bỏ hút thuốc lá là quá trình khó khăn, đòi hỏi sự kiên trì.`,
-  22: `Người đã bỏ thuốc lá nên tránh xa khói thuốc thụ động, ăn nhiều trái cây tươi và rau xanh, uống đủ nước, tập thể dục giúp cải thiện chức năng phổi.
+  8: `Người đã bỏ thuốc lá nên tránh xa khói thuốc thụ động, ăn nhiều trái cây tươi và rau xanh, uống đủ nước, tập thể dục giúp cải thiện chức năng phổi.
 
 Thuốc lá khi đốt cháy tạo ra hơn 7.000 chất hóa học, trong đó có ít nhất 69 loại có khả năng gây ung thư. Người hút thuốc lá hoặc hít phải khói thuốc thụ động thường xuyên dễ ho, khó thở, nguy cơ cao mắc nhiều bệnh hô hấp như viêm phế quản mạn tính, bệnh phổi tắc nghẽn mạn tính, các cơn hen phế quản cấp, ung thư phổi.
 
@@ -319,7 +319,7 @@ Một số loại rau họ cải như bông cải xanh, súp lơ trắng, bắp 
 Uống đủ nước mỗi ngày làm tăng lưu thông máu, làm loãng dịch nhầy, kích thích hoạt động của hệ thống lông mao, loại bỏ độc tố ra khỏi cơ quan này. Người trưởng thành khỏe mạnh nên uống khoảng 8 cốc nước (mỗi cốc 237 ml) mỗi ngày. Ưu tiên uống nước ấm thay vì nước đá lạnh. Theo Trung tâm Y tế Đại học Maryland (Mỹ), nước trà xanh chứa chất chống oxy hóa có thể sửa chữa những tổn thương do các gốc tự do trong khói thuốc lá gây ra.
 
 Luyện hít thở sâu khoảng 5-10 phút mỗi ngày có thể giải tỏa căng thẳng, tránh cảm giác thèm hút thuốc. Các bài tập hít thở chủ động như thở chúm môi, thở bằng cơ hoành thúc đẩy quá trình trao đổi khí hiệu quả, cải thiện hoạt động của phổi.`,
-  12: `Trái cây, rau, trà xanh, sữa giúp giảm cảm giác thèm hút thuốc, trong khi cà phê, rượu bia, đồ ngọt có thể khiến nỗ lực này thất bại.
+  9: `Trái cây, rau, trà xanh, sữa giúp giảm cảm giác thèm hút thuốc, trong khi cà phê, rượu bia, đồ ngọt có thể khiến nỗ lực này thất bại.
 
 Theo Tổ chức Y tế Thế giới (WHO), thuốc lá là một trong những mối đe dọa lớn nhất đối với sức khỏe cộng đồng trên thế giới. Hút thuốc đi kèm với một loạt các vấn đề, ảnh hưởng đến nhiều bộ phận khác nhau của cơ thể như tim, hormone, quá trình trao đổi chất và não.
 
@@ -347,19 +347,19 @@ Thực phẩm có đường: Đồ ngọt khiến lượng đường trong máu 
 Cà phê: Nhiều người thường uống cà phê kèm hút thuốc. Hai thói quen này có thể liên kết về mặt tâm lý và gần như không thể tách rời. Caffeine còn mang lại cảm giác hưng phấn hơn cho tác dụng kích thích của thuốc lá. Đây là lý do khiến cà phê có thể làm tăng cảm giác thèm thuốc mạnh mẽ. Thay cà phê bằng trà thảo mộc trong một hoặc hai tuần để dần loại bỏ thói quen xấu này.
 
 Rượu, bia: Tương tự cà phê, hút thuốc lá khi uống bia, rượu hoặc đồ uống chứa cồn là thói quen khó bỏ của một số người. Người đang cai thuốc nên kiêng rượu bia trong tháng đầu tiên. Sau đó, đặt ra giới hạn ở mức hai ly hoặc ít hơn mỗi ngày khi đã bỏ hẳn hút thuốc.`,
-  13: `SKĐS - Các nhà khoa học của hai trường đại học Harvard (Mỹ) và Erasmus (Hà Lan) đã thực hiện một nghiên cứu dựa trên 2.700 người có dấu hiệu mắc bệnh tim, mạch vành.
+  10: `SKĐS - Các nhà khoa học của hai trường đại học Harvard (Mỹ) và Erasmus (Hà Lan) đã thực hiện một nghiên cứu dựa trên 2.700 người có dấu hiệu mắc bệnh tim, mạch vành.
 Các nhà khoa học của hai trường đại học Harvard (Mỹ) và Erasmus (Hà Lan) đã thực hiện một nghiên cứu dựa trên 2.700 người có dấu hiệu mắc bệnh tim, mạch vành. Kết quả khảo sát cho thấy, những người tập yoga đều đặn sau 3 tháng đã giảm được khoảng gần 2,5kg, giảm lượng cholesterol và giảm cả áp lực máu. Thậm chí, khi đối chiếu với những người uống thuốc thường xuyên, kết quả còn cho thấy những người tập luyện yoga còn giảm được huyết áp nhiều hơn gấp ba lần. Điều thú vị là, tập yoga có thể xóa bỏ tất cả những yếu tố có hại này của cơ thể.
 
 GS. Myriam Hunink của Đại học Harvard nói: “Môn thể thao được xem là thích hợp nhất dành cho người mắc bệnh béo phì lẫn bệnh tim là đạp xe. Giờ đây,  yoga cũng có hiệu quả hoàn toàn tương đương và lại tiện dụng hơn những môn thể thao khác nhiều vì nó dành cho mọi đối tượng”.
 
 Cũng trong nghiên cứu này, các nhà khoa học còn phát hiện ra rằng, những người tập luyện yoga cũng dễ dàng bỏ thuốc lá hơn ngay sau đó nếu họ luyện tập yoga đền đặn. Dù chưa thể giải thích điều này nhưng các nhà nghiên cứu cũng lý giải rằng, yoga là sự kết hợp giữa việc điều hòa hơi thở, dẫn ôxy vào cơ thể và giảm stress. Tất cả những yếu tố này đều đối nghịch với việc hút thuốc nên yoga cũng trở thành một trong những cách thức cai thuốc lá hiệu quả.`,
-  14: `Các chiến dịch truyền thông nhiều năm qua đã có tác động tích cực đến thái độ và hành vi của cả người hút thuốc và người không hút thuốc lá. Từ những cách truyền thông đa dạng về hình thức và nội dung, trên địa bàn tỉnh tỷ lệ người hút thuốc lá đã giảm đáng kể. Chính từ những tiểu phẩm tuyên truyền gần gũi với người dân đã xuất hiện nhiều tấm gương bỏ thuốc lá thành công.
+  11: `Các chiến dịch truyền thông nhiều năm qua đã có tác động tích cực đến thái độ và hành vi của cả người hút thuốc và người không hút thuốc lá. Từ những cách truyền thông đa dạng về hình thức và nội dung, trên địa bàn tỉnh tỷ lệ người hút thuốc lá đã giảm đáng kể. Chính từ những tiểu phẩm tuyên truyền gần gũi với người dân đã xuất hiện nhiều tấm gương bỏ thuốc lá thành công.
 Anh Nguyễn Hữu Miền, Đội trưởng Đội tuyên truyền, Trung tâm Văn hóa Thể thao huyện Đông Hưng có thâm niên hút thuốc lá 15 năm, mỗi ngày anh hút từ 10 điếu trở lên. Dù nhận được rất nhiều lời khuyên nhủ của gia đình nhưng anh vẫn nghiện, không bỏ được thuốc lá. May mắn, cách đây hơn 4 năm, anh Miền được chọn tham gia đóng tiểu phẩm tuyên truyền phòng, chống tác hại của thuốc lá do tỉnh tổ chức, nhận kịch bản và đọc đi đọc lại những nội dung trong kịch bản, với những lời cảnh báo từ thuốc lá, hệ lụy thuốc lá đối với sức khỏe, anh Miền đã bắt đầu suy nghĩ về việc hút thuốc lá của mình bấy lâu nay. Anh Nguyễn Hữu Miền chia sẻ: Trước kia, nhiều lần đi diễn về tôi thấy mình hay ho hắng, ốm vặt, răng thì cứ vàng đi rất xấu... vì hút quá nhiều thuốc lá. Khi trực tiếp nhận, đọc kịch bản, trực tiếp vào vai diễn liên quan đến thuốc lá, ngẫm nghĩ lại tôi thấy thuốc lá thực sự đã ảnh hưởng trực tiếp đến sức khỏe, công việc của tôi nhiều năm qua. Tôi đã chuẩn bị tinh thần và quyết tâm cao bỏ thuốc để bảo vệ sức khỏe của mình và làm tròn trách nhiệm của một tuyên truyền viên về phòng, chống tác hại của thuốc lá.
 
 Quyết định bỏ thuốc lá ngay sau khi vào vai diễn tuyên truyền, đến nay sau 4 năm, anh Miền vẫn kiên trì, không hề tái nghiện và cũng đã tuyên truyền, động viên cho nhiều người xung quanh bỏ thuốc lá. Anh Miền cho biết thêm: Cho đến bây giờ, tôi may mắn, vinh dự vẫn được chương trình phòng, chống tác hại của thuốc lá chọn đóng vai trong các tiểu phẩm, được đồng hành cùng với đội tuyên truyền về nội dung rất ý nghĩa này. Bằng những gì thiết thực nhất, cả đội tuyên truyền chúng tôi đều muốn chuyển tải tới tất cả mọi người thông điệp nên bỏ thuốc vì sức khỏe của mình và người thân...
 
 Bản thân anh Miền, khi bỏ thuốc lá thành công cho đến ngày hôm nay anh đã cảm thấy rất vui mừng nhưng những người thân trong gia đình anh còn cảm thấy hạnh phúc hơn gấp bội lần. Chị Nguyễn Thị Duyên - vợ anh Miền vui mừng chia  sẻ: Tôi và các con tôi trước đây từng rất buồn khi khuyên nhủ nhiều lần nhưng anh Miền không bỏ được thuốc lá. Nhưng giờ gia đình tôi rất vui mừng, hạnh phúc vì anh Miền không còn hút thuốc lá, thuốc lào nữa. Công việc của anh phải nói, phải diễn, sau khi anh bỏ được thuốc lá, dù nói nhiều, hát nhiều nhưng anh không còn bị mất tiếng và ho như trước. Tại gia đình, không khí cũng trong lành, các con không còn phải hít khói thuốc thụ động. Món quà lớn nhất sau bỏ thuốc của chồng tôi đó là sức khỏe được cải thiện.`,
-  15: `Cai thuốc lá dù khó nhưng không phải là không thể nếu người muốn cai thuốc có quyết tâm cao, kiên trì đến cùng. Ngoài ra, người cai nghiện thuốc lá nên duy trì thói quen sinh hoạt lành mạnh, thường xuyên luyện tập thể thao, không nên thức khuya, duy trì việc ngủ đủ giấc và ngủ đúng giờ…
+  12: `Cai thuốc lá dù khó nhưng không phải là không thể nếu người muốn cai thuốc có quyết tâm cao, kiên trì đến cùng. Ngoài ra, người cai nghiện thuốc lá nên duy trì thói quen sinh hoạt lành mạnh, thường xuyên luyện tập thể thao, không nên thức khuya, duy trì việc ngủ đủ giấc và ngủ đúng giờ…
 Là một người có trình độ, thường xuyên cập nhật thông tin, anh Nguyễn Hiếu (sinh năm 1985), ở phường Liên Bảo, thành phố Vĩnh Yên, tỉnh Vĩnh Phúc biết rất rõ tác hại của thuốc lá. Tuy nhiên, để bỏ được thuốc lá lại là một câu chuyện khác.
  
 Anh Hiếu cho biết: “Tôi hút thuốc lá từ khi còn là sinh viên. Biết hút thuốc lá rất có hại cho sức khỏe nên đã nhiều lần tôi có ý định bỏ thuốc lá nhưng đều không thành công. Là kiến trúc sư, công việc của tôi khá căng thẳng, thường xuyên phải thức khuya để thiết kế mô hình, vẽ đồ án, đồ họa, những lúc ấy, hút thuốc lá giúp tôi tỉnh táo hơn, làm việc hiệu quả hơn. Tuy nhiên, tôi cũng tự tiết chế bản thân, cố gắng hút ít hơn…”.
@@ -375,7 +375,7 @@ Anh Hải cho biết: “Tôi nhận ra tác hại nghiêm trọng của thuốc
 Theo khuyến cáo của các bác sĩ, để cai thuốc lá thành công, không nên dừng hút thuốc một cách đột ngột, nên giảm lượng thuốc lá một cách từ từ và tiến tới bỏ hẳn. Như vậy, các cơn thèm thuốc cũng sẽ có thời gian giảm dần và tự điều chỉnh phù hợp với sức đề kháng của cơ thể. Khi có cảm giác thèm thuốc lá, có thể nhai các loại kẹo cao su có chất nicotine, kẹo cao su có vị bạc hà để đánh lạc hướng cảm giác.
  
 Người cai nghiện thuốc lá nên duy trì thói quen sinh hoạt lành mạnh, thường xuyên luyện tập thể thao, không nên thức khuya, duy trì việc ngủ đủ giấc và ngủ đúng giờ…/.`,
-  16: `VTV.vn - Sau 13 năm hút thuốc lá, anh Trần Văn Chiến đã từ bỏ thành công. Đây cũng chính là tấm gương cho những người còn chưa muốn rời xa khói thuốc.
+  13: `VTV.vn - Sau 13 năm hút thuốc lá, anh Trần Văn Chiến đã từ bỏ thành công. Đây cũng chính là tấm gương cho những người còn chưa muốn rời xa khói thuốc.
 Anh Trần Văn Chiến (Gia Lâm, Hà Nội) mới ngoài 30 tuổi nhưng anh đã từng hút thuốc lá tới 13 năm. Sau khi bỏ thuốc lá được 3 năm nay, anh Chiến cảm thấy rất khoẻ mạnh. Ngày xưa, anh hút thuốc rất nhiều, có thời điểm hút tới 2 bao thuốc trong một ngày.
 
 "Lý do tôi hút thuốc là do tuổi trẻ, cũng là vì sự tò mò và muốn tìm hiểu, cũng đua đòi bạn bè nên nhiều lúc tôi muốn thực. Sau khi thử, tôi cảm thấy nghiện nặng hơn" - anh Chiến nhớ lại. Anh cho biết, quãng thời gian 13 năm hút thuốc lá, anh cảm thấy sức khỏe ngày càng yếu hơn, sức đề kháng kém dẫn đến hay mắc các bệnh về đường hô hấp, cúm mùa. Nhiều lúc anh bị ho, viêm họng rất lâu và dài, khó điều trị.
@@ -388,7 +388,7 @@ Khi bỏ, buổi sáng thức dậy, anh Chiến rất thèm thuốc lá vì đ�
 Trong chương trình Sống khỏe mỗi ngày, PGS. TS. Phan Thu Phương khẳng định, việc bỏ thuốc lá là không bao giờ muộn đối với tất cả mọi người, vì việc dừng thói quen hút thuốc lá ở bất kỳ thời điểm nào trong cuộc sống thì đều có lợi cho sức khỏe. Vì thế, bạn bỏ thuốc lá càng sớm thì sẽ càng giảm nguy cơ bệnh tật.
 
 PGS. TS. Phan Thu Phương nhắn nhủ mọi người đang hút thuốc lá: Bỏ thuốc lá tuy khó nhưng không phải không bỏ được: "Bạn bỏ rất nhiều lần rồi, bạn đã từng bị tái nghiện rồi nhưng mà sẽ có lúc bạn đạt được đến thành công nếu bạn kiên trì, quyết tâm".`,
-  17: `Vì không muốn sức khỏe của các cháu bị ảnh hưởng bởi khói thuốc lá, ông Nguyễn Văn Ngư (Bắc Ninh) quyết tâm cai thuốc. 
+  14: `Vì không muốn sức khỏe của các cháu bị ảnh hưởng bởi khói thuốc lá, ông Nguyễn Văn Ngư (Bắc Ninh) quyết tâm cai thuốc. 
 
 Từ ngày Phạm Văn Ngư, 60 tuổi bỏ hẳn thuốc lá, người dân thôn Đồng Xoài, xã Đại Đồng, huyện Thuận Thành, Bắc Ninh dành nhiều lời khen cho ông. "Nhiều người bảo tôi phong độ, trẻ hơn so với tuổi thật, da dẻ hồng hào nữa. Các bà vợ trong xóm lấy tôi làm tấm gương cho chồng mình", ông Ngư nói.
 
@@ -418,14 +418,14 @@ Theo thống kê của WHO, trên thế giới, 90% bệnh nhân bị bệnh ph�
 Tại Việt Nam, theo thống kê của các bệnh viện, 96,8% các ca bệnh nhân bị bệnh phổi do thuốc lá gây ra. Người hút thuốc có nguy cơ mắc ung thư phổi cao gấp 22 lần so vói người bình thường, cứ 5 người hút thuốc thì có một người mắc bệnh phổi tắc nghẽn mạn tính, khó chữa trị.
 
 `,
-  18: `Nếu bạn đang tìm kiếm cách để bỏ thuốc lá thì một trong những cách đơn giản và dễ làm nhất là tập thể dục. Theo một nghiên cứu mới, tập thể dục có thể giúp ích cho việc cai thuốc lá.
+  15: `Nếu bạn đang tìm kiếm cách để bỏ thuốc lá thì một trong những cách đơn giản và dễ làm nhất là tập thể dục. Theo một nghiên cứu mới, tập thể dục có thể giúp ích cho việc cai thuốc lá.
 Trang Medical News Today dẫn nghiên cứu trên cho thấy hút thuốc không tốt đối với chúng ta, nhưng việc bỏ hút thuốc có thể rất khó khăn. Các triệu chứng cai thuốc như khó chịu, khó ngủ, hoặc thậm chí trầm cảm thường xảy ra ở những người đấu tranh với cai nghiện thuốc lá.
 Tập thể dục được biết là cách làm giảm các triệu chứng cai nghiện nicotine. Các nghiên cứu cũ đã chỉ ra rằng thậm chí một đợt tập thể dục vừa phải trong 10 phút ngắn cũng có thể có những tác động tức thời trong việc làm giảm thèm muốn thuốc lá. Còn theo nghiên cứu mới này, tập thể dục ảnh hưởng đến sự thèm muốn nicotin ở chuột.
 Tiến sĩ Alexis Bailey, giảng viên cao cấp về dược lý thần kinh học tại Đại học St George ở London (Anh), là tác giả của nghiên cứu, và phát hiện này đã được đăng trên Tạp chí Dược học Anh quốc.
 Bác sĩ Bailey và nhóm của ông đã điều trị chuột với nicotine trong 14 ngày, sau đó cho chúng thực hiện một trong ba chế độ chạy bánh xe: 24 giờ mỗi ngày, 2 giờ mỗi ngày, hoặc không tập thể dục.
 Vào ngày thứ 14, các nhà nghiên cứu đã đánh giá các triệu chứng cai nghiện của động vật gặm nhấm. Các phần não của chuột cũng được phân tích và phát hiện ra rằng "những con chuột được điều trị bằng nicotine thực hiện hoạt động trên bánh xe 2 giờ hoặc 24 giờ có sự giảm đáng kể triệu chứng cai nghiện thuốc so với nhóm thụ động".
 Ngoài ra, ở những con chuột có tập thể dục, các nhà nghiên cứu thấy sự gia tăng hoạt động của một loại thụ thể nicotine não gọi là alpha7 nicotinic acetylcholine. Các thụ thể ở hippocampus của chuột, một vùng não liên quan đến việc tạo ra những ký ức mới và liên quan đến rối loạn tâm trạng.`,
-  19: `(Dân trí) - Không ai phủ nhận "cai" thuốc lá là một việc khó, tuy nhiên nếu hiểu rõ bỏ thuốc có tác dụng như thế nào, chắc chắn các đấng mày râu sẽ có thêm động lực để bớt mặn mà với thuốc.
+  16: `(Dân trí) - Không ai phủ nhận "cai" thuốc lá là một việc khó, tuy nhiên nếu hiểu rõ bỏ thuốc có tác dụng như thế nào, chắc chắn các đấng mày râu sẽ có thêm động lực để bớt mặn mà với thuốc.
 Giáo sư Elizabeth Krall và các cộng sự trong tổ chức chăm sóc sức khỏe ở trường ĐH Dental Medicine (Boston) đã tiến hành thu thập dữ liệu, nghiên cứu từ những năm 1960. Trong số hơn 2.200 quý ông tham gia nghiên cứu, các nhà khoa học đã phát hiện ra có 483 người đã từng hút và bỏ thuốc lá. Nhìn chung, những người này đều bắt đầu hút thuốc khi còn ở độ tuổi teen và trong khoảng 30 năm tiếp theo, cứ bình quân họ phải hút hết 1 gói/ngày.
 
  
@@ -463,7 +463,7 @@ Các nhà nghiên cứu cũng phát hiện ra rằng, những người uống nh
  
 
 Hầu hết mọi người đều cố gắng để bỏ thuốc 5 đến 7 lần mới đi đến thành công. Các nhà nghiên cứu khuyên rằng, nên tự tin vào khả năng chấm dứt thuốc lá của mình bởi lẽ không gì có lợi cho sức khỏe của bạn hơn là ngừng hút thuốc lá.`,
-  20: `Lời chia sẻ khiêm tốn của anh Lê Đình Thung (bảo vệ cổng sau bệnh viện quận 5, năm nay đã 56 tuổi) về hành trình cai nghiện thuốc lá với những lần thất bại và vượt qua những lần cám dỗ, mời gọi hút thuốc lá của bạn bè trong những lúc trà dư tửu hậu. Chính vì điều đó, anh luôn tự nhắc nhở bản thân phải luôn kiên trì không tái nghiện thuốc lá hàng giờ, hàng ngày. Theo anh, cai nghiện thuốc lá là phải cai nghiện lâu dài, bền bỉ và kiên trì.
+  17: `Lời chia sẻ khiêm tốn của anh Lê Đình Thung (bảo vệ cổng sau bệnh viện quận 5, năm nay đã 56 tuổi) về hành trình cai nghiện thuốc lá với những lần thất bại và vượt qua những lần cám dỗ, mời gọi hút thuốc lá của bạn bè trong những lúc trà dư tửu hậu. Chính vì điều đó, anh luôn tự nhắc nhở bản thân phải luôn kiên trì không tái nghiện thuốc lá hàng giờ, hàng ngày. Theo anh, cai nghiện thuốc lá là phải cai nghiện lâu dài, bền bỉ và kiên trì.
 
 Lời chia sẻ khiêm tốn của anh Lê Đình Thung (bảo vệ cổng sau bệnh viện quận 5, năm nay đã 56 tuổi) về hành trình cai nghiện thuốc lá với những lần thất bại và vượt qua những lần cám dỗ, mời gọi hút thuốc lá của bạn bè trong những lúc trà dư tửu hậu. Chính vì điều đó, anh luôn tự nhắc nhở bản thân phải luôn kiên trì không tái nghiện thuốc lá hàng giờ, hàng ngày. Theo anh, cai nghiện thuốc lá là phải cai nghiện lâu dài, bền bỉ và kiên trì.
 

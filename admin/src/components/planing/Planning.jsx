@@ -225,7 +225,6 @@ function PlanPage() {
   const user = useSelector((state) => state.user);
   const accountId = localStorage.getItem("accountId");
 
-
   useEffect(() => {
     if (!accountId) {
       navigate("/login");
@@ -472,7 +471,7 @@ function PlanPage() {
                 type="number"
                 name="started_smoking_age"
                 min="10"
-                max="100"
+                max="50"
                 value={form.started_smoking_age}
                 onChange={handleChange}
                 className="planpage-input"
@@ -487,7 +486,7 @@ function PlanPage() {
                 type="number"
                 name="cigarettes_per_day"
                 min="1"
-                max="100"
+                max="50"
                 value={form.cigarettes_per_day}
                 onChange={handleChange}
                 className="planpage-input"
@@ -567,7 +566,7 @@ function PlanPage() {
                 type="number"
                 name="quitAttempts"
                 min="0"
-                max="100"
+                max="10"
                 value={form.quitAttempts}
                 onChange={handleChange}
                 className="planpage-input"

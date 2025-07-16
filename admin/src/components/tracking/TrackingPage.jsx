@@ -540,6 +540,13 @@ const TrackingPage = () => {
       return;
     }
 
+    // ✅ Thêm validation số lượng
+    const cigarettes = parseInt(todayData.cigarettes_smoked);
+    if (cigarettes < 0 || cigarettes > 50) {
+      message.error("Số điếu thuốc phải từ 0 đến 50.");
+      return;
+    }
+
     setIsConfirmModalVisible(true);
   };
 
@@ -909,13 +916,38 @@ const TrackingPage = () => {
             <input
               type="number"
               min="0"
+              max="50"
               value={todayData.cigarettes_smoked}
-              onChange={(e) =>
-                handleInputChange("cigarettes_smoked", e.target.value)
-              }
-              placeholder="Nhập số điếu"
+              onChange={(e) => {
+                const value = e.target.value;
+
+                // ✅ Validation đơn giản: chỉ cho phép 0-50
+                if (
+                  value === "" ||
+                  (parseInt(value) >= 0 && parseInt(value) <= 50)
+                ) {
+                  handleInputChange("cigarettes_smoked", value);
+                }
+              }}
+              placeholder="Nhập số điếu (0-50)"
               className="quit-tracking-form-input"
             />
+
+            {/* ✅ Hiển thị lỗi validation */}
+            {todayData.cigarettes_smoked &&
+              (parseInt(todayData.cigarettes_smoked) < 0 ||
+                parseInt(todayData.cigarettes_smoked) > 50) && (
+                <div
+                  style={{
+                    color: "#ff4d4f",
+                    fontSize: "12px",
+                    marginTop: "4px",
+                    fontStyle: "italic",
+                  }}
+                >
+                  ⚠️ Số điếu phải từ 0 đến 50
+                </div>
+              )}
           </div>
 
           <div className="quit-tracking-form-group">
@@ -950,7 +982,11 @@ const TrackingPage = () => {
               size="large"
               loading={submitting}
               onClick={showConfirmModal}
-              disabled={!todayData.cigarettes_smoked}
+              disabled={
+                !todayData.cigarettes_smoked ||
+                parseInt(todayData.cigarettes_smoked) < 0 ||
+                parseInt(todayData.cigarettes_smoked) > 50
+              }
             >
               💾 Lưu dữ liệu
             </Button>

@@ -39,33 +39,32 @@ import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 
-
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
       children: [
-        // Trang công khai (không cần đăng nhập)
+        // ================ TRANG CÔNG KHAI ================
         {
-          path: "/login",
+          path: "login",
           element: <LoginPage />,
         },
         {
-          path: "/register",
+          path: "register",
           element: <RegisterPage />,
         },
         {
-          path: "/forgot-password",
+          path: "forgot-password",
           element: <ForgotPasswordForm />,
         },
         {
-          path: "/unauthorized",
+          path: "unauthorized",
           element: <Unauthorized />,
         },
 
-        // Trang chủ - chỉ cho STAFF, GUEST, CUSTOMER
+        // ================ TRANG CHỦ MẶC ĐỊNH ================
         {
-          path: "/",
+          index: true, // ✅ Đây là trang mặc định khi truy cập "/"
           element: (
             <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
               <HomePage />
@@ -73,9 +72,9 @@ function App() {
           ),
         },
 
-        // Các trang dành cho STAFF, GUEST, CUSTOMER
+        // ================ CÁC TRANG CHÍNH ================
         {
-          path: "/blog",
+          path: "blog",
           element: (
             <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
               <BlogPage />
@@ -83,7 +82,7 @@ function App() {
           ),
         },
         {
-          path: "/blog/:id",
+          path: "blog/:id",
           element: (
             <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
               <BlogDetail />
@@ -91,7 +90,7 @@ function App() {
           ),
         },
         {
-          path: "/ranking",
+          path: "ranking",
           element: (
             <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
               <RankingPage />
@@ -99,7 +98,7 @@ function App() {
           ),
         },
         {
-          path: "/planning",
+          path: "planning",
           element: (
             <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
               <PlanPage />
@@ -107,7 +106,7 @@ function App() {
           ),
         },
         {
-          path: "/booking",
+          path: "booking",
           element: (
             <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
               <BookingPage />
@@ -115,9 +114,9 @@ function App() {
           ),
         },
 
-        // Trang dành cho GUEST, CUSTOMER (không có STAFF)
+        // ================ TRANG DÀNH CHO GUEST, CUSTOMER ================
         {
-          path: "/tracking",
+          path: "tracking",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <Tracking />
@@ -125,7 +124,7 @@ function App() {
           ),
         },
         {
-          path: "/viewsurvey",
+          path: "viewsurvey",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <ViewSurvey />
@@ -133,7 +132,7 @@ function App() {
           ),
         },
         {
-          path: "/viewadvise",
+          path: "viewadvise",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <ViewAdvise />
@@ -141,7 +140,7 @@ function App() {
           ),
         },
         {
-          path: "/history-transactions",
+          path: "history-transactions",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <HistoryPayment />
@@ -149,7 +148,7 @@ function App() {
           ),
         },
         {
-          path: "/payment",
+          path: "payment",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <PaymentPage />
@@ -157,7 +156,7 @@ function App() {
           ),
         },
         {
-          path: "/payment-result",
+          path: "payment-result",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <PaymentResult />
@@ -165,7 +164,7 @@ function App() {
           ),
         },
         {
-          path: "/payment-success",
+          path: "payment-success",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <PaymentResult />
@@ -173,7 +172,7 @@ function App() {
           ),
         },
         {
-          path: "/payment-fail",
+          path: "payment-fail",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <PaymentResult />
@@ -181,7 +180,7 @@ function App() {
           ),
         },
         {
-          path: "/suggest-planing",
+          path: "suggest-planing",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <SuggestPlaning />
@@ -189,7 +188,7 @@ function App() {
           ),
         },
         {
-          path: "/create-planning",
+          path: "create-planning",
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <CreatePlanning />
@@ -197,9 +196,9 @@ function App() {
           ),
         },
 
-        // Trang chung cho tất cả role đã đăng nhập
+        // ================ TRANG CHUNG CHO TẤT CẢ ROLE ================
         {
-          path: "/profile",
+          path: "profile",
           element: (
             <ProtectedRoute
               allowedRoles={["STAFF", "GUEST", "CUSTOMER", "COACH", "ADMIN"]}
@@ -209,7 +208,7 @@ function App() {
           ),
         },
         {
-          path: "/noti",
+          path: "noti",
           element: (
             <ProtectedRoute
               allowedRoles={["STAFF", "GUEST", "CUSTOMER", "COACH", "ADMIN"]}
@@ -219,9 +218,9 @@ function App() {
           ),
         },
 
-        // Dashboard - chỉ cho ADMIN, STAFF
+        // ================ DASHBOARD ADMIN/STAFF ================
         {
-          path: "/dashboard",
+          path: "dashboard",
           element: (
             <ProtectedRoute allowedRoles={["ADMIN", "STAFF"]}>
               <Dashboard />
@@ -255,9 +254,9 @@ function App() {
           ],
         },
 
-        // Dashboard Coach - chỉ cho COACH
+        // ================ DASHBOARD COACH ================
         {
-          path: "/dashboard-coach",
+          path: "dashboard-coach",
           element: (
             <ProtectedRoute allowedRoles={["COACH"]}>
               <CoachDashboard />

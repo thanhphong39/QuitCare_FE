@@ -58,7 +58,7 @@ const Navbar = () => {
           console.log("✅ Gói là Premium → Hiện nút ĐẶT LỊCH");
           setShowBooking(true);
         } else {
-          console.log("ℹ️ Không phải gói Premium.");
+          console.log("ℹ️ Không có gói Premium tương ứng.");
         }
   
       } catch (err) {

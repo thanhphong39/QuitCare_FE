@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Modal,
   Button,
@@ -64,7 +65,9 @@ const SYMPTOM_MESSAGES = {
     "Cai thuốc có thể làm chậm tiêu hóa. Hãy uống đủ nước và ăn nhiều rau xanh, thực phẩm giàu chất xơ.",
 };
 
+
 const TrackingPage = () => {
+  const user = useSelector((state) => state.user);
   const accountId = localStorage.getItem("accountId");
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -89,7 +92,55 @@ const TrackingPage = () => {
     useState(false);
   const [completionData, setCompletionData] = useState(null);
   const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
-
+  const [showBooking, setShowBooking] = useState(false);
+  
+  useEffect(() => {
+    const fetchMembershipPlan = async () => {
+      
+      try {
+        if (!user?.id) {
+          console.log("⚠️ Không có accountId.");
+          return;
+        }
+  
+        console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
+  
+        const historyRes = await api.get(`/v1/payments/history/account/${user.id}`);
+        const transactions = historyRes.data || [];
+        console.log("📦 Danh sách giao dịch:", transactions);
+  
+        const successfulTransaction = transactions.find(tx => tx.status === "SUCCESS");
+  
+        if (!successfulTransaction) {
+          console.log("⛔ Không tìm thấy giao dịch SUCCESS.");
+          return;
+        }
+  
+        const { amountPaid } = successfulTransaction;
+        console.log("💵 amountPaid từ giao dịch:", amountPaid);
+  
+        const planRes = await api.get(`/membership-plans`);
+        const allPlans = planRes.data || [];
+        console.log("📋 Danh sách gói:", allPlans);
+  
+        const matchedPlan = allPlans.find(plan => Math.abs(plan.price - amountPaid) < 1);
+        console.log("🎯 Gói khớp:", matchedPlan);
+  
+        if (matchedPlan?.name === "Premium") {
+          console.log("✅ Gói là Premium → Hiện nút ĐẶT LỊCH");
+          setShowBooking(true);
+        } else {
+          console.log("ℹ️ Không phải gói Premium.");
+        }
+  
+      } catch (err) {
+        console.error("❌ Lỗi khi lấy membership:", err);
+      }
+    };
+  
+    fetchMembershipPlan();
+  }, [user?.id]);
+  
   // Thêm test mode - chỉnh true/false tùy ý
   const isTestMode = true; // Đặt true khi muốn test, false khi production
 
@@ -365,11 +416,16 @@ const TrackingPage = () => {
   };
 
   // Kiểm tra triệu chứng thường xuyên
-  const checkFrequentSymptoms = (dayKey, smoked, targetCigs) => {
+  const checkFrequentSymptoms = (dayKey, smoked, targetCigs, showBooking) => {
     const symptomsToday = todayData.symptoms || [];
     const checkedSymptoms = symptomsToday.filter((symptom) => symptom);
-
-    // Logic 1: Kiểm tra >= 3 triệu chứng trong ngày hiện tại
+  
+    // Tạo nội dung hỗ trợ (dựa vào quyền)
+    const supportContent = showBooking
+      ? `Nếu bạn cảm thấy cần hỗ trợ thêm, đừng ngần ngại <a href="${BOOKING_LINK}" target="_blank" style="color: #007bff; text-decoration: underline;">đặt lịch tư vấn với chuyên gia</a> của chúng tôi.`
+      : `Nếu bạn cảm thấy cần hỗ trợ thêm, hãy <strong>nâng cấp gói</strong> để nhận tư vấn từ chuyên gia.`;
+  
+    // --- Logic 1 ---
     if (checkedSymptoms.length >= 3) {
       return {
         hasFrequentSymptoms: true,
@@ -377,52 +433,47 @@ const TrackingPage = () => {
           <strong>🌟 Bạn đang gặp nhiều triệu chứng hôm nay</strong><br/>
           Chúng tôi hiểu rằng việc cai thuốc có thể khiến bạn cảm thấy khó chịu. Những triệu chứng này là hoàn toàn bình thường và cho thấy cơ thể đang điều chỉnh để thích nghi với việc không có nicotine.<br/><br/>
           <strong>💡 Đừng lo lắng:</strong> Hầu hết các triệu chứng sẽ giảm dần trong vài tuần tới. Hãy nhớ rằng mỗi ngày bạn kiên trì là một bước tiến lớn cho sức khỏe!<br/><br/>
-          Nếu bạn cảm thấy cần hỗ trợ thêm, đừng ngần ngại <a href="${BOOKING_LINK}" target="_blank" style="color: #007bff; text-decoration: underline;">đặt lịch tư vấn với chuyên gia</a> của chúng tôi.<br/><br/>
+          ${supportContent}<br/><br/>
           <strong>🎯 Bạn đang làm rất tốt! Hãy tiếp tục kiên trì nhé! 💪</strong>
         </div>`,
       };
     }
-
-    // Logic 2: Kiểm tra triệu chứng kéo dài qua nhiều ngày
-    const dayKeys = Object.keys(trackingData).sort((a, b) => {
-      return new Date(a) - new Date(b);
-    });
-
+  
+    // --- Logic 2 ---
+    const dayKeys = Object.keys(trackingData).sort((a, b) => new Date(a) - new Date(b));
+  
     for (const symptom of checkedSymptoms) {
       let consecutive = 0;
-
-      // Đếm số ngày liên tiếp có triệu chứng này (bao gồm cả ngày hôm nay)
+  
       for (let i = dayKeys.length - 1; i >= 0; i--) {
         const dayData = trackingData[dayKeys[i]];
         if (dayData && dayData.symptoms && dayData.symptoms.includes(symptom)) {
           consecutive++;
         } else if (dayData && dayData.symptoms && dayData.symptoms.length > 0) {
-          // Nếu có dữ liệu triệu chứng nhưng không có triệu chứng này thì dừng đếm
           break;
         }
       }
-
-      // Thêm ngày hôm nay vào đếm nếu có triệu chứng này
+  
       if (checkedSymptoms.includes(symptom)) {
         consecutive++;
       }
-
-      // Nếu triệu chứng kéo dài >= 3 ngày liên tiếp
+  
       if (consecutive >= 3) {
         return {
           hasFrequentSymptoms: true,
           content: `<div style="margin: 12px 0; padding: 12px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;">
             <strong>📌 Chú ý: Triệu chứng "${SYMPTOMS[symptom]}" kéo dài</strong><br/>
             Chúng tôi nhận thấy triệu chứng này đã xuất hiện liên tiếp ${consecutive} ngày. Mặc dù đây có thể là phần của quá trình cai thuốc, nhưng chúng tôi khuyến nghị bạn nên tham khảo ý kiến chuyên gia để được hỗ trợ tốt nhất.<br/><br/>
-            <strong>🩺 Lời khuyên:</strong> Hãy <a href="${BOOKING_LINK}" target="_blank" style="color: #007bff; text-decoration: underline;">đặt lịch tư vấn với bác sĩ</a> để được đánh giá và tư vấn cách giảm thiểu triệu chứng này một cách hiệu quả.<br/><br/>
+            <strong>🩺 Lời khuyên:</strong> ${supportContent}<br/><br/>
             <em>Sức khỏe của bạn là ưu tiên hàng đầu! 🌟</em>
           </div>`,
         };
       }
     }
-
+  
     return { hasFrequentSymptoms: false, content: "" };
   };
+  
 
   // Hiển thị popup thành công
   const showSuccessPopup = (smoked, target, isTestData = false) => {

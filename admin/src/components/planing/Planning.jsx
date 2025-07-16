@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import api from "../../configs/axios";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux"; // ✅ Thêm useSelector
+import { useSelector } from "react-redux";
 import Footer from "../footer/Footer";
 import Navbar from "../navbar/Navbar";
 import { Input, Radio, Modal } from "antd";
 import "./Planning.css";
 import planningBanner from "../../assets/images/planning1.png";
 
+// ================ CONSTANTS & INITIAL STATE ================
 const initialState = {
   started_smoking_age: "",
   cigarettes_per_day: "",
@@ -22,19 +23,15 @@ const initialState = {
   quitReasons: "",
 };
 
+// ================ MAPPING FUNCTIONS ================
 const mapTime = (value) => {
-  switch (value) {
-    case "≤5 phút":
-      return "LESS_THAN_5_MIN";
-    case "6–30 phút":
-      return "BETWEEN_6_AND_30_MIN";
-    case "31–60 phút":
-      return "BETWEEN_31_AND_60_MIN";
-    case ">60 phút":
-      return "MORE_THAN_60_MIN";
-    default:
-      return "";
-  }
+  const timeMap = {
+    "≤5 phút": "LESS_THAN_5_MIN",
+    "6–30 phút": "BETWEEN_6_AND_30_MIN",
+    "31–60 phút": "BETWEEN_31_AND_60_MIN",
+    ">60 phút": "MORE_THAN_60_MIN",
+  };
+  return timeMap[value] || "";
 };
 
 const mapQuitAttempts = (value) => {
@@ -45,80 +42,61 @@ const mapQuitAttempts = (value) => {
 };
 
 const mapDuration = (value) => {
-  switch (value) {
-    case "LESS_THAN_1_DAY":
-      return "LESS_THAN_1_DAY";
-    case "BETWEEN_1_AND_3_DAYS":
-      return "BETWEEN_1_AND_3_DAYS";
-    case "ONE_WEEK":
-      return "ONE_WEEK";
-    case "MORE_THAN_ONE_WEEK":
-      return "MORE_THAN_ONE_WEEK";
-    default:
-      return "";
-  }
+  const durationMap = {
+    LESS_THAN_1_DAY: "LESS_THAN_1_DAY",
+    BETWEEN_1_AND_3_DAYS: "BETWEEN_1_AND_3_DAYS",
+    ONE_WEEK: "ONE_WEEK",
+    MORE_THAN_ONE_WEEK: "MORE_THAN_ONE_WEEK",
+  };
+  return durationMap[value] || "";
 };
 
 const mapTimeline = (value) => {
-  switch (value) {
-    case "7 ngày":
-      return "ONEWEEK";
-    case "1 tháng":
-      return "ONEMONTH";
-    case "3 tháng":
-      return "THREEMONTH";
-    case "5 tháng":
-      return "FIVEMONTH";
-    case "Chưa chắc":
-      return "UNKNOWN";
-    default:
-      return "";
-  }
+  const timelineMap = {
+    "7 ngày": "ONEWEEK",
+    "1 tháng": "ONEMONTH",
+    "3 tháng": "THREEMONTH",
+    "5 tháng": "FIVEMONTH",
+    "Chưa chắc": "UNKNOWN",
+  };
+  return timelineMap[value] || "";
 };
 
 const mapReadiness = (value) => {
-  switch (value) {
-    case "Chưa sẵn sàng":
-      return "NOTREADY";
-    case "Đang cân nhắc":
-      return "UNDERCONSIDERATION";
-    case "Rất sẵn sàng":
-      return "ALREADY";
-    default:
-      return "";
-  }
+  const readinessMap = {
+    "Chưa sẵn sàng": "NOTREADY",
+    "Đang cân nhắc": "UNDERCONSIDERATION",
+    "Rất sẵn sàng": "ALREADY",
+  };
+  return readinessMap[value] || "";
 };
 
+// ================ BUSINESS LOGIC FUNCTIONS ================
 // Hàm đánh giá mức độ nghiện thuốc lá
 function calcAddictionLevel(form) {
-  let cigarettes = parseInt(form.cigarettes_per_day, 10);
+  // Tính điểm cho số điếu/ngày
+  const cigarettes = parseInt(form.cigarettes_per_day, 10);
   let pointCig = 0;
   if (cigarettes <= 10) pointCig = 0;
   else if (cigarettes <= 20) pointCig = 1;
   else if (cigarettes <= 30) pointCig = 2;
   else pointCig = 3;
 
+  // Tính điểm cho thời gian hút điếu đầu tiên
   let pointTime = 0;
-  switch (form.timeToFirstCigarette) {
-    case "≤5 phút":
-      pointTime = 3;
-      break;
-    case "6–30 phút":
-      pointTime = 2;
-      break;
-    case "31–60 phút":
-      pointTime = 1;
-      break;
-    case ">60 phút":
-      pointTime = 0;
-      break;
-    default:
-      pointTime = 0;
-  }
+  const timeMap = {
+    "≤5 phút": 3,
+    "6–30 phút": 2,
+    "31–60 phút": 1,
+    ">60 phút": 0,
+  };
+  pointTime = timeMap[form.timeToFirstCigarette] || 0;
 
+  // Tính tổng điểm và xác định mức độ
   const total = pointCig + pointTime;
   let level = "";
   let message = "";
+
   if (total <= 2) {
     level = "Nhẹ";
     message =
@@ -132,6 +110,7 @@ function calcAddictionLevel(form) {
     message =
       "Bạn có mức độ nghiện thuốc lá cao. Đừng nản lòng, hãy kiên trì và tìm kiếm sự hỗ trợ từ gia đình, bạn bè hoặc chuyên gia. Bạn chắc chắn sẽ làm được!";
   }
+
   return {
     total,
     level,
@@ -140,24 +119,21 @@ function calcAddictionLevel(form) {
   };
 }
 
-// Thêm hàm tính toán kế hoạch đề xuất
+// Hàm tính toán kế hoạch đề xuất
 const generateSuggestedPlan = (form) => {
   const cigarettesPerDay = parseInt(form.cigarettes_per_day);
   const addictionLevel = calcAddictionLevel(form);
-
-  // Tính toán các giai đoạn dựa trên số điếu/ngày theo công thức mới
   const stages = [];
-  let currentCigarettes = cigarettesPerDay;
 
-  // Giai đoạn 1: Giảm 50% N
-  const stage1Target = Math.max(1, Math.ceil(currentCigarettes * 0.5));
+  // Giai đoạn 1: Giảm 50% số điếu ban đầu
+  const stage1Target = Math.max(1, Math.ceil(cigarettesPerDay * 0.5));
   stages.push({
     stageNumber: 1,
     week_range: "Tuần 1 - 4",
     targetCigarettes: stage1Target,
   });
 
-  // Giai đoạn 2: Giảm 75% N (từ số ban đầu)
+  // Giai đoạn 2: Giảm 75% số điếu ban đầu
   const stage2Target = Math.max(1, Math.ceil(cigarettesPerDay * 0.25));
   stages.push({
     stageNumber: 2,
@@ -165,7 +141,7 @@ const generateSuggestedPlan = (form) => {
     targetCigarettes: stage2Target,
   });
 
-  // Giai đoạn 3: Giảm 87.5% N (từ số ban đầu)
+  // Giai đoạn 3: Giảm 87.5% số điếu ban đầu
   const stage3Target = Math.max(1, Math.ceil(cigarettesPerDay * 0.125));
   stages.push({
     stageNumber: 3,
@@ -173,15 +149,16 @@ const generateSuggestedPlan = (form) => {
     targetCigarettes: stage3Target,
   });
 
-  // Giai đoạn 4: Nếu số điếu <= 1 → Giai đoạn bỏ hoàn toàn
+  // Giai đoạn 4: Quyết định dựa trên giai đoạn 3
   if (stage3Target <= 1) {
+    // Nếu giai đoạn 3 đã xuống 1 điếu, giai đoạn 4 sẽ cai hoàn toàn
     stages.push({
       stageNumber: 4,
       week_range: "Tuần 13 - 16",
       targetCigarettes: 0,
     });
   } else {
-    // Nếu vẫn > 1, tiếp tục giảm xuống 1 điếu
+    // Nếu chưa, giảm xuống 1 điếu trước
     stages.push({
       stageNumber: 4,
       week_range: "Tuần 13 - 16",
@@ -209,44 +186,41 @@ const generateSuggestedPlan = (form) => {
   };
 };
 
+// ================ MAIN COMPONENT ================
 function PlanPage() {
+  // ================ STATE MANAGEMENT ================
   const [form, setForm] = useState(initialState);
   const [showChoice, setShowChoice] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [addictionInfo, setAddictionInfo] = useState(null);
-
-  // ✅ Thêm modal cho GUEST
   const [showGuestModal, setShowGuestModal] = useState(false);
 
+  // ================ HOOKS ================
   const navigate = useNavigate();
-
-  // ✅ Lấy thông tin user từ Redux
   const user = useSelector((state) => state.user);
   const accountId = localStorage.getItem("accountId");
 
+  // ================ EFFECTS ================
   useEffect(() => {
     if (!accountId) {
       navigate("/login");
       return;
     }
 
-    // ✅ Kiểm tra role khi component mount
-    if (
-      !user ||
-      (user.role !== "CUSTOMER" &&
-        user.role !== "GUEST" &&
-        user.role !== "STAFF")
-    ) {
+    // Kiểm tra phân quyền
+    if (!user || !["CUSTOMER", "GUEST", "STAFF"].includes(user.role)) {
       setError("Bạn không có quyền truy cập trang này.");
       setLoading(false);
       return;
     }
 
+    // Kiểm tra kế hoạch hiện có
     async function checkPlan() {
       try {
         const res = await api.get(`/v1/customers/${accountId}/quit-plans`);
         if (res.data && typeof res.data === "object" && res.data.id) {
+          // Đã có kế hoạch, chuyển hướng theo loại kế hoạch
           if (res.data.systemPlan === false) {
             navigate("/create-planning");
           } else {
@@ -255,71 +229,56 @@ function PlanPage() {
           return;
         }
       } catch (err) {
-        if (err?.response?.status === 404) {
-          setLoading(false);
-        } else {
-          setLoading(false);
-        }
+        // Chưa có kế hoạch hoặc lỗi API
+        setLoading(false);
       }
     }
+
     checkPlan();
   }, [accountId, navigate, user]);
 
+  // ================ EVENT HANDLERS ================
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     setForm({ ...form, [name]: value });
     setError("");
-  };
-
-  const isFilled = () => {
-    return (
-      form.started_smoking_age &&
-      form.cigarettes_per_day &&
-      form.cigarettes_per_pack &&
-      form.timeToFirstCigarette &&
-      form.quitAttempts !== "" &&
-      form.longestQuitDuration &&
-      form.cravingWithoutSmoking !== "" &&
-      form.triggerSituation &&
-      form.quitIntentionTimeline &&
-      form.readinessLevel &&
-      form.quitReasons !== ""
-    );
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // ✅ Kiểm tra phân quyền trước khi xử lý
+    // Kiểm tra đăng nhập
     if (!user) {
       setError("Vui lòng đăng nhập để sử dụng chức năng này.");
       return;
     }
 
+    // Kiểm tra GUEST
     if (user.role === "GUEST") {
-      // ✅ GUEST chỉ được xem form, không được sử dụng
       setShowGuestModal(true);
       return;
     }
 
+    // Kiểm tra CUSTOMER
     if (user.role !== "CUSTOMER") {
       setError("Chỉ khách hàng mới có thể sử dụng chức năng này.");
       return;
     }
 
+    // Kiểm tra form đầy đủ
     if (!isFilled()) {
       setError("Vui lòng nhập đầy đủ tất cả các thông tin!");
       return;
     }
 
-    // Đánh giá mức độ nghiện và lưu vào state
+    // Đánh giá mức độ nghiện và hiển thị lựa chọn
     const addiction = calcAddictionLevel(form);
     setAddictionInfo(addiction);
     setShowChoice(true);
   };
 
   const handlePlanChoice = async (type) => {
-    // ✅ Double check phân quyền
+    // Double check phân quyền
     if (!user || user.role !== "CUSTOMER") {
       setError("Chỉ khách hàng mới có thể tạo kế hoạch cai thuốc.");
       setShowChoice(false);
@@ -332,11 +291,13 @@ function PlanPage() {
       setLoading(true);
 
       if (type === "recommend") {
+        // Kế hoạch đề xuất từ hệ thống
         const suggestedPlan = generateSuggestedPlan(form);
         localStorage.setItem("planSurvey", JSON.stringify(form));
         localStorage.setItem("suggestedPlan", JSON.stringify(suggestedPlan));
         navigate("/suggest-planing");
       } else {
+        // Kế hoạch tự lập
         const payload = {
           started_smoking_age: parseInt(form.started_smoking_age),
           cigarettes_per_day: parseInt(form.cigarettes_per_day),
@@ -377,33 +338,31 @@ function PlanPage() {
     }
   };
 
-  // ✅ Hàm xử lý upgrade account
   const handleUpgradeAccount = () => {
     setShowGuestModal(false);
     navigate("/");
   };
 
-  // ✅ Tạo helper function
-  // const isDisabled = () => {
-  //   if (!user) {
-  //     console.log("🔒 Disabled: No user");
-  //     return true;
-  //   }
+  // ================ HELPER FUNCTIONS ================
+  const isFilled = () => {
+    return (
+      form.started_smoking_age &&
+      form.cigarettes_per_day &&
+      form.cigarettes_per_pack &&
+      form.timeToFirstCigarette &&
+      form.quitAttempts !== "" &&
+      form.longestQuitDuration &&
+      form.cravingWithoutSmoking !== "" &&
+      form.triggerSituation &&
+      form.quitIntentionTimeline &&
+      form.readinessLevel &&
+      form.quitReasons !== ""
+    );
+  };
 
-  //   if (user.role === "GUEST") {
-  //     console.log("🔒 Disabled: GUEST role");
-  //     return true;
-  //   }
+  const isFieldDisabled = () => user && user.role === "GUEST";
 
-  //   if (user.role === "CUSTOMER") {
-  //     console.log("✅ Enabled: CUSTOMER role");
-  //     return false;
-  //   }
-
-  //   console.log("🔒 Disabled: Unknown role:", user.role);
-  //   return true;
-  // };
-
+  // ================ RENDER CONDITIONS ================
   if (loading) {
     return (
       <>
@@ -416,9 +375,12 @@ function PlanPage() {
     );
   }
 
+  // ================ MAIN RENDER ================
   return (
     <>
       <Navbar />
+
+      {/* Banner Section */}
       <div className="planpage-banner">
         <img
           src={planningBanner}
@@ -436,7 +398,7 @@ function PlanPage() {
       </div>
 
       <div className="planpage-container">
-        {/* ✅ Hiển thị cảnh báo cho GUEST */}
+        {/* Guest Warning */}
         {user && user.role === "GUEST" && (
           <div
             style={{
@@ -460,10 +422,15 @@ function PlanPage() {
           </div>
         )}
 
+        {/* Form Title */}
         <h2 className="planpage-title">📋 Thông tin khảo sát cai thuốc lá</h2>
+
+        {/* Survey Form */}
         <form className="planpage-form">
           <div className="planpage-grid">
+            {/* Left Column */}
             <div>
+              {/* Question 1: Age started smoking */}
               <div className="planpage-question">
                 <b>[1]</b> Bạn bắt đầu hút thuốc từ năm bao nhiêu tuổi?
               </div>
@@ -476,9 +443,10 @@ function PlanPage() {
                 onChange={handleChange}
                 className="planpage-input"
                 placeholder="Nhập tuổi"
-                disabled={user && user.role === "GUEST"}
+                disabled={isFieldDisabled()}
               />
 
+              {/* Question 2: Cigarettes per day */}
               <div className="planpage-question">
                 <b>[2]</b> Hiện tại hút bao nhiêu điếu/ngày?
               </div>
@@ -491,9 +459,10 @@ function PlanPage() {
                 onChange={handleChange}
                 className="planpage-input"
                 placeholder="Số điếu/ngày"
-                disabled={user && user.role === "GUEST"}
+                disabled={isFieldDisabled()}
               />
 
+              {/* Question 3: Cigarettes per pack */}
               <div className="planpage-question">
                 <b>[3]</b> Một bao có bao nhiêu điếu?
               </div>
@@ -506,59 +475,32 @@ function PlanPage() {
                 onChange={handleChange}
                 className="planpage-input"
                 placeholder="Số điếu/bao"
-                disabled={user && user.role === "GUEST"}
+                disabled={isFieldDisabled()}
               />
 
+              {/* Question 4: Time to first cigarette */}
               <div className="planpage-question">
                 <b>[4]</b> Sau khi thức dậy bao lâu bạn hút điếu đầu?
               </div>
               <div className="planpage-options">
-                <label>
-                  <input
-                    type="radio"
-                    name="timeToFirstCigarette"
-                    value="≤5 phút"
-                    checked={form.timeToFirstCigarette === "≤5 phút"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  ≤5 phút
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="timeToFirstCigarette"
-                    value="6–30 phút"
-                    checked={form.timeToFirstCigarette === "6–30 phút"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  6–30 phút
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="timeToFirstCigarette"
-                    value="31–60 phút"
-                    checked={form.timeToFirstCigarette === "31–60 phút"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  31–60 phút
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="timeToFirstCigarette"
-                    value=">60 phút"
-                    checked={form.timeToFirstCigarette === ">60 phút"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  &gt;60 phút
-                </label>
+                {["≤5 phút", "6–30 phút", "31–60 phút", ">60 phút"].map(
+                  (option) => (
+                    <label key={option}>
+                      <input
+                        type="radio"
+                        name="timeToFirstCigarette"
+                        value={option}
+                        checked={form.timeToFirstCigarette === option}
+                        onChange={handleChange}
+                        disabled={isFieldDisabled()}
+                      />
+                      {option === ">60 phút" ? ">60 phút" : option}
+                    </label>
+                  )
+                )}
               </div>
 
+              {/* Question 5: Quit attempts */}
               <div className="planpage-question">
                 <b>[5]</b> Bạn đã từng cố gắng cai thuốc chưa? (Số lần)
               </div>
@@ -571,63 +513,37 @@ function PlanPage() {
                 onChange={handleChange}
                 className="planpage-input"
                 placeholder="Số lần"
-                disabled={user && user.role === "GUEST"}
+                disabled={isFieldDisabled()}
               />
 
+              {/* Question 6: Longest quit duration */}
               <div className="planpage-question">
                 <b>[6]</b> Thời gian dài nhất từng không hút thuốc?
               </div>
               <div className="planpage-options">
-                <label>
-                  <input
-                    type="radio"
-                    name="longestQuitDuration"
-                    value="LESS_THAN_1_DAY"
-                    checked={form.longestQuitDuration === "LESS_THAN_1_DAY"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  Ít hơn 1 ngày
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="longestQuitDuration"
-                    value="BETWEEN_1_AND_3_DAYS"
-                    checked={
-                      form.longestQuitDuration === "BETWEEN_1_AND_3_DAYS"
-                    }
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  Giữa 1 và 3 ngày
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="longestQuitDuration"
-                    value="ONE_WEEK"
-                    checked={form.longestQuitDuration === "ONE_WEEK"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  1 tuần
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="longestQuitDuration"
-                    value="MORE_THAN_ONE_WEEK"
-                    checked={form.longestQuitDuration === "MORE_THAN_ONE_WEEK"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  Hơn 1 tuần
-                </label>
+                {[
+                  { value: "LESS_THAN_1_DAY", label: "Ít hơn 1 ngày" },
+                  { value: "BETWEEN_1_AND_3_DAYS", label: "Giữa 1 và 3 ngày" },
+                  { value: "ONE_WEEK", label: "1 tuần" },
+                  { value: "MORE_THAN_ONE_WEEK", label: "Hơn 1 tuần" },
+                ].map((option) => (
+                  <label key={option.value}>
+                    <input
+                      type="radio"
+                      name="longestQuitDuration"
+                      value={option.value}
+                      checked={form.longestQuitDuration === option.value}
+                      onChange={handleChange}
+                      disabled={isFieldDisabled()}
+                    />
+                    {option.label}
+                  </label>
+                ))}
               </div>
 
+              {/* Question 7: Craving without smoking */}
               <div className="planpage-question">
-                <b>[7]</b> Bạn có cảm thấy khó chịu nếi không hút?
+                <b>[7]</b> Bạn có cảm thấy khó chịu nếu không hút?
               </div>
               <div className="planpage-options">
                 <label>
@@ -637,7 +553,7 @@ function PlanPage() {
                     value="true"
                     checked={form.cravingWithoutSmoking === "true"}
                     onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
+                    disabled={isFieldDisabled()}
                   />
                   Có
                 </label>
@@ -648,12 +564,13 @@ function PlanPage() {
                     value="false"
                     checked={form.cravingWithoutSmoking === "false"}
                     onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
+                    disabled={isFieldDisabled()}
                   />
                   Không
                 </label>
               </div>
 
+              {/* Question 8: Trigger situations */}
               <div className="planpage-question">
                 <b>[8]</b> Bạn hút nhiều hơn khi nào?
               </div>
@@ -664,111 +581,57 @@ function PlanPage() {
                 onChange={handleChange}
                 className="planpage-input"
                 placeholder="Ví dụ: căng thẳng, sau bữa ăn..."
-                disabled={user && user.role === "GUEST"}
+                disabled={isFieldDisabled()}
               />
             </div>
 
+            {/* Right Column */}
             <div>
+              {/* Question 9: Quit intention timeline */}
               <div className="planpage-question">
                 <b>[9]</b> Ý định cai thuốc trong bao lâu tới?
               </div>
               <div className="planpage-options">
-                <label>
-                  <input
-                    type="radio"
-                    name="quitIntentionTimeline"
-                    value="7 ngày"
-                    checked={form.quitIntentionTimeline === "7 ngày"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  7 ngày
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="quitIntentionTimeline"
-                    value="1 tháng"
-                    checked={form.quitIntentionTimeline === "1 tháng"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  1 tháng
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="quitIntentionTimeline"
-                    value="3 tháng"
-                    checked={form.quitIntentionTimeline === "3 tháng"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  3 tháng
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="quitIntentionTimeline"
-                    value="5 tháng"
-                    checked={form.quitIntentionTimeline === "5 tháng"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  5 tháng
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="quitIntentionTimeline"
-                    value="Chưa chắc"
-                    checked={form.quitIntentionTimeline === "Chưa chắc"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  Chưa chắc
-                </label>
+                {["7 ngày", "1 tháng", "3 tháng", "5 tháng", "Chưa chắc"].map(
+                  (option) => (
+                    <label key={option}>
+                      <input
+                        type="radio"
+                        name="quitIntentionTimeline"
+                        value={option}
+                        checked={form.quitIntentionTimeline === option}
+                        onChange={handleChange}
+                        disabled={isFieldDisabled()}
+                      />
+                      {option}
+                    </label>
+                  )
+                )}
               </div>
 
+              {/* Question 10: Readiness level */}
               <div className="planpage-question">
                 <b>[10]</b> Mức độ sẵn sàng cai thuốc
               </div>
               <div className="planpage-options">
-                <label>
-                  <input
-                    type="radio"
-                    name="readinessLevel"
-                    value="Chưa sẵn sàng"
-                    checked={form.readinessLevel === "Chưa sẵn sàng"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  Chưa sẵn sàng
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="readinessLevel"
-                    value="Đang cân nhắc"
-                    checked={form.readinessLevel === "Đang cân nhắc"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  Đang cân nhắc
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="readinessLevel"
-                    value="Rất sẵn sàng"
-                    checked={form.readinessLevel === "Rất sẵn sàng"}
-                    onChange={handleChange}
-                    disabled={user && user.role === "GUEST"}
-                  />
-                  Rất sẵn sàng
-                </label>
+                {["Chưa sẵn sàng", "Đang cân nhắc", "Rất sẵn sàng"].map(
+                  (option) => (
+                    <label key={option}>
+                      <input
+                        type="radio"
+                        name="readinessLevel"
+                        value={option}
+                        checked={form.readinessLevel === option}
+                        onChange={handleChange}
+                        disabled={isFieldDisabled()}
+                      />
+                      {option}
+                    </label>
+                  )
+                )}
               </div>
 
+              {/* Question 11: Quit reasons */}
               <div className="planpage-question">
                 <b>[11]</b> Lý do chính muốn cai thuốc?
               </div>
@@ -776,7 +639,7 @@ function PlanPage() {
                 name="quitReasons"
                 value={form.quitReasons}
                 onChange={handleChange}
-                disabled={user && user.role === "GUEST"} // ✅ Disable Ant Design component
+                disabled={isFieldDisabled()}
                 options={[
                   { value: "Improving_health", label: "Cải thiện sức khỏe" },
                   {
@@ -801,6 +664,7 @@ function PlanPage() {
             </div>
           </div>
 
+          {/* Submit Button */}
           <button
             onClick={handleSubmit}
             className="planpage-submit"
@@ -810,10 +674,12 @@ function PlanPage() {
               ? "🔒 Nâng cấp tài khoản để sử dụng"
               : "📝 Gửi thông tin"}
           </button>
+
+          {/* Error Message */}
           {error && <div className="planpage-error">{error}</div>}
         </form>
 
-        {/* ✅ Modal cho GUEST khi nhấn submit */}
+        {/* Guest Modal */}
         {showGuestModal && (
           <div
             className="planpage-choice-modal"
@@ -869,7 +735,7 @@ function PlanPage() {
           </div>
         )}
 
-        {/* ✅ Modal choice chỉ cho CUSTOMER */}
+        {/* Choice Modal for Customers */}
         {showChoice && user && user.role === "CUSTOMER" && (
           <div
             className="planpage-choice-modal"
@@ -879,6 +745,7 @@ function PlanPage() {
               className="planpage-choice-box"
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Addiction Assessment Display */}
               {addictionInfo && (
                 <div
                   style={{
@@ -944,10 +811,10 @@ function PlanPage() {
           </div>
         )}
       </div>
+
       <Footer />
     </>
   );
 }
 
 export default PlanPage;
-// Phân quyền Customer

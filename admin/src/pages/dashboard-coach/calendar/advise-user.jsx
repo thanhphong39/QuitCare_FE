@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Table,
   Tabs,
   Button,
   Tag,
   Space,
-  Modal,
   message,
-  Tooltip,
   Card,
   Badge,
   Avatar,
@@ -29,7 +26,6 @@ import {
   LinkOutlined,
   ReloadOutlined,
   MailOutlined,
-  FileTextOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
@@ -60,17 +56,17 @@ const AdviseUser = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const data = response.data.map((item, index) => {
+      const data = response.data.map((item) => {
         const start = moment(`${item.appointmentDate} ${item.startTime}`);
         return {
-          id: index,
+          id: item.id,
           memberName: item.customerName,
+          memberEmail: "",
           startTime: start,
-          endTime: start.clone().add(60, "minutes"), // Giả định 30 phút
+          endTime: start.clone().add(60, "minutes"),
           status: item.status.toLowerCase(),
           meetLink: item.googleMeetLink,
           memberAvatar: null,
-          notes: "",
         };
       });
 
@@ -82,6 +78,59 @@ const AdviseUser = () => {
       setLoading(false);
     }
   };
+
+  const updateAppointmentStatus = async (id, status) => {
+    const token = localStorage.getItem("token");
+    let url = "";
+  
+    if (status === "COMPLETED") {
+      url = `/booking/coach/complete/${id}`;
+    } else if (status === "CANCELLED") {
+      url = `/booking/coach/cancle/${id}`;
+    } else {
+      console.warn("Trạng thái không hợp lệ:", status);
+      return;
+    }
+  
+    try {
+      await api.put(url, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      setAppointments((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, status: status.toLowerCase() } : item))
+      );
+  
+      message.success("Cập nhật trạng thái thành công");
+    } catch (error) {
+      console.error("Lỗi cập nhật trạng thái:", error);
+      message.error("Không thể cập nhật trạng thái");
+    }
+  };
+  
+
+  const handleCompleteConsultation = async (record) => {
+    await updateAppointmentStatus(record.id, "COMPLETED");
+  };
+
+  const handleCancelConsultation = async (record) => {
+    await updateAppointmentStatus(record.id, "CANCELLED");
+  };
+
+  const filteredAppointments = appointments.filter((appointment) => {
+    const matchesTab =
+      activeTab === "all" ||
+      (activeTab === "pending" && appointment.status === "pending") ||
+      (activeTab === "completed" && appointment.status === "completed");
+
+    const matchesSearch = appointment.memberName
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
+
+    return matchesTab && matchesSearch;
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -103,86 +152,25 @@ const AdviseUser = () => {
     }
   };
 
-  const handleStartConsultation = (record) => {
-    Modal.confirm({
-      title: "Bắt đầu tư vấn",
-      icon: <VideoCameraOutlined style={{ color: "#1890ff" }} />,
-      content: (
-        <p>Bạn có muốn bắt đầu buổi tư vấn với <strong>{record.memberName}</strong>?</p>
-      ),
-      okText: "Bắt đầu",
-      cancelText: "Hủy",
-      onOk: () => {
-        updateAppointmentStatus(record.id, "in_progress");
-        window.open(record.meetLink, "_blank");
-        message.success("Đã bắt đầu buổi tư vấn");
-      },
-    });
-  };
-
-  const handleCompleteConsultation = (record) => {
-    Modal.confirm({
-      title: "Hoàn thành tư vấn",
-      icon: <CheckCircleOutlined style={{ color: "#52c41a" }} />,
-      content: (
-        <p>Bạn có muốn đánh dấu buổi tư vấn với <strong>{record.memberName}</strong> là hoàn thành?</p>
-      ),
-      okText: "Hoàn thành",
-      cancelText: "Hủy",
-      onOk: () => {
-        updateAppointmentStatus(record.id, "completed");
-        message.success("Đã đánh dấu hoàn thành");
-      },
-    });
-  };
-
-  const updateAppointmentStatus = (id, status) => {
-    setAppointments((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status } : item))
-    );
-  };
-
-  const filteredAppointments = appointments.filter((appointment) => {
-    const matchesTab =
-      activeTab === "all" ||
-      (activeTab === "pending" && appointment.status === "pending") ||
-      // (activeTab === "in_progress" && appointment.status === "in_progress") ||
-      (activeTab === "completed" && appointment.status === "completed");
-
-    const matchesSearch = appointment.memberName
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-
-    return matchesTab && matchesSearch;
-  });
-
   const columns = [
     {
       title: "Thành viên",
       dataIndex: "memberName",
       key: "memberName",
-      width: 280,
-      render: (text, record) => (
+      render: (text) => (
         <div className="member-info">
-          <Avatar src={record.memberAvatar} icon={<UserOutlined />} size={50} />
-          <div className="member-details">
-            <div className="member-name">{text}</div>
-            <div className="member-contact">
-              <MailOutlined className="contact-icon" /> <span>{record.memberEmail}</span>
-            </div>
-          </div>
+          <Avatar icon={<UserOutlined />} size={40} />
+          <span style={{ marginLeft: 10 }}>{text}</span>
         </div>
       ),
     },
     {
       title: "Thời gian",
       key: "time",
-      width: 200,
       render: (_, record) => (
         <div>
           <div><CalendarOutlined /> {moment(record.startTime).format("DD/MM/YYYY")}</div>
           <div><ClockCircleOutlined /> {moment(record.startTime).format("HH:mm")} - {moment(record.endTime).format("HH:mm")}</div>
-          <div>Thời lượng: {moment(record.endTime).diff(moment(record.startTime), "minutes")} phút</div>
         </div>
       ),
     },
@@ -190,7 +178,6 @@ const AdviseUser = () => {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      width: 140,
       render: (status) => (
         <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
       ),
@@ -205,73 +192,40 @@ const AdviseUser = () => {
         </a>
       ),
     },
-    // {
-    //   title: "Ghi chú",
-    //   dataIndex: "notes",
-    //   key: "notes",
-    //   width: 250,
-    //   render: (notes) => (
-    //     <Tooltip title={notes}><Text ellipsis>{notes}</Text></Tooltip>
-    //   ),
-    // },
     {
       title: "Hành động",
       key: "actions",
-      width: 180,
       render: (_, record) => (
         <div>
           {record.status === "pending" && (
-            <Button
-              type="primary"
-              size="small"
-              icon={<VideoCameraOutlined />}
-              onClick={() => handleStartConsultation(record)}
-            >
-              Bắt đầu
-            </Button>
+            <>
+              <Button type="primary" icon={<VideoCameraOutlined />} size="small" onClick={() => {
+                window.open(record.meetLink, "_blank");
+                setAppointments((prev) => prev.map((item) => item.id === record.id ? { ...item, status: "in_progress" } : item));
+              }}>
+                Bắt đầu
+              </Button>
+              <Button danger size="small" style={{ marginLeft: 8 }} onClick={() => handleCancelConsultation(record)}>
+                Hủy
+              </Button>
+            </>
           )}
-
           {record.status === "in_progress" && (
-            <Space direction="vertical">
-              <Button
-                type="default"
-                size="small"
-                icon={<LinkOutlined />}
-                onClick={() => window.open(record.meetLink, "_blank")}
-              >
-                Vào phòng
-              </Button>
-              <Button
-                type="primary"
-                size="small"
-                icon={<CheckCircleOutlined />}
-                onClick={() => handleCompleteConsultation(record)}
-              >
-                Hoàn thành
-              </Button>
+            <Space>
+              <Button icon={<LinkOutlined />} size="small" onClick={() => window.open(record.meetLink, "_blank")}>Vào phòng</Button>
+              <Button type="primary" icon={<CheckCircleOutlined />} size="small" onClick={() => handleCompleteConsultation(record)}>Hoàn thành</Button>
             </Space>
           )}
-
           {record.status === "completed" && (
-            <Button
-              type="default"
-              size="small"
-              icon={<CheckCircleOutlined />}
-              disabled
-            >
-              Đã hoàn thành
-            </Button>
+            <Tag color="green">Đã hoàn thành</Tag>
+          )}
+          {record.status === "cancelled" && (
+            <Tag color="red">Đã hủy</Tag>
           )}
         </div>
       ),
     },
   ];
-
-  const getTabCount = (status) => {
-    return appointments.filter(
-      (apt) => status === "all" || apt.status === status
-    ).length;
-  };
 
   return (
     <div className="advise-user-page">
@@ -280,59 +234,37 @@ const AdviseUser = () => {
           <div className="header-content">
             <div className="header-info">
               <Title level={2}>Quản lý lịch tư vấn</Title>
-              <Text>Theo dõi và quản lý các buổi tư vấn với thành viên</Text>
+              <Text>Theo dõi và quản lý các buổi tư vấn</Text>
             </div>
             <div className="header-actions">
               <Search
                 placeholder="Tìm kiếm thành viên..."
-                onChange={(e) => setSearchText(e.target.value)}
                 allowClear
-                size="large"
+                onChange={(e) => setSearchText(e.target.value)}
                 prefix={<SearchOutlined />}
-                style={{ width: 320 }}
+                style={{ width: 300 }}
               />
-              <Button
-                type="primary"
-                icon={<ReloadOutlined />}
-                onClick={fetchAppointments}
-                loading={loading}
-                size="large"
-              >
+              <Button icon={<ReloadOutlined />} onClick={fetchAppointments} loading={loading} style={{ marginLeft: 16 }}>
                 Làm mới
               </Button>
             </div>
           </div>
         </div>
 
-        <div className="statistics-section">
-          <Row gutter={[16, 16]}>
-            <Col xs={12} sm={6}><Card><Statistic title="Chờ tư vấn" value={getTabCount("pending")} valueStyle={{ color: "#fa8c16" }} prefix={<ClockCircleOutlined />} /></Card></Col>
-            {/* <Col xs={12} sm={6}><Card><Statistic title="Đang tư vấn" value={getTabCount("in_progress")} valueStyle={{ color: "#1890ff" }} prefix={<VideoCameraOutlined />} /></Card></Col> */}
-            <Col xs={12} sm={6}><Card><Statistic title="Hoàn thành" value={getTabCount("completed")} valueStyle={{ color: "#52c41a" }} prefix={<CheckCircleOutlined />} /></Card></Col>
-            <Col xs={12} sm={6}><Card><Statistic title="Tổng số" value={getTabCount("all")} valueStyle={{ color: "#722ed1" }} prefix={<TeamOutlined />} /></Card></Col>
-          </Row>
-        </div>
-
         <Card className="main-content-card">
           <Tabs activeKey={activeTab} onChange={setActiveTab} size="large">
-            <TabPane tab={<Badge count={getTabCount("pending")}><span><ClockCircleOutlined /> Chờ tư vấn</span></Badge>} key="pending" />
-            {/* <TabPane tab={<Badge count={getTabCount("in_progress")}><span><VideoCameraOutlined /> Đang tư vấn</span></Badge>} key="in_progress" /> */}
-            <TabPane tab={<Badge count={getTabCount("completed")}><span><CheckCircleOutlined /> Hoàn thành</span></Badge>} key="completed" />
-            <TabPane tab={<Badge count={getTabCount("all")}><span><TeamOutlined /> Tất cả</span></Badge>} key="all" />
+            <TabPane tab={<Badge count={appointments.filter(a => a.status === 'pending').length}>Chờ tư vấn</Badge>} key="pending" />
+            <TabPane tab={<Badge count={appointments.filter(a => a.status === 'completed').length}>Hoàn thành</Badge>} key="completed" />
+            <TabPane tab={<Badge count={appointments.length}>Tất cả</Badge>} key="all" />
           </Tabs>
 
-          {filteredAppointments.length === 0 ? (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có lịch hẹn nào phù hợp" />
-          ) : (
-            <Table
-              columns={columns}
-              dataSource={filteredAppointments}
-              rowKey="id"
-              loading={loading}
-              pagination={{ pageSize: 10 }}
-              scroll={{ x: 1200 }}
-            />
-          )}
+          <Table
+            columns={columns}
+            dataSource={filteredAppointments}
+            rowKey="id"
+            loading={loading}
+            pagination={{ pageSize: 10 }}
+          />
         </Card>
       </div>
     </div>

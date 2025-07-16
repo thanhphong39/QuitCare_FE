@@ -4,7 +4,7 @@ import {  useNavigate } from "react-router-dom";
 import "./PaymentPage.css";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-
+import { HomeOutlined } from "@ant-design/icons";
 
 const PaymentPage = () => {
 
@@ -105,6 +105,27 @@ const PaymentPage = () => {
 
   return (
     <div className="payment-container">
+      {/* Nút quay lại nằm góc trái trên cùng */}
+      <div className="back-home-top-left" style={{ position: "absolute", top: 20, left: 20 }}>
+        <button
+          onClick={() => navigate("/")}
+          className="back-button"
+          style={{
+            backgroundColor: "#ffffff",
+            color: "#333",
+            padding: "8px 16px",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
+            fontSize: "14px",
+            cursor: "pointer",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+          }}
+        >
+          ← Quay lại trang chủ
+        </button>
+      </div>
+  
+      {/* Nội dung chính */}
       <div className="payment-card">
         <div className="payment-header">
           <img
@@ -114,7 +135,7 @@ const PaymentPage = () => {
           />
           <h2>Xác nhận thanh toán</h2>
         </div>
-
+  
         {pkg ? (
           <div className="order-details">
             <p className="order-title">Thông tin đơn hàng</p>
@@ -136,9 +157,9 @@ const PaymentPage = () => {
         ) : (
           <p>Đang tải thông tin gói...</p>
         )}
-
+  
         {error && <div className="payment-error">{error}</div>}
-
+  
         <div className="payment-actions">
           <button
             onClick={handlePayment}
@@ -154,6 +175,7 @@ const PaymentPage = () => {
       </div>
     </div>
   );
+  
 };
 
 export default PaymentPage;

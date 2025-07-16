@@ -131,7 +131,7 @@ const PaymentResult = () => {
                 Cảm ơn bạn đã thanh toán qua VNPay.
                 <br />
                 <strong style={{ color: "#52c41a" }}>
-                  Tài khoản đã được nâng cấp thành CUSTOMER!
+                  Tài khoản đã được nâng cấp thành khách hàng!
                 </strong>
                 <br />
                 <span style={{ color: "#666" }}>

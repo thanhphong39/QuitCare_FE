@@ -138,3 +138,9 @@ body {
   margin-top: 15px;
   margin-bottom: 0;
 }
+.back-home-top-left {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}

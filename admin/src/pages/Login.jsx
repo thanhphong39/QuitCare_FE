@@ -6,7 +6,7 @@ function Login() {
 
   return <>
     <Navbar_authen />
-    <AuthenTemplate isLogin={true}></AuthenTemplate>;
+    <AuthenTemplate isLogin={true}></AuthenTemplate>
   </>
 }
 

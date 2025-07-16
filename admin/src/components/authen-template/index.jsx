@@ -4,16 +4,25 @@ import LoginForm from "../authen-form/LoginForm";
 import RegisterForm from "../authen-form/RegisterForm";
 import { useNavigate } from "react-router-dom";
 import Navbar_authen from "../authen-navbar/Navbar-authen";
+import mountainBg from "../../assets/images/login1.png";
 
 function AuthenTemplate({ isLogin }) {
   const navigate = useNavigate();
-  return (
 
-    <div className="authen-template" >
+  // Nếu là trang đăng ký, hiển thị layout 2 cột mới
+  if (!isLogin) {
+    return <RegisterForm />;
+  }
+
+  // Nếu là trang đăng nhập, giữ nguyên layout cũ
+  return (
+    <div
+      className="authen-template"
+      style={{ backgroundImage: `url(${mountainBg})` }}
+    >
       <div className="authen-template__form">
-        {isLogin ? <LoginForm /> : <RegisterForm />}
+        <LoginForm />
       </div>
-      <div className="authen-template__image"></div>
     </div>
   );
 }

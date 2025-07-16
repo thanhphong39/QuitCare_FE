@@ -54,8 +54,8 @@ function MemberComparison() {
               </tr>
               <tr>
                 <td>Chi phí</td>
-                <td>49.000 VND</td>
-                <td>299.000 VND</td>
+                <td>99.000 VND</td>
+                <td>499.000 VND</td>
               </tr>
             </tbody>
           </table>

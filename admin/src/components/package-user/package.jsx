@@ -4,6 +4,7 @@ import freeCard from "../../assets/images/pack2.png";
 import premiumCard from "../../assets/images/pack1.png";
 import api from "../../configs/axios"; // nếu bạn có file cấu hình axios sẵn
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Package = () => {
   const [packages, setPackages] = useState([]);
@@ -59,7 +60,36 @@ const Package = () => {
               <button
   className={`btn ${pkg.name.toLowerCase() === "basic" ? "btn-basic" : "btn-premium"}`}
   onClick={() => {
-    navigate(`/payment?membershipPlanId=${pkg.id}`);
+    if (pkg.name.toLowerCase() === "basic") {
+      Swal.fire({
+        title: 'Bạn đang chọn gói Basic ',
+        text: `Gói ${pkg.name.toUpperCase()}  sẽ có chức năng hạn chế. 
+  Chúng tôi khuyến khích bạn nâng cấp lên gói PREMIUM để được hỗ trợ tư vấn sớm từ chuyên gia.`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Vẫn chọn gói BASIC',
+        cancelButtonText: 'Xem gói PREMIUM',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(`/payment?membershipPlanId=${pkg.id}`);
+        } else {
+          navigate(`/payment?membershipPlanId=2`); // Điều hướng sang gói PREMIUM (id=2)
+        }
+      });
+    } else {
+      Swal.fire({
+        title: 'Xác nhận mua gói PREMIUM?',
+        text: `Bạn có chắc chắn muốn mua gói ${pkg.name.toUpperCase()} với giá ${pkg.price.toLocaleString()} VND không?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận',
+        cancelButtonText: 'Hủy',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate(`/payment?membershipPlanId=${pkg.id}`);
+        }
+      });
+    }
   }}
 >
   Mua gói

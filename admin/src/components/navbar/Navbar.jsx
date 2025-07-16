@@ -23,44 +23,52 @@ const Navbar = () => {
           console.log("⚠️ Không có accountId.");
           return;
         }
-
+  
         console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
-
+  
         const historyRes = await api.get(`/v1/payments/history/account/${user.id}`);
         const transactions = historyRes.data || [];
         console.log("📦 Danh sách giao dịch:", transactions);
-
-        const successfulTransaction = transactions.find(tx => tx.status === "SUCCESS");
-
-        if (!successfulTransaction) {
-          console.log("⛔ Không tìm thấy giao dịch SUCCESS.");
+  
+        // ✅ Lọc các giao dịch thành công
+        const successTransactions = transactions.filter(tx => tx.status === "SUCCESS");
+  
+        if (successTransactions.length === 0) {
+          console.log("⛔ Không có giao dịch SUCCESS.");
           return;
         }
-
-        const { amountPaid } = successfulTransaction;
-        console.log("💵 amountPaid từ giao dịch:", amountPaid);
-
+  
+        // ✅ Tìm giao dịch có amountPaid lớn nhất
+        const maxTransaction = successTransactions.reduce((max, curr) =>
+          curr.amountPaid > max.amountPaid ? curr : max
+        );
+        const { amountPaid } = maxTransaction;
+        console.log("💵 amountPaid lớn nhất từ giao dịch SUCCESS:", amountPaid);
+  
+        // Lấy danh sách các gói
         const planRes = await api.get(`/membership-plans`);
         const allPlans = planRes.data || [];
         console.log("📋 Danh sách gói:", allPlans);
-
+  
+        // So sánh với các gói
         const matchedPlan = allPlans.find(plan => Math.abs(plan.price - amountPaid) < 1);
         console.log("🎯 Gói khớp:", matchedPlan);
-
+  
         if (matchedPlan?.name === "Premium") {
           console.log("✅ Gói là Premium → Hiện nút ĐẶT LỊCH");
           setShowBooking(true);
         } else {
           console.log("ℹ️ Không phải gói Premium.");
         }
-
+  
       } catch (err) {
         console.error("❌ Lỗi khi lấy membership:", err);
       }
     };
-
+  
     fetchMembershipPlan();
   }, [user?.id]);
+  
 
   // 👉 Scroll Lock cho Mobile Menu
   useEffect(() => {

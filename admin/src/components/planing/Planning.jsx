@@ -100,15 +100,15 @@ function calcAddictionLevel(form) {
   if (total <= 2) {
     level = "Nhẹ";
     message =
-      "Bạn có mức độ nghiện thuốc lá nhẹ. Đây là thời điểm rất tốt để bắt đầu cai thuốc. Hãy kiên trì, bạn hoàn toàn có thể thành công!";
+      "Theo các chuyên gia cai nghiện, bạn đang ở mức độ nghiện thuốc lá nhẹ – đây là giai đoạn thuận lợi nhất để bắt đầu từ bỏ thuốc. Hãy tận dụng cơ hội này, vì chỉ sau vài ngày không thuốc, cơ thể bạn sẽ có những cải thiện rõ rệt.";
   } else if (total <= 4) {
     level = "Trung bình";
     message =
-      "Bạn có mức độ nghiện thuốc lá trung bình. Đừng lo lắng, với quyết tâm và sự hỗ trợ phù hợp, bạn sẽ vượt qua được thử thách này!";
+      "Với mức độ nghiện trung bình, bạn có thể gặp một số cơn thèm thuốc trong quá trình cai. Tuy nhiên, theo chuyên gia, nếu kết hợp chiến lược phù hợp và có hệ thống hỗ trợ, khả năng thành công của bạn là rất cao.";
   } else {
     level = "Cao";
     message =
-      "Bạn có mức độ nghiện thuốc lá cao. Đừng nản lòng, hãy kiên trì và tìm kiếm sự hỗ trợ từ gia đình, bạn bè hoặc chuyên gia. Bạn chắc chắn sẽ làm được!";
+      "Bạn đang ở mức độ nghiện cao – điều này không hiếm và hoàn toàn có thể vượt qua. Các chuyên gia khuyến nghị bạn nên lập kế hoạch rõ ràng, sử dụng các phương pháp hỗ trợ tâm lý hoặc y tế, và duy trì kết nối với người hỗ trợ trong suốt hành trình.";
   }
 
   return {
@@ -195,6 +195,8 @@ function PlanPage() {
   const [loading, setLoading] = useState(true);
   const [addictionInfo, setAddictionInfo] = useState(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
+  // Thêm state mới cho Guest
+  const [showAddictionResult, setShowAddictionResult] = useState(false);
 
   // ================ HOOKS ================
   const navigate = useNavigate();
@@ -215,32 +217,54 @@ function PlanPage() {
       return;
     }
 
-    // Kiểm tra kế hoạch hiện có
-    async function checkPlan() {
-      try {
-        const res = await api.get(`/v1/customers/${accountId}/quit-plans`);
-        if (res.data && typeof res.data === "object" && res.data.id) {
-          // Đã có kế hoạch, chuyển hướng theo loại kế hoạch
-          if (res.data.systemPlan === false) {
-            navigate("/create-planning");
-          } else {
-            navigate("/suggest-planing");
+    // Kiểm tra kế hoạch hiện có (chỉ cho CUSTOMER)
+    if (user.role === "CUSTOMER") {
+      async function checkPlan() {
+        try {
+          const res = await api.get(`/v1/customers/${accountId}/quit-plans`);
+          if (res.data && typeof res.data === "object" && res.data.id) {
+            // Đã có kế hoạch, chuyển hướng theo loại kế hoạch
+            if (res.data.systemPlan === false) {
+              navigate("/create-planning");
+            } else {
+              navigate("/suggest-planing");
+            }
+            return;
           }
-          return;
+        } catch (err) {
+          // Chưa có kế hoạch hoặc lỗi API
+          setLoading(false);
         }
-      } catch (err) {
-        // Chưa có kế hoạch hoặc lỗi API
-        setLoading(false);
       }
-    }
 
-    checkPlan();
+      checkPlan();
+    } else {
+      // GUEST hoặc STAFF không cần check plan
+      setLoading(false);
+    }
   }, [accountId, navigate, user]);
 
   // ================ EVENT HANDLERS ================
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+    setError("");
+  };
+
+  // Handler mới cho Guest xem tình trạng nghiện
+  const handleCheckAddiction = (e) => {
+    e.preventDefault();
+
+    // Kiểm tra form đầy đủ
+    if (!isFilled()) {
+      setError("Vui lòng nhập đầy đủ tất cả các thông tin để xem đánh giá!");
+      return;
+    }
+
+    // Tính toán và hiển thị kết quả nghiện
+    const addiction = calcAddictionLevel(form);
+    setAddictionInfo(addiction);
+    setShowAddictionResult(true);
     setError("");
   };
 
@@ -360,7 +384,7 @@ function PlanPage() {
     );
   };
 
-  const isFieldDisabled = () => user && user.role === "GUEST";
+  const isFieldDisabled = () => false; // Cho phép GUEST nhập form
 
   // ================ RENDER CONDITIONS ================
   if (loading) {
@@ -416,8 +440,8 @@ function PlanPage() {
               ⚠️ Tài khoản của bạn chưa nâng cấp
             </h4>
             <p style={{ margin: "0", color: "#856404", fontSize: "14px" }}>
-              Bạn chỉ xem form khảo sát nhưng cần nâng cấp tài khoản để sử dụng
-              đầy đủ chức năng lập kế hoạch cai thuốc.
+              Bạn có thể nhập form và xem đánh giá mức độ nghiện miễn phí. Để
+              tạo kế hoạch cai thuốc cá nhân, vui lòng nâng cấp tài khoản.
             </p>
           </div>
         )}
@@ -664,20 +688,122 @@ function PlanPage() {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <button
-            onClick={handleSubmit}
-            className="planpage-submit"
-            type="submit"
-          >
-            {user && user.role === "GUEST"
-              ? "🔒 Nâng cấp tài khoản để sử dụng"
-              : "📝 Gửi thông tin"}
-          </button>
+          {/* Button Container */}
+          <div className="planpage-button-container">
+            {user && user.role === "GUEST" ? (
+              // Buttons cho GUEST
+              <div className="planpage-guest-buttons">
+                <button
+                  onClick={handleCheckAddiction}
+                  className="planpage-check-addiction"
+                  type="button"
+                >
+                  📊 Xem tình trạng
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="planpage-submit-guest"
+                  type="button"
+                >
+                  🔒 Nâng cấp tài khoản
+                </button>
+              </div>
+            ) : (
+              // Button cho CUSTOMER
+              <button
+                onClick={handleSubmit}
+                className="planpage-submit"
+                type="submit"
+              >
+                📝 Gửi thông tin
+              </button>
+            )}
+          </div>
 
           {/* Error Message */}
           {error && <div className="planpage-error">{error}</div>}
         </form>
+
+        {/* Guest Addiction Result Modal */}
+        {showAddictionResult && user && user.role === "GUEST" && (
+          <div
+            className="planpage-choice-modal"
+            onClick={() => setShowAddictionResult(false)}
+          >
+            <div
+              className="planpage-choice-box"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 style={{ color: "#1890ff", marginBottom: "24px" }}>
+                📊 Đánh giá mức độ nghiện thuốc lá
+              </h3>
+
+              {addictionInfo && (
+                <div className="planpage-addiction-info">
+                  <div className="planpage-addiction-summary">
+                    {addictionInfo.summary}
+                  </div>
+                  <div className="planpage-addiction-level">
+                    <b>Mức độ nghiện: </b>
+                    <span
+                      style={{
+                        color:
+                          addictionInfo.level === "Cao"
+                            ? "#e74c3c"
+                            : addictionInfo.level === "Trung bình"
+                            ? "#f39c12"
+                            : "#27ae60",
+                        fontWeight: "bold",
+                        fontSize: "18px",
+                      }}
+                    >
+                      {addictionInfo.level}
+                    </span>
+                  </div>
+                  <div className="planpage-addiction-message">
+                    💡 <strong>Lời khuyên:</strong> {addictionInfo.message}
+                  </div>
+                </div>
+              )}
+
+              {/* <div
+                style={{
+                  background:
+                    "linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)",
+                  border: "1px solid #1890ff",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  marginBottom: "24px",
+                  textAlign: "center",
+                }}
+              >
+                <h4 style={{ margin: "0 0 12px 0", color: "#0050b3" }}>
+                  🚀 Muốn có kế hoạch cai thuốc cá nhân?
+                </h4>
+                <p
+                  style={{
+                    margin: "0 0 16px 0",
+                    color: "#0050b3",
+                    fontSize: "14px",
+                  }}
+                >
+                  Nâng cấp tài khoản để nhận kế hoạch cai thuốc được thiết kế
+                  riêng cho bạn!
+                </p>
+                
+              </div> */}
+
+              <div style={{ textAlign: "center" }}>
+                <button
+                  className="planpage-choice-btn close"
+                  onClick={() => setShowAddictionResult(false)}
+                >
+                  ✕ Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Guest Modal */}
         {showGuestModal && (
@@ -715,7 +841,7 @@ function PlanPage() {
                 </ul>
               </div>
 
-              <div className="planpage-choice-btns">
+              <div className="planpage-choice-btns two-buttons">
                 <button
                   className="planpage-choice-btn recommend"
                   type="button"
@@ -728,7 +854,7 @@ function PlanPage() {
                   type="button"
                   onClick={() => setShowGuestModal(false)}
                 >
-                  Để sau
+                  ⏸️ Để sau
                 </button>
               </div>
             </div>
@@ -791,7 +917,7 @@ function PlanPage() {
               )}
 
               <h3>Bạn muốn chọn phương án nào?</h3>
-              <div className="planpage-choice-btns">
+              <div className="planpage-choice-btns two-buttons">
                 <button
                   className="planpage-choice-btn recommend"
                   type="button"

@@ -23,6 +23,60 @@ const initialState = {
   quitReasons: "",
 };
 
+// ================ LOCALSTORAGE UTILITIES ================
+const FORM_STORAGE_KEY = "planningFormData";
+const FORM_TIMESTAMP_KEY = "planningFormTimestamp";
+const FORM_EXPIRY_HOURS = 24; // Form data expires after 24 hours
+
+// Lưu form data vào localStorage
+const saveFormToStorage = (formData) => {
+  try {
+    const timestamp = new Date().getTime();
+    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
+    localStorage.setItem(FORM_TIMESTAMP_KEY, timestamp.toString());
+  } catch (error) {
+    console.warn("Không thể lưu form vào localStorage:", error);
+  }
+};
+
+// Load form data từ localStorage
+const loadFormFromStorage = () => {
+  try {
+    const savedData = localStorage.getItem(FORM_STORAGE_KEY);
+    const savedTimestamp = localStorage.getItem(FORM_TIMESTAMP_KEY);
+
+    if (!savedData || !savedTimestamp) {
+      return null;
+    }
+
+    // Kiểm tra expiry
+    const currentTime = new Date().getTime();
+    const savedTime = parseInt(savedTimestamp);
+    const hoursDiff = (currentTime - savedTime) / (1000 * 60 * 60);
+
+    if (hoursDiff > FORM_EXPIRY_HOURS) {
+      // Data đã expired, xóa khỏi localStorage
+      clearFormFromStorage();
+      return null;
+    }
+
+    return JSON.parse(savedData);
+  } catch (error) {
+    console.warn("Không thể load form từ localStorage:", error);
+    return null;
+  }
+};
+
+// Xóa form data khỏi localStorage
+const clearFormFromStorage = () => {
+  try {
+    localStorage.removeItem(FORM_STORAGE_KEY);
+    localStorage.removeItem(FORM_TIMESTAMP_KEY);
+  } catch (error) {
+    console.warn("Không thể xóa form từ localStorage:", error);
+  }
+};
+
 // ================ MAPPING FUNCTIONS ================
 const mapTime = (value) => {
   const timeMap = {
@@ -195,8 +249,8 @@ function PlanPage() {
   const [loading, setLoading] = useState(true);
   const [addictionInfo, setAddictionInfo] = useState(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
-  // Thêm state mới cho Guest
   const [showAddictionResult, setShowAddictionResult] = useState(false);
+  const [formLoaded, setFormLoaded] = useState(false); // Track if form is loaded from storage
 
   // ================ HOOKS ================
   const navigate = useNavigate();
@@ -205,6 +259,14 @@ function PlanPage() {
 
   // ================ EFFECTS ================
   useEffect(() => {
+    // Load saved form data khi component mount
+    const savedFormData = loadFormFromStorage();
+    if (savedFormData) {
+      setForm(savedFormData);
+      setFormLoaded(true);
+      console.log("✅ Đã tải form từ localStorage");
+    }
+
     if (!accountId) {
       navigate("/login");
       return;
@@ -244,11 +306,39 @@ function PlanPage() {
     }
   }, [accountId, navigate, user]);
 
+  // Auto-save form data khi form thay đổi
+  useEffect(() => {
+    // Chỉ save khi form đã được load và có ít nhất 1 field được điền
+    if (formLoaded && Object.values(form).some((value) => value !== "")) {
+      const saveTimeout = setTimeout(() => {
+        saveFormToStorage(form);
+      }, 500); // Debounce 500ms
+
+      return () => clearTimeout(saveTimeout);
+    }
+  }, [form, formLoaded]);
+
   // ================ EVENT HANDLERS ================
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
     setError("");
+
+    // Mark form as loaded if user starts typing
+    if (!formLoaded) {
+      setFormLoaded(true);
+    }
+  };
+
+  // Handler cho Radio Group (Ant Design)
+  const handleRadioChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    setError("");
+
+    if (!formLoaded) {
+      setFormLoaded(true);
+    }
   };
 
   // Handler mới cho Guest xem tình trạng nghiện
@@ -319,6 +409,7 @@ function PlanPage() {
         const suggestedPlan = generateSuggestedPlan(form);
         localStorage.setItem("planSurvey", JSON.stringify(form));
         localStorage.setItem("suggestedPlan", JSON.stringify(suggestedPlan));
+
         navigate("/suggest-planing");
       } else {
         // Kế hoạch tự lập
@@ -344,6 +435,10 @@ function PlanPage() {
 
         localStorage.setItem("quitPlanId", res.data.id);
         localStorage.setItem("planSurvey", JSON.stringify(payload));
+
+        // Xóa form data vì đã submit thành công
+        clearFormFromStorage();
+
         navigate("/create-planning");
       }
     } catch (err) {
@@ -367,6 +462,15 @@ function PlanPage() {
     navigate("/");
   };
 
+  // Handler để xóa form data
+  const handleClearForm = () => {
+    if (window.confirm("Bạn có chắc muốn xóa tất cả dữ liệu đã nhập?")) {
+      setForm(initialState);
+      clearFormFromStorage();
+      setFormLoaded(false);
+    }
+  };
+
   // ================ HELPER FUNCTIONS ================
   const isFilled = () => {
     return (
@@ -385,6 +489,11 @@ function PlanPage() {
   };
 
   const isFieldDisabled = () => false; // Cho phép GUEST nhập form
+
+  // Kiểm tra xem form có data đã lưu không
+  const hasStoredData = () => {
+    return Object.values(form).some((value) => value !== "");
+  };
 
   // ================ RENDER CONDITIONS ================
   if (loading) {
@@ -443,6 +552,60 @@ function PlanPage() {
               Bạn có thể nhập form và xem đánh giá mức độ nghiện miễn phí. Để
               tạo kế hoạch cai thuốc cá nhân, vui lòng nâng cấp tài khoản.
             </p>
+          </div>
+        )}
+
+        {/* Saved Data Notification */}
+        {formLoaded && hasStoredData() && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #d4edda, #c3e6cb)",
+              border: "2px solid #28a745",
+              borderRadius: "12px",
+              padding: "12px 20px",
+              margin: "20px auto 20px",
+              maxWidth: "800px",
+              textAlign: "center",
+              boxShadow: "0 4px 12px rgba(40, 167, 69, 0.2)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  color: "#155724",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                💾 Dữ liệu đã được tự động lưu và khôi phục
+              </span>
+            </div>
+            <button
+              onClick={handleClearForm}
+              style={{
+                background: "transparent",
+                border: "1px solid #dc3545",
+                color: "#dc3545",
+                borderRadius: "6px",
+                padding: "4px 12px",
+                fontSize: "12px",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = "#dc3545";
+                e.target.style.color = "white";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = "transparent";
+                e.target.style.color = "#dc3545";
+              }}
+            >
+              🗑️ Xóa form
+            </button>
           </div>
         )}
 
@@ -662,7 +825,7 @@ function PlanPage() {
               <Radio.Group
                 name="quitReasons"
                 value={form.quitReasons}
-                onChange={handleChange}
+                onChange={handleRadioChange}
                 disabled={isFieldDisabled()}
                 options={[
                   { value: "Improving_health", label: "Cải thiện sức khỏe" },
@@ -698,14 +861,14 @@ function PlanPage() {
                   className="planpage-check-addiction"
                   type="button"
                 >
-                  📊 Xem tình trạng
+                  📊 Xem tình trạng hiện tại
                 </button>
                 <button
                   onClick={handleSubmit}
                   className="planpage-submit-guest"
                   type="button"
                 >
-                  🔒 Nâng cấp tài khoản
+                  🔒 Nâng cấp tài khoản sử dụng
                 </button>
               </div>
             ) : (
@@ -766,32 +929,7 @@ function PlanPage() {
                 </div>
               )}
 
-              {/* <div
-                style={{
-                  background:
-                    "linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)",
-                  border: "1px solid #1890ff",
-                  borderRadius: "12px",
-                  padding: "20px",
-                  marginBottom: "24px",
-                  textAlign: "center",
-                }}
-              >
-                <h4 style={{ margin: "0 0 12px 0", color: "#0050b3" }}>
-                  🚀 Muốn có kế hoạch cai thuốc cá nhân?
-                </h4>
-                <p
-                  style={{
-                    margin: "0 0 16px 0",
-                    color: "#0050b3",
-                    fontSize: "14px",
-                  }}
-                >
-                  Nâng cấp tài khoản để nhận kế hoạch cai thuốc được thiết kế
-                  riêng cho bạn!
-                </p>
-                
-              </div> */}
+             
 
               <div style={{ textAlign: "center" }}>
                 <button

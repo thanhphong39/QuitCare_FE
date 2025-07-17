@@ -392,7 +392,7 @@ function SuggestPlaning() {
             {!isConfirmed && (
               <div className="suggest-actions">
                 <div className="suggest-question">
-                  <h3>🤔 Bạn có muốn xác nhận kế hoạch này không?</h3>
+                  <h3>🤔 Bạn có chắc chắn xác nhận kế hoạch này không?</h3>
                   <p>
                     Nếu đồng ý, kế hoạch sẽ được lưu và bạn có thể bắt đầu theo
                     dõi tiến trình cai thuốc. Nếu không, bạn có thể tự lập kế
@@ -521,3 +521,6 @@ function SuggestPlaning() {
 }
 
 export default SuggestPlaning;
+
+// Hãy xử lý check người dùng được xóa kế hoạch khi họ chưa nhập số thuốc đã hút , chưa lưu dữ liệu về form theo dõi hằng ngày chưa được Lưu dữ liệu . Nếu đã nhập có dư liệu người dùng nhập ở data thì ẩn nút xóa và không được xóa
+// Tôi muốn Call API xóa kế hoạch đề xuất sau khi xác nhận. Nút xóa kế hoạch nhấn vào Hiển thị xác nhận bạn có chắc chắn xóa không.  Khi xóa xong quay lại trang kế hoạch /planning

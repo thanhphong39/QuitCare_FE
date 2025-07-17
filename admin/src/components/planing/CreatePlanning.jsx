@@ -305,7 +305,6 @@ function CreatePlanning() {
           ) : (
             <div>
               <Input
-                disabled={mode === "edit"} // Không cho edit tuần khi đã lưu
                 value={row.week}
                 placeholder="Ví dụ: Tuần 1 - 2, Tuần 3"
                 onChange={(e) =>
@@ -331,7 +330,6 @@ function CreatePlanning() {
           ) : (
             <div>
               <Input
-                disabled={mode === "view"}
                 type="number"
                 min={0}
                 max={100}
@@ -414,34 +412,20 @@ function CreatePlanning() {
             ? "Hướng dẫn chỉnh sửa kế hoạch:"
             : "Hướng dẫn tạo kế hoạch linh hoạt:"}
         </h3>
-        {mode === "edit" ? (
-          <ul className="qc-planning-guide-list">
-            <li>
-              ⚠️ <strong>Khoảng thời gian tuần không thể chỉnh sửa</strong> sau
-              khi đã lưu
-            </li>
-            <li>
-              ✅ Chỉ có thể thay đổi <strong>số điếu thuốc/ngày</strong>
-            </li>
-            <li>✅ Có thể thêm/xóa giai đoạn và khoảng thời gian mới</li>
-            <li>✅ Số điếu/ngày phải từ 1 đến 50</li>
-          </ul>
-        ) : (
-          <ul className="qc-planning-guide-list">
-            <li>
-              Bạn có thể tạo nhiều giai đoạn (ví dụ: Giai đoạn 1, 2, 3...)
-            </li>
-            <li>Mỗi giai đoạn có thể có nhiều khoảng thời gian khác nhau</li>
-            <li>
-              <strong>Định dạng khoảng thời gian hợp lệ:</strong>
-            </li>
-            <p style={{ marginLeft: "20px", color: "#52c41a" }}>
-              ✓ "Tuần 1 - 2", "Tuần 3-5", "Tuần 1"
-              <br />✓ "Tuần 1 đến 3", "Tuần 1 - Tuần 3"
-            </p>
-            <li>Số điếu/ngày phải từ 1 đến 50</li>
-          </ul>
-        )}
+        <ul className="qc-planning-guide-list">
+          <li>Bạn có thể tạo nhiều giai đoạn (ví dụ: Giai đoạn 1, 2, 3...)</li>
+          <li>Mỗi giai đoạn có thể có nhiều khoảng thời gian khác nhau</li>
+          <li>
+            <strong>Định dạng khoảng thời gian hợp lệ:</strong>
+          </li>
+          <p style={{ marginLeft: "20px", color: "#52c41a" }}>
+            ✓ "Tuần 1 - 2", "Tuần 3-5", "Tuần 1"
+            <br />✓ "Tuần 1 đến 3", "Tuần 1 - Tuần 3"
+          </p>
+          <li>✅ Có thể thêm/xóa giai đoạn và khoảng thời gian</li>
+          <li>✅ Có thể chỉnh sửa cả khoảng thời gian và số điếu thuốc</li>
+          <li>✅ Số điếu/ngày phải từ 1 đến 50</li>
+        </ul>
       </div>
     );
   };

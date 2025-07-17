@@ -1,369 +1,711 @@
-/* Nền và bố cục */
+/* ================ ANIMATIONS & KEYFRAMES ================ */
+@keyframes fadeSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    0% {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* ================ MAIN CONTAINER ================ */
 .auth-login-container {
-    display        : flex;
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(30, 64, 175, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* ================ LEFT SIDE - WELCOME SECTION ================ */
+.auth-login-welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items    : center;
-    border-radius  : 20px;
-    box-sizing     : border-box;
-    overflow       : hidden;
+    align-items: center;
+    padding: 60px 40px;
+    color: white;
+    position: relative;
+    z-index: 2;
+    animation: slideInFromLeft 0.8s ease-out;
 }
 
-/* Thẻ card chính */
+.auth-login-welcome-content {
+    max-width: 500px;
+    text-align: center;
+}
+
+.auth-login-welcome-logo {
+    width: 90px;
+    height: 90px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    animation: float 4s ease-in-out infinite;
+}
+
+.auth-login-welcome-logo svg {
+    width: 45px;
+    height: 45px;
+    fill: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.auth-login-welcome-title {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: white;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeSlideIn 0.8s ease-out 0.2s both;
+    margin-top: 20px;
+}
+
+.auth-login-welcome-subtitle {
+    font-size: 20px;
+    font-weight: 300;
+    margin-bottom: 40px;
+    opacity: 0.95;
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    animation: fadeSlideIn 0.8s ease-out 0.4s both;
+}
+
+.auth-login-welcome-features {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 40px;
+}
+
+.auth-login-welcome-feature {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    animation: fadeSlideIn 0.8s ease-out calc(0.6s + var(--delay, 0s)) both;
+}
+
+.auth-login-welcome-feature:nth-child(1) { --delay: 0s; }
+.auth-login-welcome-feature:nth-child(2) { --delay: 0.1s; }
+.auth-login-welcome-feature:nth-child(3) { --delay: 0.2s; }
+.auth-login-welcome-feature:nth-child(4) { --delay: 0.3s; }
+
+.auth-login-welcome-feature:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.auth-login-welcome-feature-icon {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.auth-login-welcome-feature-text {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* ================ RIGHT SIDE - FORM SECTION ================ */
+.auth-login-form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 60px 40px;
+    position: relative;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+    animation: slideInFromRight 0.8s ease-out;
+}
+
+.auth-login-form-wrapper {
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ================ CARD STYLES ================ */
 .auth-login-card {
-    width           : 400px;
-    height          : auto;
-    background-color: #fff;
-    box-shadow      : 0 12px 28px rgba(0, 0, 0, 0.1);
-    padding         : 16px;
-    border          : none;
+    width: 100%;
+    background: white;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    animation: fadeSlideIn 0.8s ease-out 0.3s both;
 }
 
-/* Tiêu đề card */
+.auth-login-card .ant-card-head {
+    border: none;
+    padding: 0 0 40px 0;
+    background: transparent;
+}
+
 .auth-login-card .ant-card-head-title {
-    font-size  : 24px;
-    font-weight: bold;
-    color      : #1f2937;
-    text-align : center;
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #2563eb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin: 0;
+    position: relative;
+    letter-spacing: -1px;
+    text-shadow: none;
+    margin-top: 60px;
 }
 
-/* Form đăng nhập */
+.auth-login-card .ant-card-head-title::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.auth-login-card .ant-card-head-title::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+/* Hover effect cho title */
+.auth-login-card .ant-card-head-title:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+}
+
+.auth-login-card .ant-card-head-title:hover::after {
+    width: 100px;
+    transition: all 0.3s ease;
+}
+
+.auth-login-card .ant-card-body {
+    padding: 0;
+}
+
+/* ================ FORM STYLES ================ */
 .auth-login-form {
     width: 100%;
 }
 
-/* Các item trong form */
 .auth-login-form-item {
-    margin-bottom: 10px;
+    margin-bottom: 24px;
 }
 
-/* Checkbox */
-.auth-login-form-item-remember {
-    margin-bottom: 16px;
+.auth-login-form-item label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+    margin-bottom: 8px;
 }
 
-/* Ô input */
 .auth-login-input {
-    border-radius: 8px;
-    padding      : 10px;
-    font-size    : 14px;
-    width        : 100%;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.auth-login-input:hover {
+    border-color: #d1d5db;
+    background: white;
+}
+
+.auth-login-input:focus {
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.auth-login-form-item-remember {
+    margin-bottom: 32px;
 }
 
 .auth-login-haha {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.auth-login-checkbox {
+    color: #6b7280;
+    font-weight: 500;
 }
 
 .auth-login-forgot-link {
-    flex: 1;
+    text-align: right;
 }
 
-/* Checkbox ghi nhớ */
-.auth-login-checkbox {
-    color: #4b5563;
-    flex : 1;
+.auth-login-forgot-link-a {
+    color: #3b82f6;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    padding: 6px 10px;
+    border-radius: 6px;
 }
 
-/* Nút đăng nhập */
+.auth-login-forgot-link-a:hover {
+    color: #2563eb;
+    background: rgba(59, 130, 246, 0.05);
+}
+
+/* ================ BUTTONS ================ */
 .auth-login-button {
-    background-color: #3b82f6;
-    border          : none;
-    border-radius   : 8px;
-    font-weight     : 600;
-    height          : 40px;
-    transition      : background-color 0.3s ease;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    height: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+    color: white;
 }
 
 .auth-login-button:hover {
-    background-color: #2563eb;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    color: white;
 }
 
-/* Dòng phân cách */
-.auth-login-divider {
-    text-align: center;
-    margin    : 16px 0;
-    color     : #9ca3af;
-    font-size : 13px;
-    position  : relative;
+.auth-login-button:focus {
+    box-shadow: 
+        0 0 0 3px rgba(59, 130, 246, 0.2),
+        0 8px 20px rgba(59, 130, 246, 0.4);
+    color: white;
 }
 
-.auth-login-divider::before,
-.auth-login-divider::after {
-    content   : "";
-    position  : absolute;
-    top       : 50%;
-    width     : 45%;
-    height    : 1px;
-    background: #e5e7eb;
+.auth-login-button:active {
+    transform: translateY(0);
 }
 
-.auth-login-divider::before {
-    left: 0;
-}
-
-.auth-login-divider::after {
-    right: 0;
-}
-
-/* Nút Google */
-.auth-login-google-button {
-    border          : 1px solid #d1d5db;
-    background-color: #fff;
-    border-radius   : 8px;
-    height          : 40px;
-    color           : #111827;
-    transition      : all 0.3s ease;
-    display         : flex;
-    align-items     : center;
-    justify-content : center;
-}
-
-.auth-login-google-button:hover {
-    background-color: #f3f4f6 !important;
-    border-color    : #9ca3af !important;
-    color           : #111827 !important;
-}
-
-.auth-login-google-button .anticon {
-    margin-right: 8px !important;
-    font-size   : 18px !important;
-}
-
-/* Thông báo lỗi */
-.auth-login-error {
-    color           : #ef4444;
-    background-color: #fee2e2;
-    padding         : 12px;
-    margin-bottom   : 16px;
-    border-radius   : 8px;
-    text-align      : center;
-    font-weight     : 500;
-}
-
+/* ================ REGISTER LINK ================ */
 .auth-login-register-link {
-    margin-top: 16px;
     text-align: center;
-    font-size : 14px;
-    color     : #4b5563;
+    font-size: 15px;
+    color: #6b7280;
+    font-weight: 500;
+    margin-top: 32px;
+    padding: 18px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
 }
 
-.auth-login-register-link .auth-login-register-link-a {
-    color          : #106cff;
-    font-weight    : 500;
+.auth-login-register-link-a {
+    color: #3b82f6;
+    font-weight: 700;
     text-decoration: none;
-    margin-left    : 4px;
+    margin-left: 4px;
+    transition: color 0.3s ease;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
-.auth-login-register-link .auth-login-register-link-a:hover {
-    text-decoration: underline;
-    color          : #759aeb;
+.auth-login-register-link-a:hover {
+    color: #2563eb;
+    background: rgba(59, 130, 246, 0.05);
 }
 
-.auth-login-google-login {
-    display        : flex;
-    justify-content: center;
-    align-items    : center;
-    width          : 100%;
-    margin-bottom  : 12px;
+/* ================ ERROR MESSAGE ================ */
+.auth-login-error {
+    color: #dc2626;
+    background: #fef2f2;
+    padding: 16px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #fecaca;
 }
 
-/* =========================
-   RESPONSIVE BREAKPOINTS
-   ========================= */
-/* Mobile: 320px - 767px */
-/* Tablet: 768px - 1023px */
-/* Desktop: 1024px+ */
+/* ================ RESPONSIVE DESIGN ================ */
 
-/* =========================
-   TABLET RESPONSIVE
-   ========================= */
-@media screen and (max-width: 1023px) {
-    .auth-login-card {
-        width    : 100%;
-        max-width: 450px;
-        padding  : 20px;
+/* ================ TABLET ================ */
+@media screen and (max-width: 1200px) {
+    .auth-login-welcome {
+        padding: 40px 30px;
     }
+    
+    .auth-login-form-section {
+        padding: 40px 30px;
+    }
+    
+    .auth-login-welcome-title {
+        font-size: 42px;
+    }
+    
+    .auth-login-welcome-subtitle {
+        font-size: 18px;
+    }
+}
 
+@media screen and (max-width: 1024px) {
+    .auth-login-welcome {
+        padding: 30px 20px;
+    }
+    
+    .auth-login-form-section {
+        padding: 30px 20px;
+    }
+    
+    .auth-login-welcome-title {
+        font-size: 38px;
+    }
+    
     .auth-login-card .ant-card-head-title {
-        font-size: 22px;
-    }
-
-    .auth-login-input {
-        padding  : 12px;
-        font-size: 15px;
-    }
-
-    .auth-login-button,
-    .auth-login-google-button {
-        height: 44px;
-    }
-
-    .auth-login-form-item {
-        margin-bottom: 12px;
-    }
-
-    .auth-login-form-item-remember {
-        margin-bottom: 18px;
-    }
-
-    .auth-login-divider {
-        margin: 18px 0;
-    }
-
-    .auth-login-google-login {
-        margin-bottom: 14px;
+        font-size: 28px;
     }
 }
 
-/* =========================
-   MOBILE RESPONSIVE
-   ========================= */
-@media screen and (max-width: 767px) {
-    .auth-login-card {
-        width     : 100%;
-        max-width : 100%;
-        padding   : 16px;
-        box-shadow: none;
-        background: transparent;
+/* ================ MOBILE RESPONSIVE ================ */
+@media screen and (max-width: 768px) {
+    .auth-login-container {
+        flex-direction: column;
+        min-height: 100vh;
     }
-
-    .auth-login-card .ant-card-head-title {
-        font-size: 20px;
+    
+    .auth-login-welcome {
+        flex: none;
+        padding: 40px 20px 30px;
+        min-height: 40vh;
+        animation: fadeSlideIn 0.6s ease-out;
     }
-
-    .auth-login-input {
-        padding  : 10px;
-        font-size: 14px;
-    }
-
-    .auth-login-button,
-    .auth-login-google-button {
-        height: 40px;
-    }
-
-    .auth-login-form-item {
-        margin-bottom: 10px;
-    }
-
-    .auth-login-form-item-remember {
+    
+    .auth-login-welcome-title {
+        font-size: 30px;
         margin-bottom: 16px;
     }
-
+    
+    .auth-login-welcome-subtitle {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .auth-login-welcome-features {
+        display: none;
+    }
+    
+    .auth-login-form-section {
+        flex: 1;
+        padding: 30px 20px 40px;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 20px 20px 0 0;
+        margin-top: -20px;
+        position: relative;
+        z-index: 2;
+        animation: slideInFromRight 0.6s ease-out 0.2s both;
+    }
+    
+    .auth-login-card .ant-card-head-title {
+        font-size: 26px;
+    }
+    
+    .auth-login-card .ant-card-head {
+        padding-bottom: 30px;
+    }
+    
+    .auth-login-form-item {
+        margin-bottom: 20px;
+    }
+    
+    .auth-login-form-item-remember {
+        margin-bottom: 24px;
+    }
+    
     .auth-login-haha {
         flex-direction: column;
-        gap           : 8px;
+        gap: 12px;
+        align-items: center;
     }
-
+    
     .auth-login-forgot-link {
         text-align: center;
     }
-
-    .auth-login-checkbox {
-        text-align: center;
+    
+    .auth-login-input {
+        padding: 12px 14px;
+        font-size: 16px;
+        border-radius: 10px;
     }
-
-    .auth-login-divider {
-        margin   : 16px 0;
-        font-size: 12px;
+    
+    .auth-login-button {
+        height: 48px;
+        font-size: 16px;
+        border-radius: 10px;
     }
-
-    .auth-login-error {
-        padding      : 10px;
-        font-size    : 13px;
-        margin-bottom: 14px;
-    }
-
+    
     .auth-login-register-link {
-        margin-top: 14px;
-        font-size : 13px;
-    }
-
-    .auth-login-google-login {
-        margin-bottom: 12px;
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 10px;
+        font-size: 14px;
     }
 }
 
-/* =========================
-   VERY SMALL MOBILE
-   ========================= */
-@media screen and (max-width: 479px) {
-    .auth-login-card {
-        padding: 12px;
+/* ================ SMALL MOBILE ================ */
+@media screen and (max-width: 480px) {
+    .auth-login-welcome {
+        padding: 30px 15px 20px;
+        min-height: 35vh;
     }
+    
+    .auth-login-welcome-title {
+        font-size: 26px;
+    }
+    
+    .auth-login-welcome-subtitle {
+        font-size: 14px;
+    }
+    
+    .auth-login-form-section {
+        padding: 25px 15px 30px;
+    }
+    
+    .auth-login-card .ant-card-head-title {
+        font-size: 24px;
+    }
+    
+    .auth-login-input {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    .auth-login-button {
+        height: 46px;
+        font-size: 15px;
+    }
+    
+    .auth-login-form-item {
+        margin-bottom: 18px;
+    }
+    
+    .auth-login-form-item-remember {
+        margin-bottom: 20px;
+    }
+    
+    .auth-login-register-link {
+        font-size: 13px;
+        padding: 14px;
+    }
+}
 
+/* ================ LANDSCAPE MOBILE ================ */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .auth-login-container {
+        flex-direction: row;
+    }
+    
+    .auth-login-welcome {
+        flex: 0.4;
+        padding: 20px 15px;
+        min-height: 100vh;
+    }
+    
+    .auth-login-welcome-title {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+    
+    .auth-login-welcome-subtitle {
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .auth-login-welcome-features {
+        display: none;
+    }
+    
+    .auth-login-form-section {
+        flex: 0.6;
+        padding: 20px 15px;
+        margin-top: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    .auth-login-card .ant-card-head {
+        padding-bottom: 15px;
+    }
+    
     .auth-login-card .ant-card-head-title {
         font-size: 18px;
     }
-
-    .auth-login-input {
-        padding  : 8px;
-        font-size: 13px;
-    }
-
-    .auth-login-button,
-    .auth-login-google-button {
-        height: 36px;
-    }
-
+    
     .auth-login-form-item {
-        margin-bottom: 8px;
-    }
-
-    .auth-login-form-item-remember {
-        margin-bottom: 14px;
-    }
-
-    .auth-login-divider {
-        margin   : 14px 0;
-        font-size: 11px;
-    }
-
-    .auth-login-error {
-        padding      : 8px;
-        font-size    : 12px;
-        margin-bottom: 12px;
-    }
-
-    .auth-login-register-link {
-        margin-top: 12px;
-        font-size : 12px;
-    }
-
-    .auth-login-google-login {
         margin-bottom: 10px;
     }
-
-    .auth-login-google-button .anticon {
-        margin-right: 6px !important;
-        font-size   : 16px !important;
+    
+    .auth-login-form-item-remember {
+        margin-bottom: 12px;
+    }
+    
+    .auth-login-button {
+        height: 40px;
     }
 }
 
-/* =========================
-   LANDSCAPE MOBILE
-   ========================= */
-@media screen and (max-height: 500px) and (orientation: landscape) {
-    .auth-login-card {
-        padding: 12px;
+/* ================ HIGH CONTRAST ================ */
+@media (prefers-contrast: high) {
+    .auth-login-input {
+        border-width: 3px;
     }
-
+    
+    .auth-login-button {
+        background: #1e40af;
+        color: #fff;
+    }
+    
     .auth-login-card .ant-card-head-title {
-        font-size    : 16px;
-        margin-bottom: 8px;
+        background: #1e40af;
+        -webkit-background-clip: unset;
+        -webkit-text-fill-color: #1e40af;
+        background-clip: unset;
+        color: #1e40af;
     }
-
-    .auth-login-form-item {
-        margin-bottom: 6px;
+    
+    .auth-login-card .ant-card-head-title::after {
+        background: #1e40af;
     }
+}
 
-    .auth-login-form-item-remember {
-        margin-bottom: 10px;
+/* ================ REDUCED MOTION ================ */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
-
-    .auth-login-divider {
-        margin: 10px 0;
+    
+    .auth-login-button:hover {
+        transform: none;
     }
+    
+    .auth-login-welcome-feature:hover {
+        transform: none;
+    }
+    
+    .auth-login-card .ant-card-head-title:hover {
+        transform: none;
+        transition: none;
+    }
+    
+    .auth-login-card .ant-card-head-title:hover::after {
+        width: 80px;
+        transition: none;
+    }
+}
 
-    .auth-login-google-login {
-        margin-bottom: 8px;
+/* ================ PRINT STYLES ================ */
+@media print {
+    .auth-login-container {
+        background: white;
+        color: black;
+    }
+    
+    .auth-login-welcome {
+        display: none;
+    }
+    
+    .auth-login-form-section {
+        flex: 1;
+        box-shadow: none;
+    }
+    
+    .auth-login-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
     }
 }

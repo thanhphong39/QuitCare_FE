@@ -9,6 +9,11 @@ import mountainBg from "../../assets/images/login1.png";
 function AuthenTemplate({ isLogin }) {
   const navigate = useNavigate();
 
+  // Nếu là trang đăng nhập, sử dụng layout 2 cột mới
+  if (isLogin) {
+    return <LoginForm />;
+  }
+  
   // Nếu là trang đăng ký, hiển thị layout 2 cột mới
   if (!isLogin) {
     return <RegisterForm />;

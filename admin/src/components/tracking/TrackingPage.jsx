@@ -174,18 +174,19 @@ const TrackingPage = () => {
         return;
       }
 
-      // Tạo danh sách tất cả ngày trong kế hoạch trừ ngày cuối
+      // Tạo danh sách tất cả ngày trong kế hoạch (trừ ngày cuối để người dùng tự nhập)
       const allDays = [];
       let currentDate = planStartDate;
 
+      // Điền tất cả ngày trừ ngày cuối cùng (để người dùng tự nhập ngày cuối)
       while (isBefore(currentDate, planEndDate)) {
-        // Không bao gồm ngày cuối
         allDays.push(new Date(currentDate));
         currentDate = addDays(currentDate, 1);
       }
 
+      const totalPlanDays = differenceInDays(planEndDate, planStartDate) + 1;
       console.log(
-        `📅 Sẽ điền dữ liệu cho ${allDays.length} ngày (trừ ngày cuối)`
+        `📅 Tổng số ngày kế hoạch: ${totalPlanDays} | Script sẽ điền: ${allDays.length} ngày (để lại ngày cuối)`
       );
 
       // Dữ liệu mẫu đa dạng để mô phỏng thực tế
@@ -325,7 +326,7 @@ const TrackingPage = () => {
       loadTrackingData();
 
       message.success(
-        `🎉 Đã điền thành công ${allDays.length} ngày! Còn lại ngày cuối để bạn tự nhập.`
+        `🎉 Đã điền thành công ${allDays.length} ngày! Còn lại ngày cuối để bạn tự nhập thực tế.`
       );
     } catch (error) {
       console.error("❌ Lỗi auto fill:", error);
@@ -413,7 +414,9 @@ const TrackingPage = () => {
 
   // Parse week range thành số ngày - CẬP NHẬT để hiểu định dạng từ CreatePlanning
   const parseWeekRangeToDays = (weekRange) => {
-    if (!weekRange || typeof weekRange !== "string") return 7;
+    if (!weekRange || typeof weekRange !== "string") {
+      return 7;
+    }
 
     const cleanRange = weekRange.trim();
 
@@ -432,7 +435,9 @@ const TrackingPage = () => {
       if (rangeMatch) {
         const startWeek = parseInt(rangeMatch[1]);
         const endWeek = parseInt(rangeMatch[2]);
-        return Math.max(1, endWeek - startWeek + 1) * 7;
+        const totalWeeks = Math.max(1, endWeek - startWeek + 1);
+        const totalDays = totalWeeks * 7;
+        return totalDays;
       }
 
       const numberMatch = numbersOnly.match(/^(\d+)$/);
@@ -448,7 +453,9 @@ const TrackingPage = () => {
     if (rangeMatch) {
       const startWeek = parseInt(rangeMatch[1]);
       const endWeek = parseInt(rangeMatch[2]);
-      return Math.max(1, endWeek - startWeek + 1) * 7;
+      const totalWeeks = Math.max(1, endWeek - startWeek + 1);
+      const totalDays = totalWeeks * 7;
+      return totalDays;
     }
 
     const numberMatch = cleanRange.match(/^(\d+)$/);
@@ -523,7 +530,9 @@ const TrackingPage = () => {
 
   // Tính ngày kết thúc kế hoạch
   const getPlanEndDate = () => {
-    if (!plan || !plan.stages || plan.stages.length === 0) return null;
+    if (!plan || !plan.stages || plan.stages.length === 0) {
+      return null;
+    }
 
     const startDate = startOfDay(new Date(plan.localDateTime));
 
@@ -556,15 +565,15 @@ const TrackingPage = () => {
 
       for (const stage of sortedStages) {
         if (stage.week_range) {
-          totalDays += parseWeekRangeToDays(stage.week_range);
+          const stageDays = parseWeekRangeToDays(stage.week_range);
+          totalDays += stageDays;
         }
       }
 
-      return totalDays > 0 ? addDays(startDate, totalDays - 1) : null;
+      const endDate = totalDays > 0 ? addDays(startDate, totalDays - 1) : null;
+      return endDate;
     }
-  };
-
-  // Kiểm tra ngày có trong kế hoạch không
+  }; // Kiểm tra ngày có trong kế hoạch không
   const isDateInPlan = (date) => {
     if (!plan) return false;
 
@@ -973,16 +982,24 @@ const TrackingPage = () => {
     const planEndDate = getPlanEndDate();
     const totalDaysInPlan = differenceInDays(planEndDate, planStartDate) + 1;
 
-    // Tính toán thống kê đơn giản - TẤT CẢ dữ liệu đã submit
     const realDataEntries = Object.entries(totalStats).filter(
       ([_, value]) => value.submitted
     );
 
-    const completionRate = (realDataEntries.length / totalDaysInPlan) * 100;
-    const totalSavedCigarettes = realDataEntries.reduce((sum, [_, value]) => {
-      return sum + Math.max(0, value.target - value.cigarettes_smoked);
-    }, 0);
-    const totalSavedMoney = totalSavedCigarettes * 1000;
+    // 🔍 Debug chi tiết
+    console.log("🔍 Debug completion modal:", {
+      totalDaysInPlan,
+      realDataEntriesLength: realDataEntries.length,
+      planStartDate: format(planStartDate, "dd/MM/yyyy"),
+      planEndDate: format(planEndDate, "dd/MM/yyyy"),
+      allSubmittedDates: realDataEntries.map(([date]) => date).sort(),
+    });
+
+    // ✅ Đảm bảo cả 2 tỷ lệ không vượt quá 100%
+    const completionRate = Math.min(
+      100,
+      (realDataEntries.length / totalDaysInPlan) * 100
+    );
 
     const successDays = realDataEntries.filter(
       ([_, value]) => value.cigarettes_smoked <= value.target
@@ -990,7 +1007,7 @@ const TrackingPage = () => {
 
     const successRate =
       realDataEntries.length > 0
-        ? (successDays / realDataEntries.length) * 100
+        ? Math.min(100, (successDays / realDataEntries.length) * 100)
         : 0;
 
     setCompletionData({
@@ -1078,38 +1095,46 @@ const TrackingPage = () => {
     });
 
     setTrackingData(savedData);
-    calculateStats(savedData);
+
+    // Chỉ tính toán stats khi plan đã được load
+    if (plan && plan.localDateTime) {
+      calculateStats(savedData);
+    }
+
     console.log("📊 Đã load lại dữ liệu tracking:", savedData);
   };
 
-  // Tính toán thống kê (bao gồm cả dữ liệu auto-filled)
+  // Tính toán thống kê chính xác
   const calculateStats = (data) => {
+    // Kiểm tra xem plan đã được load chưa
+    if (!plan || !plan.localDateTime) {
+      return;
+    }
+
+    // 📅 TỔNG SỐ NGÀY: Tính từ lịch kế hoạch (ngày bắt đầu → ngày kết thúc)
+    const planStartDate = new Date(plan.localDateTime);
+    const planEndDate = getPlanEndDate();
+
+    let totalPlanDays = 0;
+    if (planEndDate) {
+      // Tổng số ngày trên lịch = ngày kết thúc - ngày bắt đầu + 1 (bao gồm cả 2 ngày)
+      totalPlanDays = differenceInDays(planEndDate, planStartDate) + 1;
+    }
+
+    // ✅ NGÀY HOÀN THÀNH: Đếm những ngày người dùng đã nhập xong form (submitted = true)
     const allEntries = Object.entries(data);
     const completedDays = allEntries.filter(
-      ([_, value]) => value.submitted
+      ([_, value]) => value.submitted === true
     ).length;
 
+    // 📈 TIẾN ĐỘ: Tính % hoàn thành = (ngày đã nhập form / tổng ngày trên lịch) * 100
     const averageProgress =
-      completedDays > 0
-        ? allEntries.reduce((sum, [_, value]) => {
-            if (value.submitted && value.target > 0) {
-              return (
-                sum +
-                Math.max(
-                  0,
-                  ((value.target - value.cigarettes_smoked) / value.target) *
-                    100
-                )
-              );
-            }
-            return sum;
-          }, 0) / completedDays
-        : 0;
+      totalPlanDays > 0 ? (completedDays / totalPlanDays) * 100 : 0;
 
     setStats({
-      totalDays: allEntries.length,
-      completedDays,
-      averageProgress: Math.round(averageProgress),
+      totalDays: totalPlanDays, // 📅 Tổng số ngày trên LỊCH kế hoạch
+      completedDays, // ✅ Số ngày đã NHẬP FORM xong
+      averageProgress: Math.round(averageProgress), // 📈 % tiến độ hoàn thành
     });
   };
 
@@ -1136,11 +1161,17 @@ const TrackingPage = () => {
   const initializeData = async () => {
     try {
       setLoading(true);
-      await Promise.all([
+
+      // Load plan và smoking status trước
+      const [planData, smokingStatusData] = await Promise.all([
         fetchPlan(),
         fetchSmokingStatus(),
-        loadTrackingData(),
       ]);
+
+      // Sau khi có plan, mới load tracking data và tính stats
+      if (planData) {
+        loadTrackingData();
+      }
     } catch (error) {
       console.error("Lỗi khởi tạo dữ liệu:", error);
     } finally {
@@ -1159,6 +1190,13 @@ const TrackingPage = () => {
   useEffect(() => {
     loadSelectedDateData();
   }, [selectedDate, trackingData]);
+
+  // Tính lại stats khi plan hoặc trackingData thay đổi
+  useEffect(() => {
+    if (plan && plan.localDateTime && Object.keys(trackingData).length >= 0) {
+      calculateStats(trackingData);
+    }
+  }, [plan, trackingData]);
 
   // Thêm hàm renderInputForm
   const renderInputForm = () => {
@@ -1553,10 +1591,13 @@ const TrackingPage = () => {
                 <span style={{ fontSize: "12px", color: "#666" }}>
                   Script sẽ tạo dữ liệu mẫu cho{" "}
                   {plan && getPlanEndDate()
-                    ? differenceInDays(
-                        getPlanEndDate(),
-                        new Date(plan.localDateTime)
-                      )
+                    ? (() => {
+                        const planStartDate = new Date(plan.localDateTime);
+                        const planEndDate = getPlanEndDate();
+                        const totalDays =
+                          differenceInDays(planEndDate, planStartDate) + 1;
+                        return totalDays;
+                      })()
                     : "?"}{" "}
                   ngày
                 </span>
@@ -1565,12 +1606,12 @@ const TrackingPage = () => {
           )}
         </div>
 
-        {/* Giữ nguyên stats */}
+        {/* Thống kê chính xác */}
         <Row gutter={[16, 16]} className="quit-tracking-stats-row">
           <Col xs={24} sm={12} md={8}>
             <Card className="quit-tracking-stats-card">
               <Statistic
-                title="Tổng số ngày"
+                title="📅 Tổng số ngày"
                 value={stats.totalDays}
                 prefix={<CalendarOutlined />}
               />
@@ -1579,7 +1620,7 @@ const TrackingPage = () => {
           <Col xs={24} sm={12} md={8}>
             <Card className="quit-tracking-stats-card">
               <Statistic
-                title="Ngày hoàn thành"
+                title="✅ Ngày đã nhập form"
                 value={stats.completedDays}
                 prefix={<SmileOutlined />}
               />
@@ -1588,7 +1629,7 @@ const TrackingPage = () => {
           <Col xs={24} sm={12} md={8}>
             <Card className="quit-tracking-stats-card">
               <Statistic
-                title="Tiến độ trung bình"
+                title="📈 Tiến độ hoàn thành"
                 value={stats.averageProgress}
                 suffix="%"
                 prefix={<HeartOutlined />}
@@ -1813,15 +1854,14 @@ const TrackingPage = () => {
                           lineHeight: 1,
                         }}
                       >
-                        {completionData.totalDays}
+                        {completionData.completedDays}
                         <span
                           style={{
                             fontSize: "24px",
-                            // fontWeight: "600",
                             color: "#666",
                           }}
                         >
-                          /{completionData.completedDays}
+                          /{completionData.totalDays}
                         </span>
                       </div>
                       <div

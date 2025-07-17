@@ -12,6 +12,7 @@ import {
   Card,
   Row,
   Col,
+  Tooltip,
 } from "antd";
 import {
   EditOutlined,
@@ -62,7 +63,8 @@ function PostsManagement() {
       filtered = filtered.filter(
         (post) =>
           post.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-          post.category?.toLowerCase().includes(searchText.toLowerCase())
+          post.category?.toLowerCase().includes(searchText.toLowerCase()) ||
+          post.description?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
 
@@ -148,6 +150,45 @@ function PostsManagement() {
       dataIndex: "title",
     },
     {
+      title: "Mô tả",
+      dataIndex: "description",
+      width: 350, // Tăng width lên 350px
+      render: (text) => {
+        if (!text) return "Không có";
+
+        // Hiển thị 150 ký tự đầu thay vì 120
+        const isLong = text.length > 150;
+        const displayText = isLong ? `${text.substring(0, 150)}...` : text;
+
+        return (
+          <Tooltip
+            title={isLong ? text : null}
+            placement="topLeft"
+            overlayStyle={{
+              maxWidth: "600px", // Tăng lên 600px
+              maxHeight: "400px", // Giới hạn chiều cao tooltip
+              overflow: "auto", // Cho phép scroll nếu quá dài
+              whiteSpace: "pre-wrap", // Giữ nguyên format text
+              wordBreak: "break-word", // Xuống dòng tự động
+            }}
+          >
+            <div
+              style={{
+                cursor: isLong ? "pointer" : "default",
+                maxWidth: "330px", // Tăng lên 330px
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                lineHeight: "1.4", // Tăng line height cho dễ đọc
+              }}
+            >
+              {displayText}
+            </div>
+          </Tooltip>
+        );
+      },
+    },
+    {
       title: "Chuyên mục",
       dataIndex: "category",
       render: (text) => text || "Không có",
@@ -213,7 +254,7 @@ function PostsManagement() {
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={8}>
             <Search
-              placeholder="Tìm kiếm theo tiêu đề, chuyên mục..."
+              placeholder="Tìm kiếm theo tiêu đề, chuyên mục, mô tả..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               allowClear
@@ -228,6 +269,9 @@ function PostsManagement() {
               allowClear
               style={{ width: "100%" }}
             >
+              <Option value="Kiến Thức">Kiến Thức</Option>
+              <Option value="Tập luyện & Sức khỏe">Tập luyện & Sức khỏe</Option>
+              <Option value="Câu Chuyện">Câu Chuyện</Option>
               <Option value="Tư vấn">Tư vấn</Option>
               <Option value="Chia sẻ">Chia sẻ</Option>
               <Option value="Hỏi đáp">Hỏi đáp</Option>
@@ -276,6 +320,8 @@ function PostsManagement() {
         onOk={handleSubmit}
         okText="Lưu"
         cancelText="Huỷ"
+        width={800}
+        style={{ top: 20 }}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -287,11 +333,47 @@ function PostsManagement() {
           </Form.Item>
 
           <Form.Item
+            label="Mô tả"
+            name="description"
+            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+          >
+            <Input.TextArea
+              rows={8} // Tăng từ 6 lên 8 rows để viết thoải mái hơn
+              placeholder="Nhập mô tả chi tiết cho bài viết (không giới hạn độ dài)..."
+              showCount // Vẫn hiển thị số ký tự để theo dõi
+              // Bỏ maxLength - không giới hạn độ dài
+              style={{
+                resize: "vertical", // Cho phép kéo dãn theo chiều dọc
+                minHeight: "120px",
+              }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Hình ảnh (URL)"
+            name="image"
+            rules={[
+              { required: false },
+              { type: "url", message: "Vui lòng nhập URL hợp lệ!" },
+            ]}
+          >
+            <Input placeholder="https://example.com/image.jpg" />
+          </Form.Item>
+
+          <Form.Item
             label="Chuyên mục"
             name="category"
-            rules={[{ required: true, message: "Vui lòng nhập chuyên mục!" }]}
+            rules={[{ required: true, message: "Vui lòng chọn chuyên mục!" }]}
           >
-            <Input />
+            <Select placeholder="Chọn chuyên mục">
+              <Option value="Kiến Thức">Kiến Thức</Option>
+              <Option value="Tập luyện & Sức khỏe">Tập luyện & Sức khỏe</Option>
+              <Option value="Câu Chuyện">Câu Chuyện</Option>
+              <Option value="Tư vấn">Tư vấn</Option>
+              <Option value="Chia sẻ">Chia sẻ</Option>
+              <Option value="Hỏi đáp">Hỏi đáp</Option>
+              <Option value="Kinh nghiệm">Kinh nghiệm</Option>
+            </Select>
           </Form.Item>
 
           <Form.Item
@@ -311,7 +393,7 @@ function PostsManagement() {
             name="date"
             rules={[{ required: true, message: "Vui lòng nhập ngày đăng!" }]}
           >
-            <Input />
+            <Input placeholder="YYYY-MM-DD hoặc DD/MM/YYYY" />
           </Form.Item>
         </Form>
       </Modal>

@@ -7,7 +7,7 @@ import api from "../../configs/axios";
 import { toast } from "react-toastify";
 
 const customDescriptions = {
-  4: `Hút thuốc lá là thói quen xấu, có hại cho sức khỏe của bạn. Do đó, hãy học cách bỏ hút thuốc lá ngay từ hôm nay để bảo vệ sức khỏe của mình và những người xung quanh. Cảm giác thèm thuốc lá có thể khiến bạn suy sụp khi bạn đang cố gắng bỏ thuốc lá. Sử dụng 13 mẹo cai thuốc lá tốt nhất từ ​​trước đến nay trong bài viết dưới đây để chống lại cảm giác thèm thuốc lá và bỏ hút thuốc lá.
+  1: `Hút thuốc lá là thói quen xấu, có hại cho sức khỏe của bạn. Do đó, hãy học cách bỏ hút thuốc lá ngay từ hôm nay để bảo vệ sức khỏe của mình và những người xung quanh. Cảm giác thèm thuốc lá có thể khiến bạn suy sụp khi bạn đang cố gắng bỏ thuốc lá. Sử dụng 13 mẹo cai thuốc lá tốt nhất từ ​​trước đến nay trong bài viết dưới đây để chống lại cảm giác thèm thuốc lá và bỏ hút thuốc lá.
 
 1. Làm sao cai được thuốc lá hay bỏ hút thuốc?
 Hầu hết những người sử dụng thuốc lá, cảm giác thèm thuốc lá hoặc thúc giục hút thuốc có thể rất mạnh. Nhưng bạn không hề có những cảm giác thèm ăn này. Khi cảm giác muốn sử dụng thuốc lá xảy ra, hãy nhớ rằng mặc dù nó có thể rất dữ dội, nhưng nó có thể sẽ trôi qua trong vòng 5 đến 10 phút cho dù bạn có hút thuốc lá hay ngậm thuốc lá hay không. Mỗi khi bạn chống lại cơn thèm thuốc lá, bạn đang tiến gần hơn một bước tới việc ngừng sử dụng thuốc lá một cách tốt đẹp.

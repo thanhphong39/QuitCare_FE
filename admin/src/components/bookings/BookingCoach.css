@@ -804,3 +804,19 @@
         transform: none;
     }
 }
+.booking-btn-primary {
+    background-color: #1890ff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    min-width: 120px;
+    transition: all 0.3s ease;
+  }
+  
+  .booking-btn-primary.loading {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  

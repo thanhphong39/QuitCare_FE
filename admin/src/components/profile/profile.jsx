@@ -18,6 +18,7 @@ import Navbar from "../navbar/Navbar";
 import api from "../../configs/axios";
 import { login } from "../../redux/features/userSlice";
 import "./profile.css";
+import { toast } from "react-toastify";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -46,20 +47,20 @@ const Profile = () => {
         gender: form.gender,
       });
 
-      dispatch(
-        login({
-          ...response.data,
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-            response.data.fullname
-          )}&background=4f46e5&color=ffffff&size=128&rounded=true`,
-        })
-      );
+      // dispatch(
+      //   login({
+      //     ...response.data,
+      //     avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      //       response.data.fullname
+      //     )}&background=4f46e5&color=ffffff&size=128&rounded=true`,
+      //   })
+      // );
 
-      message.success("Cập nhật thông tin thành công!");
+      toast.success("Cập nhật thông tin thành công!");
       setIsEditing(false);
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);
-      message.error("Cập nhật thất bại!");
+      toast.error("Cập nhật thất bại!");
     } finally {
       setLoading(false);
     }

@@ -7,7 +7,7 @@ import { Link } from "react-router";
 
 const knowledgePosts = [
   {
-    id: "4",
+    id: "1",
     title: "13 mẹo cai thuốc lá tốt nhất từ trước đến nay",
     date: "22/07/2024",
     category: "Kiến Thức",

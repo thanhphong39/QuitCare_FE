@@ -86,7 +86,7 @@ const AdviseUser = () => {
     if (status === "COMPLETED") {
       url = `/booking/coach/complete/${id}`;
     } else if (status === "CANCELLED") {
-      url = `/booking/coach/cancle/${id}`;
+      url = `/booking/${id}/cancel`;
     } else {
       console.warn("Trạng thái không hợp lệ:", status);
       return;

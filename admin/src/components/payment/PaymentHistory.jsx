@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
 import "./PaymentHistory.css";
+import { Modal, Descriptions } from "antd";
 
 const { Title } = Typography;
 
@@ -19,20 +20,29 @@ const HistoryPayment = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const accountId = localStorage.getItem("accountId");
   const PAGE_SIZE = 8;
-  const [packageStatusMap, setPackageStatusMap] = useState({});
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [selectedMembership, setSelectedMembership] = useState(null);
+  // const [packageStatusMap, setPackageStatusMap] = useState({});
   useEffect(() => {
     const fetchPaymentsWithMembershipStatus = async () => {
       try {
-        const res = await api.get(`/v1/payments/history/account/${accountId}`);
-        const payments = res.data || [];
-  
+        // 1. Gọi tất cả dữ liệu cần thiết
+        const [paymentsRes, plansRes] = await Promise.all([
+          api.get(`/v1/payments/history/account/${accountId}`),
+          api.get(`/membership-plans`),
+        ]);
+
+        const payments = paymentsRes.data || [];
+        const membershipPlans = plansRes.data || [];
+
         const sortedPayments = payments.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-  
-        // 🔥 Chỉ lấy những giao dịch SUCCESS
-        const successPayments = sortedPayments.filter(p => p.status === "SUCCESS");
-  
+
+        const successPayments = sortedPayments.filter(
+          (p) => p.status === "SUCCESS"
+        );
+
         const uniqueMembershipIds = [
           ...new Set(
             successPayments
@@ -40,38 +50,55 @@ const HistoryPayment = () => {
               .filter((id) => id !== null && id !== undefined)
           ),
         ];
-  
-        // Gọi API trạng thái gói
+
         const membershipStatuses = await Promise.all(
           uniqueMembershipIds.map((id) =>
             api
               .get(`/user-memberships/${id}`)
-              .then((res) => ({ id, status: res.data.status }))
+              .then((res) => ({ id, data: res.data }))
               .catch((err) => {
                 console.error(`❌ Lỗi khi lấy trạng thái gói #${id}:`, err);
-                return { id, status: "UNKNOWN" };
+                return { id, data: { status: "UNKNOWN" } };
               })
           )
         );
-  
+
+        // 2. Tạo map với gói tương ứng theo amountPaid
+        const getMatchingPlan = (amount) => {
+          return membershipPlans.find((plan) => plan.price === amount) || null;
+        };
+
         const statusMap = {};
-        membershipStatuses.forEach(({ id, status }) => {
-          statusMap[id] = status;
+        membershipStatuses.forEach(({ id, data }) => {
+          // 3. Tìm lại giao dịch tương ứng để lấy amountPaid
+          const matchingPayment = successPayments.find(
+            (p) => p.userMembershipId === id
+          );
+
+          const matchedPlan = matchingPayment
+            ? getMatchingPlan(matchingPayment.amountPaid)
+            : null;
+
+          statusMap[id] = {
+            ...data,
+            membershipPlan: matchedPlan,
+          };
+          console.log("✅ statusMap:", statusMap);
         });
-  
-        // Gán status cho các giao dịch SUCCESS
+
+        // 4. Gắn dữ liệu enrich vào từng payment
         const paymentsWithStatus = sortedPayments.map((payment) => {
-          const status =
+          const membership =
             payment.status === "SUCCESS"
-              ? statusMap[payment.userMembershipId] || "UNKNOWN"
+              ? statusMap[payment.userMembershipId] || null
               : null;
-  
+
           return {
             ...payment,
-            membershipStatus: status,
+            membershipStatus: membership,
           };
         });
-  
+        console.log("✅ paymentsWithStatus:", paymentsWithStatus);
         setPayments(paymentsWithStatus);
       } catch (err) {
         console.error("❌ Lỗi khi lấy lịch sử thanh toán:", err);
@@ -79,12 +106,24 @@ const HistoryPayment = () => {
         setLoading(false);
       }
     };
-  
+
     if (accountId) {
       fetchPaymentsWithMembershipStatus();
     }
   }, [accountId]);
-  
+
+  const getStatusDisplay = (status) => {
+    switch (status) {
+      case "ACTIVE":
+        return { text: "Đang hoạt động", color: "green" };
+      case "INACTIVE":
+        return { text: "Không hoạt động", color: "gray" };
+      case "EXPIRED":
+        return { text: "Hết hạn", color: "red" };
+      default:
+        return { text: "Không xác định", color: "gray" };
+    }
+  };
 
   const columns = [
     {
@@ -140,27 +179,31 @@ const HistoryPayment = () => {
       ),
     },
     {
-      title: "Trạng thái gói",
+      title: "Chi tiết gói",
       dataIndex: "membershipStatus",
       key: "membershipStatus",
-      render: (status) => {
-        const display =
-          status === "ACTIVE"
-            ? "Đang hoạt động"
-            : status === "INACTIVE"
-            ? "Không hoạt động"
-            : status === "EXPIRED"
-            ? "Hết hạn"
-            : "Không xác định";
-    
-        const color =
-          status === "ACTIVE"
-            ? "green"
-            : status === "EXPIRED"
-            ? "red"
-            : "gray";
-    
-        return <span style={{ color, fontWeight: 500 }}>{display}</span>;
+      render: (membership) => {
+        if (!membership)
+          return <span style={{ color: "gray" }}>Không xác định</span>;
+
+        const { text, color } = getStatusDisplay(membership.status);
+
+        return (
+          <span
+            style={{
+              color,
+              fontWeight: 500,
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+            onClick={() => {
+              setSelectedMembership(membership);
+              setVisibleModal(true);
+            }}
+          >
+             {text}
+          </span>
+        );
       },
     },
   ];
@@ -241,6 +284,47 @@ const HistoryPayment = () => {
                   }}
                   bordered={false}
                 />
+                <Modal
+                  title="Chi tiết gói thành viên"
+                  open={visibleModal}
+                  onCancel={() => setVisibleModal(false)}
+                  footer={null}
+                >
+                  {selectedMembership ? (
+                    <Descriptions column={1} bordered size="small">
+                      {/* <Descriptions.Item label="ID gói">
+                        {selectedMembership.id}
+                      </Descriptions.Item> */}
+                      <Descriptions.Item label="Trạng thái">
+                        {getStatusDisplay(selectedMembership.status).text}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Ngày bắt đầu">
+                        {dayjs(selectedMembership.startDate).format(
+                          "DD/MM/YYYY"
+                        )}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Ngày kết thúc">
+                        {dayjs(selectedMembership.endDate).format("DD/MM/YYYY")}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Tên gói">
+                        {selectedMembership.membershipPlan?.name ||
+                          "Không xác định"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Giá">
+                        {selectedMembership.membershipPlan?.price?.toLocaleString(
+                          "vi-VN"
+                        ) || "?"}{" "}
+                        VND
+                      </Descriptions.Item>
+                    </Descriptions>
+                  ) : (
+                    <Alert
+                      message="Không có dữ liệu gói"
+                      type="warning"
+                      showIcon
+                    />
+                  )}
+                </Modal>
               </div>
             )}
           </div>

@@ -2,28 +2,45 @@ import React, { useEffect, useState } from "react";
 import "./package.css";
 import freeCard from "../../assets/images/pack2.png";
 import premiumCard from "../../assets/images/pack1.png";
-import api from "../../configs/axios"; // nếu bạn có file cấu hình axios sẵn
+import api from "../../configs/axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const Package = () => {
   const [packages, setPackages] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
-    // Giả sử có 2 gói: ID 1 là FREE, ID 2 là PREMIUM
     const fetchPackages = async () => {
       try {
-        const basicRes = await api.get(`/membership-plans/1`);
-        const premiumRes = await api.get(`/membership-plans/2`);
-        setPackages([
-          { ...basicRes.data, image: freeCard },
-          { ...premiumRes.data, image: premiumCard },
-        ]);
+        const res = await api.get("/membership-plans");
+        const allPlans = res.data;
+  
+        if (!Array.isArray(allPlans) || allPlans.length === 0) {
+          console.warn("Không có gói hội viên nào");
+          return;
+        }
+  
+        // Bước 1: Sắp xếp theo ID giảm dần
+        const sortedById = [...allPlans].sort((a, b) => b.id - a.id);
+  
+        // Bước 2: Lấy 2 phần tử đầu tiên có ID cao nhất
+        const top2Plans = sortedById.slice(0, 2);
+  
+        // Bước 3: Tạo danh sách hiển thị với hình ảnh
+        const packageList = top2Plans.map((plan) => {
+          return {
+            ...plan,
+            image: plan.name.toLowerCase() === "basic" ? freeCard : premiumCard,
+          };
+        });
+  
+        setPackages(packageList);
       } catch (error) {
-        console.error("Lỗi khi lấy gói hội viên:", error);
+        console.error("Lỗi khi lấy danh sách gói hội viên:", error);
       }
     };
-
+  
     fetchPackages();
   }, []);
 
@@ -48,52 +65,61 @@ const Package = () => {
             <img src={pkg.image} alt={pkg.name} className="card-img" />
             <div className="info">
               <h3
-                className={`package-name ${pkg.price === 0 ? "basic" : "premium"
-                  }`}
+                className={`package-name ${
+                  pkg.price === 0 ? "basic" : "premium"
+                }`}
               >
                 {pkg.name.toUpperCase()}
               </h3>
-              <p className="price">
-                {`${pkg.price.toLocaleString()} VND`}
-              </p>
+              <p className="price">{`${pkg.price.toLocaleString()} VND`}</p>
               <p className="benefit">{pkg.description}</p>
               <button
-  className={`btn ${pkg.name.toLowerCase() === "basic" ? "btn-basic" : "btn-premium"}`}
-  onClick={() => {
-    if (pkg.name.toLowerCase() === "basic") {
-      Swal.fire({
-        title: 'Bạn đang chọn gói Basic ',
-        text: `Gói ${pkg.name.toUpperCase()}  sẽ có chức năng hạn chế. 
-  Chúng tôi khuyến khích bạn nâng cấp lên gói PREMIUM để được hỗ trợ tư vấn sớm từ chuyên gia.`,
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: 'Vẫn chọn gói BASIC',
-        cancelButtonText: 'Xem gói PREMIUM',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate(`/payment?membershipPlanId=${pkg.id}`);
-        } else {
-          navigate(`/payment?membershipPlanId=2`); // Điều hướng sang gói PREMIUM (id=2)
-        }
-      });
-    } else {
-      Swal.fire({
-        title: 'Xác nhận mua gói PREMIUM?',
-        text: `Bạn có chắc chắn muốn mua gói ${pkg.name.toUpperCase()} với giá ${pkg.price.toLocaleString()} VND không?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Xác nhận',
-        cancelButtonText: 'Hủy',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate(`/payment?membershipPlanId=${pkg.id}`);
-        }
-      });
-    }
-  }}
->
-  Mua gói
-</button>
+                className={`btn ${
+                  pkg.name.toLowerCase() === "basic"
+                    ? "btn-basic"
+                    : "btn-premium"
+                }`}
+                onClick={() => {
+                  if (pkg.name.toLowerCase() === "basic") {
+                    Swal.fire({
+                      title: "Bạn đang chọn gói Basic ",
+                      text: `Gói ${pkg.name.toUpperCase()}  sẽ có chức năng hạn chế. 
+Chúng tôi khuyến khích bạn nâng cấp lên gói PREMIUM để được hỗ trợ tư vấn sớm từ chuyên gia.`,
+                      icon: "info",
+                      showCancelButton: true,
+                      confirmButtonText: "Vẫn chọn gói BASIC",
+                      cancelButtonText: "Xem gói PREMIUM",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        navigate(`/payment?membershipPlanId=${pkg.id}`);
+                      } else {
+                        // Chuyển hướng sang gói Premium nếu người dùng muốn xem
+                        const premium = packages.find(
+                          (p) => p.name.toLowerCase() === "premium"
+                        );
+                        if (premium) {
+                          navigate(`/payment?membershipPlanId=${premium.id}`);
+                        }
+                      }
+                    });
+                  } else {
+                    Swal.fire({
+                      title: "Xác nhận mua gói PREMIUM?",
+                      text: `Bạn có chắc chắn muốn mua gói ${pkg.name.toUpperCase()} với giá ${pkg.price.toLocaleString()} VND không?`,
+                      icon: "question",
+                      showCancelButton: true,
+                      confirmButtonText: "Xác nhận",
+                      cancelButtonText: "Hủy",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        navigate(`/payment?membershipPlanId=${pkg.id}`);
+                      }
+                    });
+                  }
+                }}
+              >
+                Mua gói
+              </button>
             </div>
           </div>
         ))}

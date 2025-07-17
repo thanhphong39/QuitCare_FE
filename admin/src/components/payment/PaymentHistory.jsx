@@ -139,11 +139,17 @@ const HistoryPayment = () => {
       title: "Số tiền đã thanh toán",
       dataIndex: "amountPaid",
       key: "amountPaid",
-      render: (amount) => (
-        <span className="payment-amount">
-          {amount.toLocaleString("vi-VN")} VND
-        </span>
-      ),
+      render: (amount, record) => {
+        if (record.status === "SUCCESS") {
+          return (
+            <span className="payment-amount">
+              {amount.toLocaleString("vi-VN")} VND
+            </span>
+          );
+        } else {
+          return <span style={{ color: "gray" }}>----</span>;
+        }
+      },
     },
     {
       title: "Trạng thái",
@@ -210,7 +216,8 @@ const HistoryPayment = () => {
 
   // Calculate statistics
   const totalAmount = payments.reduce(
-    (sum, payment) => sum + payment.amountPaid,
+    (sum, payment) =>
+      payment.status === "SUCCESS" ? sum + payment.amountPaid : sum,
     0
   );
   const successCount = payments.filter((p) => p.status === "SUCCESS").length;

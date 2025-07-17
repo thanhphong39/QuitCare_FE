@@ -38,6 +38,7 @@ import Unauthorized from "./pages/Unauthorized";
 import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
+import Blog from "./components/blog/Blog";
 
 function App() {
   const router = createBrowserRouter([
@@ -62,9 +63,15 @@ function App() {
           element: <Unauthorized />,
         },
 
-        // ================ TRANG CHỦ MẶC ĐỊNH ================
+        // ================ TRANG CHỦ MẶC ĐỊNH - CHO PHÉP TRUY CẬP CÔNG KHAI ================
         {
-          index: true, // ✅ Đây là trang mặc định khi truy cập "/"
+          index: true, // Trang mặc định khi truy cập "/"
+          element: <HomePage />, 
+        },
+
+        // ================ TRANG CHỦ CHO NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ================
+        {
+          path: "home",
           element: (
             <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
               <HomePage />

@@ -429,6 +429,7 @@
     box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.4);
     position: relative;
     overflow: hidden;
+    margin-top: 20px;
 }
 
 .auth-register-button::before {

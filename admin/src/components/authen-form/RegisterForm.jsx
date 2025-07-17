@@ -34,7 +34,6 @@ function RegisterForm() {
             Hành trình cai thuốc lá hiệu quả và bền vững
           </h1>
           
-
           <div className="auth-register-features">
             <div className="auth-register-feature-item">
               <div className="auth-register-feature-icon">🎯</div>

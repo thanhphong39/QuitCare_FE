@@ -21,7 +21,7 @@ const Booking = () => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [defaultDatesSet, setDefaultDatesSet] = useState(false);
   const user = useSelector((state) => state.user);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const from = currentMonth.startOf("month").format("YYYY-MM-DD");
   const to = currentMonth.endOf("month").format("YYYY-MM-DD");
@@ -57,6 +57,10 @@ const Booking = () => {
 
   useEffect(() => {
     const fetchCoaches = async () => {
+      if (!user?.role?.includes("CUSTOMER")) {
+        toast.warning("Bạn cần nâng cấp gói Premium để đặt lịch tư vấn.");
+        return;
+      }
       try {
         const res = await api.get("/session/coaches");
         const coachesData = res.data || [];
@@ -111,7 +115,7 @@ const Booking = () => {
     });
 
     setDefaultDatesSet(true);
-  }, [initialLoad]);
+  }, [initialLoad, defaultDatesSet, coaches, availableSlots, selectedDates]);
 
   const handleDateChange = (coachId, value) => {
     setSelectedDates((prev) => ({ ...prev, [coachId]: value }));
@@ -143,7 +147,11 @@ const Booking = () => {
 
     try {
       setLoadingState((prev) => ({ ...prev, [coach.id]: true }));
-
+      console.log("role user", user.role);
+      if (!user?.role?.includes("CUSTOMER")) {
+        toast.warning("Bạn cần mua gói Premium để đặt lịch tư vấn.");
+        return;
+      }
       const res = await api.post("/booking", {
         coachId: coach.id,
         appointmentDate: date,

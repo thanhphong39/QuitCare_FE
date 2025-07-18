@@ -186,10 +186,19 @@ const Booking = () => {
       setSelectedSlots((prev) => ({ ...prev, [coach.id]: "" }));
     } catch (err) {
       if (err.response?.status === 409) {
-        message.error("❌ Lịch này đã được đặt bởi người khác.");
+        toast.error("❌ Lịch này đã được đặt bởi người khác.");
         const newDisabled = { ...disabledSlots, [slotKey]: true };
         setDisabledSlots(newDisabled);
         localStorage.setItem("disabledSlots", JSON.stringify(newDisabled));
+      }else if (err.response?.status === 400) {
+        toast.error("❌ Xin lỗi! Bạn chỉ có thể đặt lịch 4 lần.", { duration: 3000 });
+
+setTimeout(() => {
+  toast.error("❗ Xin hãy đăng ký gói Premium mới để sử dụng chức năng đặt lịch.", { duration: 5000 });
+}, 3200); // Hiển thị cái thứ hai sau 3.2 giây
+        // const newDisabled = { ...disabledSlots, [slotKey]: true };
+        // setDisabledSlots(newDisabled);
+        // localStorage.setItem("disabledSlots", JSON.stringify(newDisabled));
       } else {
         message.error("❌ Đặt lịch thất bại. Vui lòng thử lại sau.");
       }

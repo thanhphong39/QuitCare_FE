@@ -74,52 +74,15 @@ const Package = () => {
               <p className="price">{`${pkg.price.toLocaleString()} VND`}</p>
               <p className="benefit">{pkg.description}</p>
               <button
-                className={`btn ${
-                  pkg.name.toLowerCase() === "basic"
-                    ? "btn-basic"
-                    : "btn-premium"
-                }`}
-                onClick={() => {
-                  if (pkg.name.toLowerCase() === "basic") {
-                    Swal.fire({
-                      title: "Bạn đang chọn gói Basic ",
-                      text: `Gói ${pkg.name.toUpperCase()}  sẽ có chức năng hạn chế. 
-Chúng tôi khuyến khích bạn nâng cấp lên gói PREMIUM để được hỗ trợ tư vấn sớm từ chuyên gia.`,
-                      icon: "info",
-                      showCancelButton: true,
-                      confirmButtonText: "Vẫn chọn gói BASIC",
-                      cancelButtonText: "Xem gói PREMIUM",
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        navigate(`/payment?membershipPlanId=${pkg.id}`);
-                      } else {
-                        // Chuyển hướng sang gói Premium nếu người dùng muốn xem
-                        const premium = packages.find(
-                          (p) => p.name.toLowerCase() === "premium"
-                        );
-                        if (premium) {
-                          navigate(`/payment?membershipPlanId=${premium.id}`);
-                        }
-                      }
-                    });
-                  } else {
-                    Swal.fire({
-                      title: "Xác nhận mua gói PREMIUM?",
-                      text: `Bạn có chắc chắn muốn mua gói ${pkg.name.toUpperCase()} với giá ${pkg.price.toLocaleString()} VND không?`,
-                      icon: "question",
-                      showCancelButton: true,
-                      confirmButtonText: "Xác nhận",
-                      cancelButtonText: "Hủy",
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        navigate(`/payment?membershipPlanId=${pkg.id}`);
-                      }
-                    });
-                  }
-                }}
-              >
-                Mua gói
-              </button>
+  className={`btn ${
+    pkg.name.toLowerCase() === "basic" ? "btn-basic" : "btn-premium"
+  }`}
+  onClick={() => {
+    navigate(`/payment?membershipPlanId=${pkg.id}`);
+  }}
+>
+  Mua gói
+</button>
             </div>
           </div>
         ))}

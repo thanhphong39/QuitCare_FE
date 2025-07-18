@@ -31,6 +31,7 @@ import {
 import moment from "moment";
 import "./advise-user.css";
 import api from "../../../configs/axios";
+import { toast } from "react-toastify";
 
 const { TabPane } = Tabs;
 const { Title, Text } = Typography;
@@ -113,10 +114,12 @@ const AdviseUser = () => {
 
   const handleCompleteConsultation = async (record) => {
     await updateAppointmentStatus(record.id, "COMPLETED");
+    toast.success("Đã hoàn thành buổi tư vấn thành công!")
   };
 
   const handleCancelConsultation = async (record) => {
     await updateAppointmentStatus(record.id, "CANCELLED");
+    toast.error("Đã hủy buổi tư vấn thành công!")
   };
 
   const filteredAppointments = appointments.filter((appointment) => {

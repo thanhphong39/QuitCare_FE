@@ -102,7 +102,7 @@ const PaymentResult = () => {
     };
 
     updatePaymentStatus();
-  }, [transactionStatus, getParam, dispatch]); // ✅ Thêm dispatch vào dependency
+  }, []); // ✅ Thêm dispatch vào dependency
 
   if (loading) {
     return (

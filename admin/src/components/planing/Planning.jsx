@@ -251,6 +251,7 @@ function PlanPage() {
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [showAddictionResult, setShowAddictionResult] = useState(false);
   const [formLoaded, setFormLoaded] = useState(false); // Track if form is loaded from storage
+  const [fieldErrors, setFieldErrors] = useState({}); // <--- Thêm state cho lỗi từng trường
 
   // ================ HOOKS ================
   const navigate = useNavigate();
@@ -321,7 +322,39 @@ function PlanPage() {
   // ================ EVENT HANDLERS ================
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let errorMsg = "";
+
+    // Validate từng trường số
+    if (name === "started_smoking_age") {
+      if (value !== "" && (parseInt(value) < 10 || parseInt(value) > 50)) {
+        errorMsg = "Vui lòng nhập tuổi từ 10 đến 50.";
+      }
+    }
+    if (name === "cigarettes_per_day") {
+      if (value !== "" && (parseInt(value) < 1 || parseInt(value) > 50)) {
+        errorMsg = "Số điếu/ngày phải từ 1 đến 50.";
+      }
+    }
+    if (name === "cigarettes_per_pack") {
+      if (value !== "" && (parseInt(value) < 1 || parseInt(value) > 50)) {
+        errorMsg = "Số điếu/bao phải từ 1 đến 50.";
+      }
+    }
+    if (name === "quitAttempts") {
+      if (value !== "" && (parseInt(value) < 0 || parseInt(value) > 10)) {
+        errorMsg = "Số lần cai phải từ 0 đến 10.";
+      }
+    }
+    if (name === "triggerSituation") {
+      if (/\d/.test(value)) {
+        errorMsg = "Không được nhập số ở trường này.";
+      }
+    }
+
     setForm({ ...form, [name]: value });
+    setFieldErrors((prev) => ({ ...prev, [name]: errorMsg })); // <--- Lưu lỗi cho từng trường
+
+    // Nếu có lỗi chung (ví dụ thiếu thông tin), vẫn giữ lại
     setError("");
 
     // Mark form as loaded if user starts typing
@@ -632,6 +665,11 @@ function PlanPage() {
                 placeholder="Nhập tuổi"
                 disabled={isFieldDisabled()}
               />
+              {fieldErrors.started_smoking_age && (
+                <div className="planpage-error">
+                  {fieldErrors.started_smoking_age}
+                </div>
+              )}
 
               {/* Question 2: Cigarettes per day */}
               <div className="planpage-question">
@@ -648,6 +686,11 @@ function PlanPage() {
                 placeholder="Số điếu/ngày"
                 disabled={isFieldDisabled()}
               />
+              {fieldErrors.cigarettes_per_day && (
+                <div className="planpage-error">
+                  {fieldErrors.cigarettes_per_day}
+                </div>
+              )}
 
               {/* Question 3: Cigarettes per pack */}
               <div className="planpage-question">
@@ -664,6 +707,11 @@ function PlanPage() {
                 placeholder="Số điếu/bao"
                 disabled={isFieldDisabled()}
               />
+              {fieldErrors.cigarettes_per_pack && (
+                <div className="planpage-error">
+                  {fieldErrors.cigarettes_per_pack}
+                </div>
+              )}
 
               {/* Question 4: Time to first cigarette */}
               <div className="planpage-question">
@@ -702,6 +750,9 @@ function PlanPage() {
                 placeholder="Số lần"
                 disabled={isFieldDisabled()}
               />
+              {fieldErrors.quitAttempts && (
+                <div className="planpage-error">{fieldErrors.quitAttempts}</div>
+              )}
 
               {/* Question 6: Longest quit duration */}
               <div className="planpage-question">
@@ -770,6 +821,11 @@ function PlanPage() {
                 placeholder="Ví dụ: căng thẳng, sau bữa ăn..."
                 disabled={isFieldDisabled()}
               />
+              {fieldErrors.triggerSituation && (
+                <div className="planpage-error">
+                  {fieldErrors.triggerSituation}
+                </div>
+              )}
             </div>
 
             {/* Right Column */}
@@ -928,8 +984,6 @@ function PlanPage() {
                   </div>
                 </div>
               )}
-
-             
 
               <div style={{ textAlign: "center" }}>
                 <button

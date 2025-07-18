@@ -98,65 +98,6 @@ const TrackingPage = () => {
 
   // Script tự động điền dữ liệu
   const [isAutoFilling, setIsAutoFilling] = useState(false);
-  useEffect(() => {
-    const fetchMembershipPlan = async () => {
-      try {
-        if (!user?.id) {
-          console.log("⚠️ Không có accountId.");
-          return;
-        }
-
-        console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
-
-        const historyRes = await api.get(
-          `/v1/payments/history/account/${user.id}`
-        );
-        const transactions = historyRes.data || [];
-        console.log("📦 Danh sách giao dịch:", transactions);
-
-        // Lọc các giao dịch SUCCESS
-        const successTransactions = transactions.filter(
-          (tx) => tx.status === "SUCCESS"
-        );
-
-        if (successTransactions.length === 0) {
-          console.log("⛔ Không có giao dịch SUCCESS.");
-          return;
-        }
-
-        // Tìm giao dịch SUCCESS có số tiền lớn nhất
-        const maxTransaction = successTransactions.reduce((max, curr) =>
-          curr.amountPaid > max.amountPaid ? curr : max
-        );
-        const { amountPaid } = maxTransaction;
-
-        console.log("💵 Giao dịch có số tiền lớn nhất:", amountPaid);
-
-        // Gọi API lấy danh sách gói
-        const planRes = await api.get(`/membership-plans`);
-        const allPlans = planRes.data || [];
-        console.log("📋 Danh sách gói:", allPlans);
-
-        // Tìm gói nào có giá bằng với amountPaid lớn nhất và tên là Premium
-        const matchedPlan = allPlans.find(
-          (plan) =>
-            Math.abs(plan.price - amountPaid) < 1 && plan.name === "Premium"
-        );
-
-        if (matchedPlan) {
-          console.log("✅ Gói Premium đã mua, hiển thị nút ĐẶT LỊCH");
-          setShowBooking(true);
-          console.log("👁️ showBooking đã set:", true);
-        } else {
-          console.log("ℹ️ Không có gói Premium tương ứng.");
-        }
-      } catch (err) {
-        console.error("❌ Lỗi khi lấy membership:", err);
-      }
-    };
-
-    fetchMembershipPlan();
-  }, [user?.id]);
 
   // Script tự động điền dữ liệu tracking cho kế hoạch 2 tuần
   const autoFillTrackingData = async () => {
@@ -178,16 +119,11 @@ const TrackingPage = () => {
       const allDays = [];
       let currentDate = planStartDate;
 
-      // Điền tất cả ngày trừ ngày cuối cùng (để người dùng tự nhập ngày cuối)
+      // Điền tất cả ngày trừ ngày cuối cùng (để lại ngày cuối cho người dùng tự nhập)
       while (isBefore(currentDate, planEndDate)) {
         allDays.push(new Date(currentDate));
         currentDate = addDays(currentDate, 1);
       }
-
-      const totalPlanDays = differenceInDays(planEndDate, planStartDate) + 1;
-      console.log(
-        `📅 Tổng số ngày kế hoạch: ${totalPlanDays} | Script sẽ điền: ${allDays.length} ngày (để lại ngày cuối)`
-      );
 
       // Dữ liệu mẫu đa dạng để mô phỏng thực tế
       const sampleDataTemplates = [
@@ -308,14 +244,8 @@ const TrackingPage = () => {
           };
 
           // await api.post("/quit-progress", progressData);
-          console.log(
-            `✅ Đã lưu ngày ${format(
-              date,
-              "dd/MM/yyyy"
-            )}: ${cigarettes_smoked}/${targetCigs} điếu`
-          );
         } catch (apiError) {
-          console.warn(`⚠️ Lỗi API cho ngày ${dateStr}:`, apiError.message);
+          // Không hiển thị lỗi để không làm phiền user
         }
 
         // Delay nhỏ để tránh spam
@@ -329,7 +259,6 @@ const TrackingPage = () => {
         `🎉 Đã điền thành công ${allDays.length} ngày! Còn lại ngày cuối để bạn tự nhập thực tế.`
       );
     } catch (error) {
-      console.error("❌ Lỗi auto fill:", error);
       message.error("Có lỗi xảy ra khi điền dữ liệu tự động");
     } finally {
       setIsAutoFilling(false);
@@ -339,8 +268,6 @@ const TrackingPage = () => {
   // Xóa tất cả dữ liệu tracking (để test lại)
   const clearAllTrackingData = () => {
     // Debug log để kiểm tra
-    console.log("🗑️ clearAllTrackingData được gọi");
-
     Modal.confirm({
       title: "🗑️ Xóa tất cả dữ liệu tracking?",
       content: (
@@ -368,8 +295,6 @@ const TrackingPage = () => {
       width: 500,
       centered: true,
       onOk: () => {
-        console.log("🗑️ Bắt đầu xóa dữ liệu...");
-
         // Đếm số dữ liệu sẽ xóa
         let deletedCount = 0;
         Object.keys(localStorage).forEach((key) => {
@@ -383,14 +308,12 @@ const TrackingPage = () => {
         setTrackingData({});
         calculateStats({});
 
-        console.log(`🗑️ Đã xóa ${deletedCount} dữ liệu tracking`);
         message.success({
           content: `🗑️ Đã xóa thành công ${deletedCount} dữ liệu tracking!`,
           duration: 3,
         });
       },
       onCancel: () => {
-        console.log("❌ Đã hủy xóa dữ liệu");
         message.info("❌ Đã hủy thao tác xóa");
       },
     });
@@ -819,19 +742,15 @@ const TrackingPage = () => {
   // Thêm hàm tạo thông báo tự động
   const generateNotification = async (progressId) => {
     try {
-      console.log("🔔 Tạo thông báo cho progress ID:", progressId);
-
       const response = await api.post(
         `/quit-progress/generate-notification/${progressId}`
       );
-      console.log("✅ Thông báo đã được tạo:", response.data);
 
       // Hiển thị thông báo thành công nhẹ nhàng
       message.success("📢 Đã tạo thông báo theo dõi!");
 
       return response.data;
     } catch (error) {
-      console.error("❌ Lỗi tạo thông báo:", error);
       // Không hiển thị lỗi để không làm phiền user
       return null;
     }
@@ -870,7 +789,6 @@ const TrackingPage = () => {
   const handleSubmit = async () => {
     // Protection tránh double submit
     if (submitting) {
-      console.log("⚠️ Đang xử lý, bỏ qua request trùng lặp");
       return;
     }
 
@@ -892,15 +810,6 @@ const TrackingPage = () => {
 
     setSubmitting(true);
     try {
-      console.log("🚀 Gọi API quit-progress:", {
-        date: format(selectedDate, "yyyy-MM-dd"),
-        cigarettes_smoked,
-        quitHealthStatus: mainSymptom,
-        quitProgressStatus: "SUBMITTED",
-        quitPlanStageId: currentStage.id,
-        smokingStatusId,
-      });
-
       const progressData = {
         date: format(selectedDate, "yyyy-MM-dd"),
         cigarettes_smoked,
@@ -911,7 +820,6 @@ const TrackingPage = () => {
       };
 
       const response = await api.post("/quit-progress", progressData);
-      console.log("✅ API quit-progress Response:", response.data);
 
       message.success("✅ Đã lưu dữ liệu!");
 
@@ -940,8 +848,9 @@ const TrackingPage = () => {
       calculateStats(newTrackingData);
 
       // Kiểm tra xem có phải ngày cuối cùng không
-      if (isLastDayOfPlan(selectedDate)) {
-        // Đợi một chút để modal thành công hiển thị trước
+      const isLastDay = isLastDayOfPlan(selectedDate);
+
+      if (isLastDay) {
         setTimeout(() => {
           setIsModalVisible(false); // Đóng modal thường
           showCompletionModal(newTrackingData); // Hiện modal hoàn thành
@@ -954,7 +863,6 @@ const TrackingPage = () => {
         );
       }
     } catch (error) {
-      console.error("❌ Lỗi:", error);
       message.error(
         `❌ Lỗi: ${error.response?.data?.message || error.message}`
       );
@@ -972,57 +880,53 @@ const TrackingPage = () => {
   // Thêm hàm kiểm tra ngày cuối cùng
   const isLastDayOfPlan = (date) => {
     const endDate = getPlanEndDate();
-    if (!endDate) return false;
-    return isSameDay(date, endDate);
+    if (!endDate) {
+      return false;
+    }
+
+    // Đảm bảo so sánh ngày chính xác
+    const selectedDateOnly = startOfDay(date);
+    const endDateOnly = startOfDay(endDate);
+
+    const isLast = isSameDay(selectedDateOnly, endDateOnly);
+    return isLast;
   };
 
-  // Thêm hàm hiển thị modal hoàn thành
-  const showCompletionModal = (totalStats) => {
-    const planStartDate = new Date(plan.localDateTime);
-    const planEndDate = getPlanEndDate();
-    const totalDaysInPlan = differenceInDays(planEndDate, planStartDate) + 1;
+  // Thêm hàm hiển thị modal hoàn thành với API mới
+  const showCompletionModal = async () => {
+    // Chỉ dùng dữ liệu từ API, không dùng localStorage nữa
+    try {
+      const planEndDate = getPlanEndDate();
+      const currentStage = getCurrentStage(planEndDate);
+      if (!currentStage) return;
 
-    const realDataEntries = Object.entries(totalStats).filter(
-      ([_, value]) => value.submitted
-    );
+      const response = await api.get(
+        `/quit-progress/stage/${currentStage.id}/user/${accountId}`
+      );
+      const apiData = response.data;
 
-    // 🔍 Debug chi tiết
-    console.log("🔍 Debug completion modal:", {
-      totalDaysInPlan,
-      realDataEntriesLength: realDataEntries.length,
-      planStartDate: format(planStartDate, "dd/MM/yyyy"),
-      planEndDate: format(planEndDate, "dd/MM/yyyy"),
-      allSubmittedDates: realDataEntries.map(([date]) => date).sort(),
-    });
-
-    // ✅ Đảm bảo cả 2 tỷ lệ không vượt quá 100%
-    const completionRate = Math.min(
-      100,
-      (realDataEntries.length / totalDaysInPlan) * 100
-    );
-
-    const successDays = realDataEntries.filter(
-      ([_, value]) => value.cigarettes_smoked <= value.target
-    ).length;
-
-    const successRate =
-      realDataEntries.length > 0
-        ? Math.min(100, (successDays / realDataEntries.length) * 100)
-        : 0;
-
-    setCompletionData({
-      totalDays: totalDaysInPlan,
-      completedDays: realDataEntries.length,
-      completionRate: Math.round(completionRate),
-      successRate: Math.round(successRate),
-      savedCigarettes: totalSavedCigarettes,
-      savedMoney: totalSavedMoney,
-      planType: plan.systemPlan ? "Kế hoạch hệ thống" : "Kế hoạch tự tạo",
-      startDate: format(planStartDate, "dd/MM/yyyy"),
-      endDate: format(planEndDate, "dd/MM/yyyy"),
-    });
-
-    setIsCompletionModalVisible(true);
+      // Chỉ lấy các trường cần thiết từ API
+      const completionData = {
+        startDate: format(
+          new Date(apiData.startDate + "T00:00:00"),
+          "dd/MM/yyyy"
+        ),
+        endDate: format(new Date(apiData.endDate + "T00:00:00"), "dd/MM/yyyy"),
+        daysWithoutSmoking: apiData.daysWithoutSmoking,
+        cigarettesAvoided: apiData.cigarettesAvoided,
+        moneySaved: apiData.moneySaved,
+        completionRate:
+          apiData.completionRate >= 0 && apiData.completionRate <= 100
+            ? Math.round(apiData.completionRate)
+            : apiData.completionRate > 0 && apiData.completionRate <= 1
+            ? Math.round(apiData.completionRate * 100)
+            : 0,
+      };
+      setCompletionData(completionData);
+      setIsCompletionModalVisible(true);
+    } catch (error) {
+      message.error("Không thể lấy thống kê hoàn thành từ API.");
+    }
   };
 
   // Lấy kế hoạch cai thuốc
@@ -1041,23 +945,16 @@ const TrackingPage = () => {
             if (stagesResponse.data && stagesResponse.data.length > 0) {
               // Gán stages vào planData
               planData.stages = stagesResponse.data;
-              console.log(
-                "📊 Đã lấy stages cho kế hoạch tự tạo:",
-                stagesResponse.data
-              );
             }
           } catch (stagesError) {
-            console.error("Lỗi lấy stages:", stagesError);
             message.error("Không thể tải chi tiết kế hoạch tự tạo.");
           }
         }
 
         setPlan(planData);
-        console.log("📋 Kế hoạch đã load:", planData);
         return planData;
       }
     } catch (error) {
-      console.error("Lỗi lấy kế hoạch:", error);
       message.error("Không thể tải kế hoạch. Vui lòng tạo kế hoạch trước.");
     }
     return null;
@@ -1100,8 +997,6 @@ const TrackingPage = () => {
     if (plan && plan.localDateTime) {
       calculateStats(savedData);
     }
-
-    console.log("📊 Đã load lại dữ liệu tracking:", savedData);
   };
 
   // Tính toán thống kê chính xác
@@ -1118,7 +1013,7 @@ const TrackingPage = () => {
     let totalPlanDays = 0;
     if (planEndDate) {
       // Tổng số ngày trên lịch = ngày kết thúc - ngày bắt đầu + 1 (bao gồm cả 2 ngày)
-      totalPlanDays = differenceInDays(planEndDate, planStartDate) + 1;
+      totalPlanDays = differenceInDays(planEndDate, planStartDate) + 2;
     }
 
     // ✅ NGÀY HOÀN THÀNH: Đếm những ngày người dùng đã nhập xong form (submitted = true)
@@ -1595,7 +1490,7 @@ const TrackingPage = () => {
                         const planStartDate = new Date(plan.localDateTime);
                         const planEndDate = getPlanEndDate();
                         const totalDays =
-                          differenceInDays(planEndDate, planStartDate) + 1;
+                          differenceInDays(planEndDate, planStartDate) + 2;
                         return totalDays;
                       })()
                     : "?"}{" "}
@@ -1761,13 +1656,13 @@ const TrackingPage = () => {
           </div>
         </Modal>
 
-        {/* Modal hoàn thành - Professional Design */}
+        {/* Modal hoàn thành - Thống kê tình trạng theo dõi */}
         <Modal
           title={null}
           open={isCompletionModalVisible}
           onCancel={() => setIsCompletionModalVisible(false)}
           footer={null}
-          width={600}
+          width={700}
           centered
           className="quit-completion-modal"
           styles={{
@@ -1802,7 +1697,16 @@ const TrackingPage = () => {
                     filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
                   }}
                 >
-                  🏆
+                  <img
+                    src="/src/assets/images/logo.png"
+                    alt="QuitCare Logo"
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "contain",
+                      // Bỏ filter trắng để hiển thị logo màu gốc
+                    }}
+                  />
                 </div>
                 <h2
                   style={{
@@ -1813,7 +1717,7 @@ const TrackingPage = () => {
                     textShadow: "0 1px 3px rgba(0,0,0,0.2)",
                   }}
                 >
-                  Hoàn thành xuất sắc!
+                  Thống kê tình trạng theo dõi
                 </h2>
                 <p
                   style={{
@@ -1823,23 +1727,25 @@ const TrackingPage = () => {
                     fontWeight: "500",
                   }}
                 >
-                  Kế hoạch cai thuốc • {completionData.startDate} -{" "}
+                  {completionData.planType} • {completionData.startDate} -{" "}
                   {completionData.endDate}
                 </p>
               </div>
 
               {/* Main Stats Section */}
               <div style={{ padding: "32px 24px 24px" }}>
-                <Row gutter={[24, 24]} align="middle">
-                  <Col xs={24} md={12}>
+                {/* Thống kê chính */}
+                <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
+                  <Col xs={24} md={8}>
                     <div
                       style={{
                         textAlign: "center",
-                        padding: "24px",
-                        background: "#f8f9fa",
+                        padding: "20px",
+                        background:
+                          "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
                         borderRadius: "12px",
-                        border: "2px solid #e9ecef",
-                        height: "140px",
+                        border: "1px solid #2196f3",
+                        height: "120px",
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "center",
@@ -1847,58 +1753,38 @@ const TrackingPage = () => {
                     >
                       <div
                         style={{
-                          fontSize: "36px",
+                          fontSize: "32px",
                           fontWeight: "800",
-                          color: "#2196F3",
+                          color: "#1976d2",
                           marginBottom: "8px",
-                          lineHeight: 1,
                         }}
                       >
-                        {completionData.completedDays}
-                        <span
-                          style={{
-                            fontSize: "24px",
-                            color: "#666",
-                          }}
-                        >
-                          /{completionData.totalDays}
-                        </span>
+                        {completionData.daysWithoutSmoking}
                       </div>
                       <div
                         style={{
-                          fontSize: "14px",
-                          color: "#666",
+                          fontSize: "13px",
+                          color: "#1976d2",
                           fontWeight: "600",
                           textTransform: "uppercase",
                           letterSpacing: "0.5px",
-                          marginBottom: "12px",
                         }}
                       >
-                        Ngày hoàn thành
+                        🚭 Ngày hoàn thành kế hoạch
                       </div>
-                      <Progress
-                        percent={completionData.completionRate}
-                        strokeColor={{
-                          "0%": "#2196F3",
-                          "100%": "#4CAF50",
-                        }}
-                        trailColor="#e9ecef"
-                        strokeWidth={8}
-                        showInfo={false}
-                        style={{ maxWidth: "200px", margin: "0 auto" }}
-                      />
                     </div>
                   </Col>
 
-                  <Col xs={24} md={12}>
+                  <Col xs={24} md={8}>
                     <div
                       style={{
                         textAlign: "center",
-                        padding: "24px",
-                        background: "#f8f9fa",
+                        padding: "20px",
+                        background:
+                          "linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)",
                         borderRadius: "12px",
-                        border: "2px solid #e9ecef",
-                        height: "140px",
+                        border: "1px solid #4caf50",
+                        height: "120px",
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "center",
@@ -1906,192 +1792,234 @@ const TrackingPage = () => {
                     >
                       <div
                         style={{
-                          fontSize: "36px",
+                          fontSize: "32px",
                           fontWeight: "800",
-                          color: "#4CAF50",
+                          color: "#2e7d32",
                           marginBottom: "8px",
-                          lineHeight: 1,
                         }}
                       >
-                        {completionData.savedCigarettes}
+                        {completionData.cigarettesAvoided}
                       </div>
                       <div
                         style={{
-                          fontSize: "14px",
-                          color: "#666",
+                          fontSize: "13px",
+                          color: "#2e7d32",
                           fontWeight: "600",
                           textTransform: "uppercase",
                           letterSpacing: "0.5px",
+                        }}
+                      >
+                        🚬 Điếu thuốc tránh được
+                      </div>
+                    </div>
+                  </Col>
+
+                  <Col xs={24} md={8}>
+                    <div
+                      style={{
+                        textAlign: "center",
+                        padding: "20px",
+                        background:
+                          "linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%)",
+                        borderRadius: "12px",
+                        border: "1px solid #ff9800",
+                        height: "120px",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "28px",
+                          fontWeight: "800",
+                          color: "#f57c00",
                           marginBottom: "8px",
                         }}
                       >
-                        Điếu thuốc tiết kiệm
+                        {completionData.moneySaved.toLocaleString()}
                       </div>
                       <div
                         style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          background:
-                            "linear-gradient(135deg, #FFC107 0%, #FF9800 100%)",
-                          color: "white",
-                          padding: "6px 16px",
-                          borderRadius: "20px",
-                          fontSize: "15px",
+                          fontSize: "13px",
+                          color: "#f57c00",
                           fontWeight: "600",
-                          boxShadow: "0 2px 8px rgba(255, 193, 7, 0.3)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
                         }}
                       >
-                        💰 {completionData.savedMoney.toLocaleString()} VNĐ
+                        💰 VNĐ tiết kiệm
                       </div>
                     </div>
                   </Col>
                 </Row>
 
-                {/* Performance Metrics */}
+                {/* Tỷ lệ hoàn thành */}
                 <div
                   style={{
-                    marginTop: "24px",
-                    padding: "20px",
+                    padding: "24px",
                     background:
-                      "linear-gradient(135deg, #fff 0%, #f8f9fa 100%)",
+                      "linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)",
                     borderRadius: "12px",
-                    border: "1px solid #e9ecef",
-                  }}
-                >
-                  <Row gutter={24} align="middle">
-                    <Col xs={12}>
-                      <div style={{ textAlign: "center" }}>
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            color: "#6c757d",
-                            fontWeight: "600",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.5px",
-                            marginBottom: "6px",
-                          }}
-                        >
-                          Tỷ lệ hoàn thành
-                        </div>
-                        <div
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            background:
-                              completionData.completionRate >= 80
-                                ? "#e3f2fd"
-                                : "#fff3e0",
-                            color:
-                              completionData.completionRate >= 80
-                                ? "#1976d2"
-                                : "#f57c00",
-                            padding: "8px 16px",
-                            borderRadius: "8px",
-                            fontSize: "20px",
-                            fontWeight: "700",
-                            border: `2px solid ${
-                              completionData.completionRate >= 80
-                                ? "#bbdefb"
-                                : "#ffcc02"
-                            }`,
-                          }}
-                        >
-                          {completionData.completionRate}%
-                        </div>
-                      </div>
-                    </Col>
-                    <Col xs={12}>
-                      <div style={{ textAlign: "center" }}>
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            color: "#6c757d",
-                            fontWeight: "600",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.5px",
-                            marginBottom: "6px",
-                          }}
-                        >
-                          Tỷ lệ thành công
-                        </div>
-                        <div
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            background:
-                              completionData.successRate >= 70
-                                ? "#e8f5e8"
-                                : "#fff3e0",
-                            color:
-                              completionData.successRate >= 70
-                                ? "#2e7d32"
-                                : "#f57c00",
-                            padding: "8px 16px",
-                            borderRadius: "8px",
-                            fontSize: "20px",
-                            fontWeight: "700",
-                            border: `2px solid ${
-                              completionData.successRate >= 70
-                                ? "#c8e6c9"
-                                : "#ffcc02"
-                            }`,
-                          }}
-                        >
-                          {completionData.successRate}%
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                </div>
-
-                {/* Motivational Message */}
-                <div
-                  style={{
-                    marginTop: "24px",
-                    padding: "20px",
-                    background:
-                      "linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%)",
-                    borderRadius: "12px",
-                    border: "2px solid #ffc107",
+                    border: "1px solid #9c27b0",
                     textAlign: "center",
+                    marginBottom: "24px",
                   }}
                 >
                   <div
                     style={{
-                      fontSize: "28px",
-                      marginBottom: "8px",
+                      fontSize: "14px",
+                      color: "#7b1fa2",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      marginBottom: "12px",
                     }}
                   >
+                    📊 Tỷ lệ hoàn thành kế hoạch
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "48px",
+                      fontWeight: "800",
+                      color: "#7b1fa2",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    {(() => {
+                      // Nếu completionRate > 1 và <= 100 thì là phần trăm (100.0)
+                      // Nếu completionRate <= 1 thì là kiểu thập phân (0.95)
+                      // Nếu completionRate > 100 thì bị lỗi, hiển thị 100
+                      let percent = completionData.completionRate;
+                      if (percent > 1 && percent <= 100) {
+                        percent = Math.round(percent);
+                      } else if (percent <= 1) {
+                        percent = Math.round(percent * 100);
+                      } else if (percent > 100) {
+                        percent = 100;
+                      }
+                      return `${percent}%`;
+                    })()}
+                  </div>
+                  <Progress
+                    percent={(() => {
+                      let percent = completionData.completionRate;
+                      if (percent > 1 && percent <= 100) {
+                        percent = Math.round(percent);
+                      } else if (percent <= 1) {
+                        percent = Math.round(percent * 100);
+                      } else if (percent > 100) {
+                        percent = 100;
+                      }
+                      return percent;
+                    })()}
+                    strokeColor={{
+                      "0%": "#9c27b0",
+                      "100%": "#7b1fa2",
+                    }}
+                    trailColor="#e1bee7"
+                    strokeWidth={12}
+                    showInfo={false}
+                    style={{ maxWidth: "400px", margin: "0 auto" }}
+                  />
+                </div>
+
+                {/* Thông tin bổ sung */}
+                {/* <div
+                  style={{
+                    padding: "20px",
+                    background:
+                      "linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)",
+                    borderRadius: "12px",
+                    border: "1px solid #e0e0e0",
+                    marginBottom: "24px",
+                  }}
+                >
+                  <Row gutter={24}>
+                    <Col xs={12}>
+                      <div style={{ textAlign: "center" }}>
+                        <div
+                          style={{
+                            fontSize: "24px",
+                            fontWeight: "700",
+                            color: "#424242",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          {completionData.totalDays}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#757575",
+                            fontWeight: "500",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          Tổng số ngày
+                        </div>
+                      </div>
+                    </Col>
+                    <Col xs={12}>
+                      <div style={{ textAlign: "center" }}>
+                        <div
+                          style={{
+                            fontSize: "24px",
+                            fontWeight: "700",
+                            color: "#424242",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          {completionData.completedDays}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#757575",
+                            fontWeight: "500",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          Ngày đã hoàn thành
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                </div> */}
+
+                {/* Thông điệp động viên */}
+                <div
+                  style={{
+                    padding: "20px",
+                    background:
+                      "linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)",
+                    borderRadius: "12px",
+                    border: "2px solid #4caf50",
+                    textAlign: "center",
+                  }}
+                >
+                  <div style={{ fontSize: "28px", marginBottom: "8px" }}>
                     🌟
                   </div>
                   <p
                     style={{
                       margin: 0,
                       fontSize: "16px",
-                      color: "#e65100",
+                      color: "#2e7d32",
                       fontWeight: "600",
                       lineHeight: 1.4,
                     }}
                   >
-                    Chúc mừng! Bạn đã vượt qua thử thách và chứng minh được ý
-                    chí mạnh mẽ.
+                    Xuất sắc! Bạn đã hoàn thành kế hoạch cai thuốc thành công.
                     <br />
-                    Hãy tiếp tục duy trì lối sống khỏe mạnh này!
+                    Hãy tiếp tục duy trì lối sống khỏe mạnh này nhé! 💪
                   </p>
                 </div>
 
                 {/* Action Button */}
-                <div
-                  style={{
-                    textAlign: "center",
-                    marginTop: "32px",
-                    paddingTop: "24px",
-                    borderTop: "1px solid #e9ecef",
-                  }}
-                >
+                <div style={{ textAlign: "center", marginTop: "24px" }}>
                   <Button
                     type="primary"
                     size="large"
@@ -2106,17 +2034,6 @@ const TrackingPage = () => {
                       fontSize: "16px",
                       fontWeight: "600",
                       boxShadow: "0 4px 16px rgba(76, 175, 80, 0.3)",
-                      transition: "all 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.transform = "translateY(-2px)";
-                      e.target.style.boxShadow =
-                        "0 6px 20px rgba(76, 175, 80, 0.4)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.transform = "translateY(0)";
-                      e.target.style.boxShadow =
-                        "0 4px 16px rgba(76, 175, 80, 0.3)";
                     }}
                   >
                     ✨ Hoàn tất

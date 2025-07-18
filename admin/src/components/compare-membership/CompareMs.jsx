@@ -42,11 +42,7 @@ function MemberComparison() {
                 <td>✅</td>
                 <td>✅</td>
               </tr>
-              <tr>
-                <td>Hỗ trợ từ chuyên gia qua tin nhắn</td>
-                <td>❌</td>
-                <td>✅</td>
-              </tr>
+             
               <tr>
                 <td>Cuộc gọi tư vấn định kỳ với huấn luyện viên</td>
                 <td>❌</td>
@@ -54,8 +50,8 @@ function MemberComparison() {
               </tr>
               <tr>
                 <td>Chi phí</td>
-                <td>99.000 VND</td>
-                <td>499.000 VND</td>
+                <td>69.000 VND</td>
+                <td>269.000 VND</td>
               </tr>
             </tbody>
           </table>

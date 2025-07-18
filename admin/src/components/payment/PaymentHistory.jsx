@@ -26,23 +26,19 @@ const HistoryPayment = () => {
   useEffect(() => {
     const fetchPaymentsWithMembershipStatus = async () => {
       try {
-        // 1. Gọi tất cả dữ liệu cần thiết
-        const [paymentsRes, plansRes] = await Promise.all([
-          api.get(`/v1/payments/history/account/${accountId}`),
-          api.get(`/membership-plans`),
+        const [paymentsRes] = await Promise.all([
+          api.get(`/v1/payments/history/account/${accountId}`)
         ]);
-
+  
         const payments = paymentsRes.data || [];
-        const membershipPlans = plansRes.data || [];
-
         const sortedPayments = payments.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-
+  
         const successPayments = sortedPayments.filter(
           (p) => p.status === "SUCCESS"
         );
-
+  
         const uniqueMembershipIds = [
           ...new Set(
             successPayments
@@ -50,7 +46,7 @@ const HistoryPayment = () => {
               .filter((id) => id !== null && id !== undefined)
           ),
         ];
-
+  
         const membershipStatuses = await Promise.all(
           uniqueMembershipIds.map((id) =>
             api
@@ -62,43 +58,37 @@ const HistoryPayment = () => {
               })
           )
         );
-
-        // 2. Tạo map với gói tương ứng theo amountPaid
-        const getMatchingPlan = (amount) => {
-          return membershipPlans.find((plan) => plan.price === amount) || null;
-        };
-
+  
         const statusMap = {};
-        membershipStatuses.forEach(({ id, data }) => {
-          // 3. Tìm lại giao dịch tương ứng để lấy amountPaid
-          const matchingPayment = successPayments.find(
-            (p) => p.userMembershipId === id
-          );
-
-          const matchedPlan = matchingPayment
-            ? getMatchingPlan(matchingPayment.amountPaid)
-            : null;
-
+        for (const { id, data } of membershipStatuses) {
+          let membershipPlan = null;
+          if (data && data.planId) {
+            try {
+              const planRes = await api.get(`/membership-plans/${data.planId}`);
+              membershipPlan = planRes.data;
+            } catch (err) {
+              console.error(`❌ Lỗi khi lấy gói thành viên #${data.planId}:`, err);
+            }
+          }
+  
           statusMap[id] = {
             ...data,
-            membershipPlan: matchedPlan,
+            membershipPlan,
           };
-          console.log("✅ statusMap:", statusMap);
-        });
-
-        // 4. Gắn dữ liệu enrich vào từng payment
+        }
+  
         const paymentsWithStatus = sortedPayments.map((payment) => {
           const membership =
             payment.status === "SUCCESS"
               ? statusMap[payment.userMembershipId] || null
               : null;
-
+  
           return {
             ...payment,
             membershipStatus: membership,
           };
         });
-        console.log("✅ paymentsWithStatus:", paymentsWithStatus);
+  
         setPayments(paymentsWithStatus);
       } catch (err) {
         console.error("❌ Lỗi khi lấy lịch sử thanh toán:", err);
@@ -106,16 +96,17 @@ const HistoryPayment = () => {
         setLoading(false);
       }
     };
-
+  
     if (accountId) {
       fetchPaymentsWithMembershipStatus();
     }
   }, [accountId]);
+  
 
   const getStatusDisplay = (status) => {
     switch (status) {
       case "ACTIVE":
-        return { text: "Đang hoạt động", color: "green" };
+        return { text: "Xem chi tiết", color: "green" };
       case "INACTIVE":
         return { text: "Không hoạt động", color: "gray" };
       case "EXPIRED":
@@ -136,7 +127,7 @@ const HistoryPayment = () => {
       ),
     },
     {
-      title: "Số tiền đã thanh toán",
+      title: "Số tiền ",
       dataIndex: "amountPaid",
       key: "amountPaid",
       render: (amount, record) => {
@@ -147,7 +138,7 @@ const HistoryPayment = () => {
             </span>
           );
         } else {
-          return <span style={{ color: "gray" }}>----</span>;
+          return <span style={{ color: "gray" }}>{amount.toLocaleString("vi-VN")} VND</span>;
         }
       },
     },

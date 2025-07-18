@@ -123,7 +123,8 @@ const AdviseUser = () => {
     const matchesTab =
       activeTab === "all" ||
       (activeTab === "pending" && appointment.status === "pending") ||
-      (activeTab === "completed" && appointment.status === "completed");
+      (activeTab === "completed" && appointment.status === "completed") ||
+      (activeTab === "cancelled" && appointment.status === "cancelled");
 
     const matchesSearch = appointment.memberName
       .toLowerCase()
@@ -198,33 +199,62 @@ const AdviseUser = () => {
       render: (_, record) => (
         <div>
           {record.status === "pending" && (
-            <>
-              <Button type="primary" icon={<VideoCameraOutlined />} size="small" onClick={() => {
+            <Button
+              type="primary"
+              icon={<VideoCameraOutlined />}
+              size="small"
+              onClick={() => {
                 window.open(record.meetLink, "_blank");
-                setAppointments((prev) => prev.map((item) => item.id === record.id ? { ...item, status: "in_progress" } : item));
-              }}>
-                Bắt đầu
-              </Button>
-              <Button danger size="small" style={{ marginLeft: 8 }} onClick={() => handleCancelConsultation(record)}>
-                Hủy
-              </Button>
-            </>
+                // ✅ Cập nhật trạng thái sang "in_progress"
+                setAppointments((prev) =>
+                  prev.map((item) =>
+                    item.id === record.id ? { ...item, status: "in_progress" } : item
+                  )
+                );
+              }}
+            >
+              Bắt đầu
+            </Button>
           )}
+    
           {record.status === "in_progress" && (
             <Space>
-              <Button icon={<LinkOutlined />} size="small" onClick={() => window.open(record.meetLink, "_blank")}>Vào phòng</Button>
-              <Button type="primary" icon={<CheckCircleOutlined />} size="small" onClick={() => handleCompleteConsultation(record)}>Hoàn thành</Button>
+              <Button
+                icon={<LinkOutlined />}
+                size="small"
+                onClick={() => window.open(record.meetLink, "_blank")}
+              >
+                Vào phòng
+              </Button>
+              <Button
+                type="primary"
+                icon={<CheckCircleOutlined />}
+                size="small"
+                onClick={() => handleCompleteConsultation(record)}
+              >
+                Hoàn thành
+              </Button>
+              <Button
+                danger
+                size="small"
+                onClick={() => handleCancelConsultation(record)}
+              >
+                Hủy
+              </Button>
             </Space>
           )}
+    
           {record.status === "completed" && (
             <Tag color="green">Đã hoàn thành</Tag>
           )}
+    
           {record.status === "cancelled" && (
             <Tag color="red">Đã hủy</Tag>
           )}
         </div>
       ),
-    },
+    }
+    
   ];
 
   return (
@@ -255,6 +285,7 @@ const AdviseUser = () => {
           <Tabs activeKey={activeTab} onChange={setActiveTab} size="large">
             <TabPane tab={<Badge count={appointments.filter(a => a.status === 'pending').length}>Chờ tư vấn</Badge>} key="pending" />
             <TabPane tab={<Badge count={appointments.filter(a => a.status === 'completed').length}>Hoàn thành</Badge>} key="completed" />
+            <TabPane tab={<Badge count={appointments.filter(a => a.status === 'cancelled').length}>Đã hủy</Badge>} key="cancelled" />
             <TabPane tab={<Badge count={appointments.length}>Tất cả</Badge>} key="all" />
           </Tabs>
 

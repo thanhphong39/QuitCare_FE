@@ -25,10 +25,8 @@ const Navbar = () => {
         }
   
         console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
-  
         const historyRes = await api.get(`/v1/payments/history/account/${user.id}`);
         const transactions = historyRes.data || [];
-        console.log("📦 Danh sách giao dịch:", transactions);
   
         // Lọc các giao dịch SUCCESS
         const successTransactions = transactions.filter(tx => tx.status === "SUCCESS");
@@ -39,37 +37,50 @@ const Navbar = () => {
         }
   
         // Tìm giao dịch SUCCESS có số tiền lớn nhất
-        const maxTransaction = successTransactions.reduce((max, curr) => 
+        const maxTransaction = successTransactions.reduce((max, curr) =>
           curr.amountPaid > max.amountPaid ? curr : max
         );
-        const { amountPaid } = maxTransaction;
+        const { userMembershipId } = maxTransaction;
   
-        console.log("💵 Giao dịch có số tiền lớn nhất:", amountPaid);
+        if (!userMembershipId) {
+          console.log("⛔ Giao dịch không có userMembershipId.");
+          return;
+        }
   
-        // Gọi API lấy danh sách gói
-        const planRes = await api.get(`/membership-plans`);
-        const allPlans = planRes.data || [];
-        console.log("📋 Danh sách gói:", allPlans);
+        // Lấy thông tin user-membership
+        const membershipRes = await api.get(`/user-memberships/${userMembershipId}`);
+        const membershipData = membershipRes.data;
   
-        // Tìm gói nào có giá bằng với amountPaid lớn nhất và tên là Premium
-        const matchedPlan = allPlans.find(plan =>
-          Math.abs(plan.price - amountPaid) < 1 && plan.name === "Premium"
-        );
+        const { status, planId } = membershipData;
+        console.log("📄 Thông tin user-membership:", membershipData);
   
-        if (matchedPlan) {
-          console.log("✅ Gói Premium đã mua, hiển thị nút ĐẶT LỊCH");
+        if (status !== "ACTIVE") {
+          console.log("⛔ Gói membership không còn hiệu lực.");
+          return;
+        }
+  
+        // Gọi API lấy gói cụ thể theo planId
+        const planRes = await api.get(`/membership-plans/${planId}`);
+        const plan = planRes.data;
+  
+        console.log("🎯 Gói hội viên:", plan);
+  
+        if (plan?.name === "Premium") {
+          console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
           setShowBooking(true);
         } else {
-          console.log("ℹ️ Không có gói Premium tương ứng.");
+          console.log("ℹ️ Không phải gói Premium.");
         }
   
       } catch (err) {
-        console.error("❌ Lỗi khi lấy membership:", err);
+        console.error("❌ Lỗi khi kiểm tra gói hội viên:", err);
       }
     };
   
     fetchMembershipPlan();
   }, [user?.id]);
+  
+  
   
   
 

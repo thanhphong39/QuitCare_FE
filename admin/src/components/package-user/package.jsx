@@ -13,7 +13,7 @@ const Package = () => {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await api.get("/membership-plans");
+        const res = await api.get("/auth/api/membership-plans");
         const allPlans = res.data;
   
         if (!Array.isArray(allPlans) || allPlans.length === 0) {

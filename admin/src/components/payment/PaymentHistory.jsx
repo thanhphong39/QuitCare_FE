@@ -117,7 +117,7 @@ const HistoryPayment = () => {
       case "ACTIVE":
         return { text: "Đang hoạt động", color: "green" };
       case "INACTIVE":
-        return { text: "Không hoạt động", color: "gray" };
+        return { text: "Không hoạt động", color: "black" };
       case "EXPIRED":
         return { text: "Hết hạn", color: "red" };
       default:
@@ -147,12 +147,16 @@ const HistoryPayment = () => {
             </span>
           );
         } else {
-          return <span style={{ color: "gray" }}>{amount.toLocaleString("vi-VN")} VND</span>;
+          return (
+            <span style={{ color: "gray" }}>
+              {amount.toLocaleString("vi-VN")} VND
+            </span>
+          );
         }
       },
     },
     {
-      title: "Trạng thái",
+      title: "Trạng thái giao dịch",
       dataIndex: "status",
       key: "status",
       render: (status) => {
@@ -207,7 +211,7 @@ const HistoryPayment = () => {
               setVisibleModal(true);
             }}
           >
-             {text}
+            {text}
           </span>
         );
       },
@@ -222,7 +226,20 @@ const HistoryPayment = () => {
   );
   const successCount = payments.filter((p) => p.status === "SUCCESS").length;
   const pendingCount = payments.filter((p) => p.status === "PENDING").length;
-
+  const getColorByStatus = (status) => {
+    switch (status) {
+      case "ACTIVE":
+        return "green";
+      case "INACTIVE":
+        return "gray";
+      case "PENDING":
+        return "orange";
+      case "EXPIRED":
+        return "red";
+      default:
+        return "black";
+    }
+  };
   return (
     <>
       <Navbar />
@@ -291,6 +308,7 @@ const HistoryPayment = () => {
                   }}
                   bordered={false}
                 />
+
                 <Modal
                   title="Chi tiết gói thành viên"
                   open={visibleModal}
@@ -299,29 +317,56 @@ const HistoryPayment = () => {
                 >
                   {selectedMembership ? (
                     <Descriptions column={1} bordered size="small">
-                      {/* <Descriptions.Item label="ID gói">
-                        {selectedMembership.id}
-                      </Descriptions.Item> */}
-                      <Descriptions.Item label="Trạng thái">
-                        {getStatusDisplay(selectedMembership.status).text}
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Ngày bắt đầu">
-                        {dayjs(selectedMembership.startDate).format(
-                          "DD/MM/YYYY"
-                        )}
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Ngày kết thúc">
-                        {dayjs(selectedMembership.endDate).format("DD/MM/YYYY")}
-                      </Descriptions.Item>
                       <Descriptions.Item label="Tên gói">
                         {selectedMembership.membershipPlan?.name ||
                           "Không xác định"}
                       </Descriptions.Item>
+                      <Descriptions.Item label="Trạng thái">
+                        <span
+                          style={{
+                            color: getColorByStatus(selectedMembership.status),
+                          }}
+                        >
+                          {getStatusDisplay(selectedMembership.status).text}
+                        </span>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Ngày bắt đầu">
+                        <span style={{ color: "#1890ff" }}>
+                          {dayjs(selectedMembership.startDate).format(
+                            "DD/MM/YYYY"
+                          )}
+                        </span>
+                      </Descriptions.Item>
+
+                      <Descriptions.Item label="Ngày kết thúc">
+                        <span style={{ color: "#f5222d" }}>
+                          {dayjs(selectedMembership.endDate).format(
+                            "DD/MM/YYYY"
+                          )}
+                        </span>
+                      </Descriptions.Item>
+
                       <Descriptions.Item label="Giá">
                         {selectedMembership.membershipPlan?.price?.toLocaleString(
                           "vi-VN"
                         ) || "?"}{" "}
                         VND
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Mô tả">
+                        {selectedMembership.status === "ACTIVE" ? (
+                          selectedMembership.membershipPlan?.description ||
+                          "Không xác định"
+                        ) : (
+                          <span style={{ color: "red" }}>
+                            Gói đã hết hiệu lực
+                          </span>
+                        )}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Lưu ý">
+                        <span style={{ color: "#faad14" }}>
+                          Gói sẽ tự động hết hiệu lực sau khi dùng hết số lần đặt
+                          lịch tư vấn
+                        </span>
                       </Descriptions.Item>
                     </Descriptions>
                   ) : (

@@ -96,6 +96,79 @@ const TrackingPage = () => {
   const [showlinkBooking, setShowBooking] = useState(false);
   const BOOKING_LINK = "http://localhost:5173/booking";
 
+//keiemr tra user có gói thanh viên để Booking không
+useEffect(() => {
+  const fetchMembershipPlan = async () => {
+    try {
+      if (!user?.id) {
+        console.log("⚠️ Không có accountId.");
+        return;
+      }
+
+      console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
+      const historyRes = await api.get(`/v1/payments/history/account/${user.id}`);
+      const transactions = historyRes.data || [];
+
+      // Lọc các giao dịch SUCCESS và có userMembershipId
+      const successTransactions = transactions
+        .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Mới nhất trước
+
+      if (successTransactions.length === 0) {
+        console.log("⛔ Không có giao dịch SUCCESS hợp lệ.");
+        return;
+      }
+
+      // Duyệt các giao dịch thành công mới nhất
+      for (const tx of successTransactions) {
+        const { userMembershipId } = tx;
+
+        try {
+          // Lấy thông tin user-membership
+          const membershipRes = await api.get(`/user-memberships/${userMembershipId}`);
+          const membershipData = membershipRes.data;
+
+          const { status, planId } = membershipData;
+          console.log("📄 Thông tin user-membership:", membershipData);
+
+          if (status !== "ACTIVE") {
+            console.log("⚠️ Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo...");
+            continue;
+          }
+
+          // Lấy thông tin gói
+          const planRes = await api.get(`/membership-plans/${planId}`);
+          const plan = planRes.data;
+
+          console.log("🎯 Gói hội viên:", plan);
+
+          if (plan?.name === "Premium") {
+            console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
+            setShowBooking(true);
+            return;
+          } else {
+            console.log("ℹ️ Không phải gói Premium.");
+          }
+        } catch (innerErr) {
+          console.warn("⚠️ Lỗi khi xử lý userMembership hoặc plan:", innerErr);
+          continue; // Nếu lỗi thì bỏ qua và thử giao dịch tiếp theo
+        }
+      }
+
+      // Nếu không có gói Premium nào đang active
+      console.log("❌ Không tìm thấy gói Premium đang ACTIVE.");
+      setShowBooking(false);
+    } catch (err) {
+      console.error("❌ Lỗi khi kiểm tra gói hội viên:", err);
+    }
+  };
+
+  fetchMembershipPlan();
+}, [user?.id]);
+
+
+
+
   // Script tự động điền dữ liệu
   const [isAutoFilling, setIsAutoFilling] = useState(false);
 
@@ -612,9 +685,10 @@ const TrackingPage = () => {
           <strong>💡 Đừng lo lắng:</strong> Hầu hết các triệu chứng sẽ giảm dần trong vài tuần tới. Hãy nhớ rằng mỗi ngày bạn kiên trì là một bước tiến lớn cho sức khỏe!<br/><br/>
           ${
             showlink
-              ? `Nếu bạn cảm thấy cần hỗ trợ thêm, đừng ngần ngại <a href="${BOOKING_LINK}" target="_blank" style="color: #007bff; text-decoration: underline;">đặt lịch tư vấn với chuyên gia</a> của chúng tôi.<br/><br/>`
-              : "Hãy nâng cấp gói hội viên để được hỗ trợ tốt nhất!<br/><br/>"
+              ? `Chúng tôi nhận thấy bạn đang có nhiều triệu chứng bất ổn hôm nay, chúng tôi khuyến khích bạn nên nhận sự hỗ trợ từ <a href="${BOOKING_LINK}" target="_blank" style="color: #007bff; text-decoration: underline;">chuyên gia</a> của chúng tôi.<br/><br/>`
+              : "Hệ thống ghi nhận bạn đang gặp nhiều vấn đề trong quá trình cai thuốc. Để được hỗ trợ chuyên sâu từ các chuyên gia, vui lòng <strong style='color: #d9534f;'>nâng cấp gói hội viên</strong> để mở khóa đầy đủ tính năng hỗ trợ!<br/><br/>"
           }
+          
           <strong>🎯 Bạn đang làm rất tốt! Hãy tiếp tục kiên trì nhé! 💪</strong>
         </div>`,
       };

@@ -265,22 +265,25 @@ function ViewAdvise() {
           </Button>,
         ]}
       >
-        {selectedConsultation && (
-          <>
-            <p><strong>Coach:</strong> {selectedConsultation.coachName}</p>
-            <p>
-              <strong>Ngày giờ:</strong> {dayjs(selectedConsultation.date).format("DD/MM/YYYY")} {selectedConsultation.time}
-            </p>
-            <p>
-              <strong>Trạng thái:</strong> {getStatusConfig(selectedConsultation.status).text}
-            </p>
-            {selectedConsultation.meetingLink && (
-              <p>
-                <strong>Link:</strong> <a href={selectedConsultation.meetingLink} target="_blank" rel="noopener noreferrer">{selectedConsultation.meetingLink}</a>
-              </p>
-            )}
-          </>
-        )}
+        {selectedConsultation &&
+  <>
+    <p><strong>Coach:</strong> {selectedConsultation.coachName}</p>
+    <p>
+      <strong>Ngày giờ:</strong> {dayjs(selectedConsultation.date).format("DD/MM/YYYY")} {selectedConsultation.time}
+    </p>
+    <p>
+      <strong>Trạng thái:</strong> {getStatusConfig(selectedConsultation.status).text}
+    </p>
+
+    {selectedConsultation.status === "PENDING" && selectedConsultation.meetingLink && (
+      <p>
+        <strong>Link:</strong> <a href={selectedConsultation.meetingLink} target="_blank" rel="noopener noreferrer">
+          {selectedConsultation.meetingLink}
+        </a>
+      </p>
+    )}
+  </>
+}
       </Modal>
       <Footer />
     </>

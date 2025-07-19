@@ -23,67 +23,68 @@ const Navbar = () => {
           console.log("⚠️ Không có accountId.");
           return;
         }
-
+  
         console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
-        const historyRes = await api.get(
-          `/v1/payments/history/account/${user.id}`
-        );
+        const historyRes = await api.get(`/v1/payments/history/account/${user.id}`);
         const transactions = historyRes.data || [];
-
-        // Lọc các giao dịch SUCCESS
-        const successTransactions = transactions.filter(
-          (tx) => tx.status === "SUCCESS"
-        );
-
+  
+        // Lọc các giao dịch SUCCESS và có userMembershipId
+        const successTransactions = transactions
+          .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Mới nhất trước
+  
         if (successTransactions.length === 0) {
-          console.log("⛔ Không có giao dịch SUCCESS.");
+          console.log("⛔ Không có giao dịch SUCCESS hợp lệ.");
           return;
         }
-
-        // Tìm giao dịch SUCCESS có số tiền lớn nhất
-        const maxTransaction = successTransactions.reduce((max, curr) =>
-          curr.amountPaid > max.amountPaid ? curr : max
-        );
-        const { userMembershipId } = maxTransaction;
-
-        if (!userMembershipId) {
-          console.log("⛔ Giao dịch không có userMembershipId.");
-          return;
+  
+        // Duyệt các giao dịch thành công mới nhất
+        for (const tx of successTransactions) {
+          const { userMembershipId } = tx;
+  
+          try {
+            // Lấy thông tin user-membership
+            const membershipRes = await api.get(`/user-memberships/${userMembershipId}`);
+            const membershipData = membershipRes.data;
+  
+            const { status, planId } = membershipData;
+            console.log("📄 Thông tin user-membership:", membershipData);
+  
+            if (status !== "ACTIVE") {
+              console.log("⚠️ Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo...");
+              continue;
+            }
+  
+            // Lấy thông tin gói
+            const planRes = await api.get(`/membership-plans/${planId}`);
+            const plan = planRes.data;
+  
+            console.log("🎯 Gói hội viên:", plan);
+  
+            if (plan?.name === "Premium") {
+              console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
+              setShowBooking(true);
+              return;
+            } else {
+              console.log("ℹ️ Không phải gói Premium.");
+            }
+          } catch (innerErr) {
+            console.warn("⚠️ Lỗi khi xử lý userMembership hoặc plan:", innerErr);
+            continue; // Nếu lỗi thì bỏ qua và thử giao dịch tiếp theo
+          }
         }
-
-        // Lấy thông tin user-membership
-        const membershipRes = await api.get(
-          `/user-memberships/${userMembershipId}`
-        );
-        const membershipData = membershipRes.data;
-
-        const { status, planId } = membershipData;
-        console.log("📄 Thông tin user-membership:", membershipData);
-
-        if (status !== "ACTIVE") {
-          console.log("⛔ Gói membership không còn hiệu lực.");
-          return;
-        }
-
-        // Gọi API lấy gói cụ thể theo planId
-        const planRes = await api.get(`/membership-plans/${planId}`);
-        const plan = planRes.data;
-
-        console.log("🎯 Gói hội viên:", plan);
-
-        if (plan?.name === "Premium") {
-          console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
-          setShowBooking(true);
-        } else {
-          console.log("ℹ️ Không phải gói Premium.");
-        }
+  
+        // Nếu không có gói Premium nào đang active
+        console.log("❌ Không tìm thấy gói Premium đang ACTIVE.");
+        setShowBooking(false);
       } catch (err) {
         console.error("❌ Lỗi khi kiểm tra gói hội viên:", err);
       }
     };
-
+  
     fetchMembershipPlan();
   }, [user?.id]);
+  
 
   // 👉 Scroll Lock cho Mobile Menu
   useEffect(() => {

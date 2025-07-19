@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import api from "../../configs/axios";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./PaymentPage.css";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { HomeOutlined } from "@ant-design/icons";
-
+import { Modal,Button } from "antd";
 const PaymentPage = () => {
-
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const membershipPlanId = searchParams.get("membershipPlanId");
@@ -25,6 +24,59 @@ const PaymentPage = () => {
       currency: "VND",
     }).format(value);
   };
+
+  const [hasActivePremium, setHasActivePremium] = useState(false);
+
+  useEffect(() => {
+    const checkActivePremium = async () => {
+      try {
+        if (!user?.id) {
+          console.log("⚠️ Không có user.id để kiểm tra gói Premium.");
+          return;
+        }
+  
+        console.log("📥 Kiểm tra gói Premium đang hoạt động...");
+  
+        const historyRes = await api.get(
+          `/v1/payments/history/account/${user.id}`
+        );
+        const transactions = historyRes.data || [];
+  
+        const successTransactions = transactions
+          .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp mới nhất trước
+  
+        for (const tx of successTransactions) {
+          const { userMembershipId } = tx;
+  
+          // Lấy thông tin membership
+          const membershipRes = await api.get(`/user-memberships/${userMembershipId}`);
+          const membership = membershipRes.data;
+  
+          if (membership.status !== "ACTIVE") continue;
+  
+          // Lấy thông tin gói
+          const planRes = await api.get(`/membership-plans/${membership.planId}`);
+          const plan = planRes.data;
+  
+          if (plan.name === "Premium") {
+            console.log("✅ Có gói Premium đang ACTIVE và mới nhất.");
+            setHasActivePremium(true);
+            return;
+          }
+        }
+  
+        console.log("⛔ Không tìm thấy gói Premium ACTIVE.");
+        setHasActivePremium(false);
+      } catch (error) {
+        console.error("❌ Lỗi khi kiểm tra Premium:", error);
+        setHasActivePremium(false);
+      }
+    };
+  
+    checkActivePremium();
+  }, [user?.id]);
+  
 
   // Lấy thông tin gói
   useEffect(() => {
@@ -46,8 +98,18 @@ const PaymentPage = () => {
     fetchPackage();
   }, [membershipPlanId]);
 
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+
   // Xử lý thanh toán
-  const handlePayment = async () => {
+  const handleBuyPremium = () => {
+    if (hasActivePremium) {
+      setConfirmModalVisible(true); // mở modal xác nhận
+    } else {
+      proceedToBuy(); // mua luôn nếu không có Premium
+    }
+  };
+
+  const proceedToBuy = async () => {
     setError("");
     setLoading(true);
 
@@ -106,7 +168,10 @@ const PaymentPage = () => {
   return (
     <div className="payment-container">
       {/* Nút quay lại nằm góc trái trên cùng */}
-      <div className="back-home-top-left" style={{ position: "absolute", top: 20, left: 20 }}>
+      <div
+        className="back-home-top-left"
+        style={{ position: "absolute", top: 20, left: 20 }}
+      >
         <button
           onClick={() => navigate("/")}
           className="back-button"
@@ -124,7 +189,7 @@ const PaymentPage = () => {
           ← Quay lại trang chủ
         </button>
       </div>
-  
+
       {/* Nội dung chính */}
       <div className="payment-card">
         <div className="payment-header">
@@ -135,7 +200,7 @@ const PaymentPage = () => {
           />
           <h2>Xác nhận thanh toán</h2>
         </div>
-  
+
         {pkg ? (
           <div className="order-details">
             <p className="order-title">Thông tin đơn hàng</p>
@@ -157,12 +222,33 @@ const PaymentPage = () => {
         ) : (
           <p>Đang tải thông tin gói...</p>
         )}
-  
+
         {error && <div className="payment-error">{error}</div>}
-  
+        <Modal
+          title="Bạn đã có gói Premium đang hoạt động"
+          open={confirmModalVisible}
+          onCancel={() => setConfirmModalVisible(false)}
+          footer={[
+            <Button key="cancel" onClick={() => setConfirmModalVisible(false)}>
+              Hủy
+            </Button>,
+            <Button
+              key="confirm"
+              type="primary"
+              onClick={() => {
+                setConfirmModalVisible(false);
+                proceedToBuy();
+              }}
+            >
+              Tiếp tục mua
+            </Button>,
+          ]}
+        >
+          <p>Bạn chắc chắn muốn mua lại gói Premium mới?</p>
+        </Modal>
         <div className="payment-actions">
           <button
-            onClick={handlePayment}
+            onClick={handleBuyPremium}
             className="cta-button"
             disabled={loading || !pkg}
           >
@@ -175,7 +261,6 @@ const PaymentPage = () => {
       </div>
     </div>
   );
-  
 };
 
 export default PaymentPage;

@@ -83,7 +83,7 @@ const AdviseUser = () => {
   const updateAppointmentStatus = async (id, status) => {
     const token = localStorage.getItem("token");
     let url = "";
-  
+
     if (status === "COMPLETED") {
       url = `/booking/coach/complete/${id}`;
     } else if (status === "CANCELLED") {
@@ -92,34 +92,39 @@ const AdviseUser = () => {
       console.warn("Trạng thái không hợp lệ:", status);
       return;
     }
-  
+
     try {
-      await api.put(url, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      setAppointments((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, status: status.toLowerCase() } : item))
+      await api.put(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-  
+
+      setAppointments((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: status.toLowerCase() } : item
+        )
+      );
+
       message.success("Cập nhật trạng thái thành công");
     } catch (error) {
       console.error("Lỗi cập nhật trạng thái:", error);
       message.error("Không thể cập nhật trạng thái");
     }
   };
-  
 
   const handleCompleteConsultation = async (record) => {
     await updateAppointmentStatus(record.id, "COMPLETED");
-    toast.success("Đã hoàn thành buổi tư vấn thành công!")
+    toast.success("Đã hoàn thành buổi tư vấn thành công!");
   };
 
   const handleCancelConsultation = async (record) => {
     await updateAppointmentStatus(record.id, "CANCELLED");
-    toast.error("Đã hủy buổi tư vấn thành công!")
+    toast.error("Đã hủy buổi tư vấn thành công!");
   };
 
   const filteredAppointments = appointments.filter((appointment) => {
@@ -138,21 +143,31 @@ const AdviseUser = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "pending": return "orange";
-      case "in_progress": return "blue";
-      case "completed": return "green";
-      case "cancelled": return "red";
-      default: return "default";
+      case "pending":
+        return "orange";
+      case "in_progress":
+        return "blue";
+      case "completed":
+        return "green";
+      case "cancelled":
+        return "red";
+      default:
+        return "default";
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case "pending": return "Chờ tư vấn";
-      case "in_progress": return "Đang tư vấn";
-      case "completed": return "Hoàn thành";
-      case "cancelled": return "Đã hủy";
-      default: return status;
+      case "pending":
+        return "Chờ tư vấn";
+      case "in_progress":
+        return "Đang tư vấn";
+      case "completed":
+        return "Hoàn thành";
+      case "cancelled":
+        return "Đã hủy";
+      default:
+        return status;
     }
   };
 
@@ -173,8 +188,13 @@ const AdviseUser = () => {
       key: "time",
       render: (_, record) => (
         <div>
-          <div><CalendarOutlined /> {moment(record.startTime).format("DD/MM/YYYY")}</div>
-          <div><ClockCircleOutlined /> {moment(record.startTime).format("HH:mm")} - {moment(record.endTime).format("HH:mm")}</div>
+          <div>
+            <CalendarOutlined /> {moment(record.startTime).format("DD/MM/YYYY")}
+          </div>
+          <div>
+            <ClockCircleOutlined /> {moment(record.startTime).format("HH:mm")} -{" "}
+            {moment(record.endTime).format("HH:mm")}
+          </div>
         </div>
       ),
     },
@@ -186,16 +206,16 @@ const AdviseUser = () => {
         <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
       ),
     },
-    {
-      title: "Link tư vấn",
-      dataIndex: "meetLink",
-      key: "meetLink",
-      render: (link) => (
-        <a href={link} target="_blank" rel="noopener noreferrer">
-          <LinkOutlined /> Mở liên kết
-        </a>
-      ),
-    },
+    // {
+    //   title: "Link tư vấn",
+    //   dataIndex: "meetLink",
+    //   key: "meetLink",
+    //   render: (link) => (
+    //     <a href={link} target="_blank" rel="noopener noreferrer">
+    //       <LinkOutlined /> Mở liên kết
+    //     </a>
+    //   ),
+    // },
     {
       title: "Hành động",
       key: "actions",
@@ -211,7 +231,9 @@ const AdviseUser = () => {
                 // ✅ Cập nhật trạng thái sang "in_progress"
                 setAppointments((prev) =>
                   prev.map((item) =>
-                    item.id === record.id ? { ...item, status: "in_progress" } : item
+                    item.id === record.id
+                      ? { ...item, status: "in_progress" }
+                      : item
                   )
                 );
               }}
@@ -219,7 +241,7 @@ const AdviseUser = () => {
               Bắt đầu
             </Button>
           )}
-    
+
           {record.status === "in_progress" && (
             <Space>
               <Button
@@ -246,18 +268,15 @@ const AdviseUser = () => {
               </Button>
             </Space>
           )}
-    
+
           {record.status === "completed" && (
             <Tag color="green">Đã hoàn thành</Tag>
           )}
-    
-          {record.status === "cancelled" && (
-            <Tag color="red">Đã hủy</Tag>
-          )}
+
+          {record.status === "cancelled" && <Tag color="red">Đã hủy</Tag>}
         </div>
       ),
-    }
-    
+    },
   ];
 
   return (
@@ -277,7 +296,12 @@ const AdviseUser = () => {
                 prefix={<SearchOutlined />}
                 style={{ width: 300 }}
               />
-              <Button icon={<ReloadOutlined />} onClick={fetchAppointments} loading={loading} style={{ marginLeft: 16 }}>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={fetchAppointments}
+                loading={loading}
+                style={{ marginLeft: 16 }}
+              >
                 Làm mới
               </Button>
             </div>
@@ -286,10 +310,46 @@ const AdviseUser = () => {
 
         <Card className="main-content-card">
           <Tabs activeKey={activeTab} onChange={setActiveTab} size="large">
-            <TabPane tab={<Badge count={appointments.filter(a => a.status === 'pending').length}>Chờ tư vấn</Badge>} key="pending" />
-            <TabPane tab={<Badge count={appointments.filter(a => a.status === 'completed').length}>Hoàn thành</Badge>} key="completed" />
-            <TabPane tab={<Badge count={appointments.filter(a => a.status === 'cancelled').length}>Đã hủy</Badge>} key="cancelled" />
-            <TabPane tab={<Badge count={appointments.length}>Tất cả</Badge>} key="all" />
+            <TabPane
+              tab={
+                <Badge
+                  count={
+                    appointments.filter((a) => a.status === "pending").length
+                  }
+                >
+                  Chờ tư vấn
+                </Badge>
+              }
+              key="pending"
+            />
+            <TabPane
+              tab={
+                <Badge
+                  count={
+                    appointments.filter((a) => a.status === "completed").length
+                  }
+                >
+                  Hoàn thành
+                </Badge>
+              }
+              key="completed"
+            />
+            <TabPane
+              tab={
+                <Badge
+                  count={
+                    appointments.filter((a) => a.status === "cancelled").length
+                  }
+                >
+                  Đã hủy
+                </Badge>
+              }
+              key="cancelled"
+            />
+            <TabPane
+              tab={<Badge count={appointments.length}>Tất cả</Badge>}
+              key="all"
+            />
           </Tabs>
 
           <Table

@@ -243,7 +243,7 @@ const TrackingPage = () => {
             smokingStatusId,
           };
 
-          // await api.post("/quit-progress", progressData);
+          await api.post("/quit-progress", progressData);
         } catch (apiError) {
           // Không hiển thị lỗi để không làm phiền user
         }
@@ -255,6 +255,7 @@ const TrackingPage = () => {
       // Reload dữ liệu tracking và tính toán stats
       loadTrackingData();
 
+      // Không gọi showCompletionModal ở đây nữa, chỉ hiện khi nhập ngày cuối cùng
       message.success(
         `🎉 Đã điền thành công ${allDays.length} ngày! Còn lại ngày cuối để bạn tự nhập thực tế.`
       );

@@ -6,16 +6,9 @@ import {
   DownOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import {
-  Breadcrumb,
-  Layout,
-  Menu,
-  Dropdown,
-  Space,
-  theme,
-} from "antd";
+import { Breadcrumb, Layout, Menu, Dropdown, Space, theme } from "antd";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux"; // nếu bạn dùng Redux
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -42,6 +35,7 @@ const CoachDashboard = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const handleLogout = () => {
     dispatch(logout()); // hoặc localStorage.clear() nếu bạn không dùng Redux
@@ -121,7 +115,9 @@ const CoachDashboard = () => {
             <span style={{ cursor: "pointer" }}>
               <Space>
                 <UserOutlined style={{ fontSize: 18, color: "#666" }} />
-                <span style={{ color: "#666" }}>Coach Dashboard</span>
+                <span style={{ color: "#666", fontWeight: 500 }}>
+                  {user?.fullName || user?.name || "Coach Dashboard"}
+                </span>
                 <DownOutlined style={{ fontSize: 12, color: "#999" }} />
               </Space>
             </span>
@@ -157,7 +153,8 @@ const CoachDashboard = () => {
             borderTop: "1px solid #d9d9d9",
           }}
         >
-          QuitCare Coach Dashboard ©{new Date().getFullYear()} - Hỗ trợ cai thuốc lá
+          QuitCare Coach Dashboard ©{new Date().getFullYear()} - Hỗ trợ cai
+          thuốc lá
         </Footer>
       </Layout>
     </Layout>

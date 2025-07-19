@@ -30,6 +30,7 @@ import WorkScheduleManagement from "./pages/dashboard-coach/register/management-
 import AdviseUser from "./pages/dashboard-coach/calendar/advise-user";
 import ViewAdvise from "./components/view-advise/ViewAdvise";
 import HistoryPayment from "./components/payment/PaymentHistory";
+import TrackingStatistic from "./components/trackingstatistic/trackingstatistic";
 
 // Import component bảo vệ route
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
@@ -66,7 +67,7 @@ function App() {
         // ================ TRANG CHỦ MẶC ĐỊNH - CHO PHÉP TRUY CẬP CÔNG KHAI ================
         {
           index: true, // Trang mặc định khi truy cập "/"
-          element: <HomePage />, 
+          element: <HomePage />,
         },
 
         // ================ TRANG CHỦ CHO NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ================
@@ -127,6 +128,14 @@ function App() {
           element: (
             <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
               <Tracking />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "viewstatistics",
+          element: (
+            <ProtectedRoute allowedRoles={["GUEST", "CUSTOMER"]}>
+              <TrackingStatistic />
             </ProtectedRoute>
           ),
         },

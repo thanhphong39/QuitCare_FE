@@ -921,6 +921,7 @@ const TrackingPage = () => {
             : apiData.completionRate > 0 && apiData.completionRate <= 1
             ? Math.round(apiData.completionRate * 100)
             : 0,
+        daysNotTracked: apiData.daysNotTracked,
       };
       setCompletionData(completionData);
       setIsCompletionModalVisible(true);
@@ -1736,7 +1737,7 @@ const TrackingPage = () => {
               <div style={{ padding: "32px 24px 24px" }}>
                 {/* Thống kê chính */}
                 <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
-                  <Col xs={24} md={8}>
+                  <Col xs={24} md={6}>
                     <div
                       style={{
                         textAlign: "center",
@@ -1775,7 +1776,7 @@ const TrackingPage = () => {
                     </div>
                   </Col>
 
-                  <Col xs={24} md={8}>
+                  <Col xs={24} md={6}>
                     <div
                       style={{
                         textAlign: "center",
@@ -1814,7 +1815,7 @@ const TrackingPage = () => {
                     </div>
                   </Col>
 
-                  <Col xs={24} md={8}>
+                  <Col xs={24} md={6}>
                     <div
                       style={{
                         textAlign: "center",
@@ -1849,6 +1850,45 @@ const TrackingPage = () => {
                         }}
                       >
                         💰 VNĐ tiết kiệm
+                      </div>
+                    </div>
+                  </Col>
+
+                  <Col xs={24} md={6}>
+                    <div
+                      style={{
+                        textAlign: "center",
+                        padding: "20px",
+                        background:
+                          "linear-gradient(135deg, #fff3e0 0%, #ffccbc 100%)",
+                        borderRadius: "12px",
+                        border: "1px solid #ff9800",
+                        height: "120px",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "28px",
+                          fontWeight: "800",
+                          color: "#d84315",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        {completionData.daysNotTracked}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: "#d84315",
+                          fontWeight: "600",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        📅 Ngày chưa theo dõi
                       </div>
                     </div>
                   </Col>

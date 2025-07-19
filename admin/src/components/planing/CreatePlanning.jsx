@@ -21,6 +21,7 @@ function CreatePlanning() {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [deletedIds, setDeletedIds] = useState([]);
 
   const accountId = localStorage.getItem("accountId");
   const quitPlanId = localStorage.getItem("quitPlanId");
@@ -141,47 +142,78 @@ function CreatePlanning() {
     setStages([...stages, initialStage()]);
   };
 
-  const handleDeleteRow = (stageIdx, rowIdx) => {
+  // XÓA ROW: Lưu id vào deletedIds 
+  // const handleDeleteRow = (stageIdx, rowIdx) => {
+  //   if (mode === "view") return;
+  //   const newStages = [...stages];
+  //   const removed = newStages[stageIdx].weeks.splice(rowIdx, 1)[0];
+  //   setStages(newStages);
+  //   if (removed && removed.id) {
+  //     setDeletedIds((prev) => [...prev, removed.id]);
+  //   }
+  // };
+
+  const handleDeleteRow = async (stageIdx, rowIdx) => {
     if (mode === "view") return;
     const newStages = [...stages];
-    if (newStages[stageIdx].weeks.length > 1) {
-      newStages[stageIdx].weeks.splice(rowIdx, 1);
-      setStages(newStages);
+    const removed = newStages[stageIdx].weeks.splice(rowIdx, 1)[0];
+    setStages(newStages);
+    if (removed && removed.id) {
+      try {
+        await api.delete(
+          `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages/${removed.id}`
+        );
+      } catch (err) {
+        Modal.error({ content: "Xóa khoảng thời gian thất bại!" });
+      }
     }
   };
 
-  const handleDeleteStage = (stageIdx) => {
+  // XÓA GIAI ĐOẠN: Lưu tất cả id của weeks trong stage vào deletedIds nếu có
+  // const handleDeleteStage = (stageIdx) => {
+  //   if (mode === "view" || stages.length === 1) return;
+  //   const newStages = [...stages];
+  //   const removedStage = newStages.splice(stageIdx, 1)[0];
+  //   setStages(newStages);
+  //   removedStage.weeks.forEach((week) => {
+  //     if (week.id) setDeletedIds((prev) => [...prev, week.id]);
+  //   });
+  // };
+
+  const handleDeleteStage = async (stageIdx) => {
     if (mode === "view" || stages.length === 1) return;
     const newStages = [...stages];
-    newStages.splice(stageIdx, 1);
+    const removedStage = newStages.splice(stageIdx, 1)[0];
     setStages(newStages);
+    // Xóa tất cả week có id trên server
+    for (const week of removedStage.weeks) {
+      if (week.id) {
+        try {
+          await api.delete(
+            `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages/${week.id}`
+          );
+        } catch (err) {
+          Modal.error({ content: "Xóa khoảng thời gian thất bại!" });
+        }
+      }
+    }
   };
 
-  const handleEdit = () => setMode("edit");
+  const handleEdit = () => {
+    setDeletedIds([]);
+    setMode("edit");
+  };
 
   // ================ API FUNCTIONS ================
   const handleModalOk = async () => {
     setLoading(true);
     try {
-      // Lấy danh sách stage cũ từ server
-      const res = await api.get(
-        `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages`
-      );
-      const oldStages = res.data || [];
-
-      // Xóa stage cũ không còn trong kế hoạch mới
-      for (const old of oldStages) {
-        let stillExist = false;
-        for (const stage of stages) {
-          for (const week of stage.weeks) {
-            if (week.id === old.id) stillExist = true;
-          }
-        }
-        if (!stillExist) {
-          await api.delete(
-            `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages/${old.id}`
-          );
-        }
+      // Xóa các week đã bị xóa trên UI
+      const uniqueDeletedIds = [...new Set(deletedIds)];
+      for (const id of uniqueDeletedIds) {
+        await api.delete(
+          `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages/${id}`
+        );
       }
 
       // Cập nhật hoặc tạo mới từng dòng
@@ -192,15 +224,12 @@ function CreatePlanning() {
             week_range: week.week,
             targetCigarettes: Number(week.cigarettes),
           };
-
           if (week.id) {
-            // PUT cập nhật
             await api.put(
               `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages/${week.id}`,
               data
             );
           } else {
-            // POST tạo mới
             await api.post(
               `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages`,
               {
@@ -215,7 +244,7 @@ function CreatePlanning() {
 
       // Reload dữ liệu sau khi lưu
       await reloadPlanFromServer();
-
+      setDeletedIds([]);
       Modal.success({ content: "Lưu kế hoạch thành công!" });
     } catch (err) {
       Modal.error({ content: "Có lỗi khi lưu kế hoạch!" });
@@ -231,6 +260,7 @@ function CreatePlanning() {
       await reloadPlanFromServer();
       setMode("view");
       setErrors({});
+      setDeletedIds([]);
     } finally {
       setLoading(false);
     }
@@ -254,7 +284,7 @@ function CreatePlanning() {
 
       setStages(
         Object.keys(stageMap)
-          .sort()
+          .sort((a, b) => Number(a) - Number(b))
           .map((k) => ({ weeks: stageMap[k] }))
       );
       setMode("view");
@@ -275,7 +305,6 @@ function CreatePlanning() {
         setLoading(true);
         await reloadPlanFromServer();
       } catch (error) {
-        console.error("Error fetching plan:", error);
         const draft = localStorage.getItem(LOCAL_KEY);
         if (draft) setStages(JSON.parse(draft));
       } finally {

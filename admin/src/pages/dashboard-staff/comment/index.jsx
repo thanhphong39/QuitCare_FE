@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 function CommentManagement() {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [postMap, setPostMap] = useState({}); // postId -> { title, authorId }
+  const [userMap, setUserMap] = useState({}); // accountId -> fullName
 
   const fetchAllComments = async () => {
     setLoading(true);
@@ -15,18 +17,44 @@ function CommentManagement() {
       const postRes = await api.get("/community-posts");
       const posts = postRes.data;
 
-      // 2. Với mỗi bài post, lấy tất cả các comment tương ứng
+      // 2. Lấy danh sách tất cả user
+      const userRes = await api.get("/admin/user");
+      const users = userRes.data;
+
+      // 3. Tạo map cho user và post
+      const userMapTemp = {};
+      users.forEach((u) => {
+        userMapTemp[u.id] = u.username || u.fullName || u.email;
+      });
+      setUserMap(userMapTemp);
+
+      const postMapTemp = {};
+      posts.forEach((p) => {
+        postMapTemp[p.id] = {
+          title: p.title || `Bài viết ${p.id}`,
+          authorId: p.accountId,
+        };
+      });
+      setPostMap(postMapTemp);
+
+      // 4. Với mỗi bài post, lấy tất cả các comment tương ứng
       const commentPromises = posts.map((post) =>
         api.get(`/comments/community-posts/${post.id}/comments`)
       );
 
       const commentResponses = await Promise.all(commentPromises);
 
-      // 3. Gộp tất cả các comment lại thành một mảng
+      // 5. Gộp tất cả các comment lại thành một mảng, enrich với post title và commenter username
       const allComments = commentResponses
-        .flatMap((res) => res.data)
-        .sort((a, b) => a.id - b.id); // <-- sắp xếp theo ID tăng dần
-
+        .flatMap((res, idx) => {
+          const post = posts[idx];
+          return res.data.map((c) => ({
+            ...c,
+            postTitle: postMapTemp[post.id]?.title,
+            postAuthorName: userMapTemp[c.accountId], // username of commenter
+          }));
+        })
+        .sort((a, b) => a.id - b.id);
 
       setComments(allComments);
     } catch (error) {
@@ -61,29 +89,29 @@ function CommentManagement() {
       dataIndex: "content",
       key: "content",
     },
+    // {
+    //   title: "Trạng thái",
+    //   dataIndex: "commentStatus",
+    //   key: "commentStatus",
+    //   render: (status) => {
+    //     const color =
+    //       status === "PENDING"
+    //         ? "orange"
+    //         : status === "APPROVED"
+    //         ? "green"
+    //         : "red";
+    //     return <Tag color={color}>{status}</Tag>;
+    //   },
+    // },
     {
-      title: "Trạng thái",
-      dataIndex: "commentStatus",
-      key: "commentStatus",
-      render: (status) => {
-        const color =
-          status === "PENDING"
-            ? "orange"
-            : status === "APPROVED"
-              ? "green"
-              : "red";
-        return <Tag color={color}>{status}</Tag>;
-      },
+      title: "Tiêu đề bài viết",
+      dataIndex: "postTitle",
+      key: "postTitle",
     },
     {
-      title: "Post ID",
-      dataIndex: "communityPostId",
-      key: "communityPostId",
-    },
-    {
-      title: "Tài khoản",
-      dataIndex: "accountId",
-      key: "accountId",
+      title: "Người đăng bài",
+      dataIndex: "postAuthorName",
+      key: "postAuthorName",
     },
     {
       title: "Thời gian tạo",

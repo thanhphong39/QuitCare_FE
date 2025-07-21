@@ -371,6 +371,45 @@
     transform: translateY(0);
 }
 
+.auth-login-google-btn {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.auth-login-google-btn > div {
+  width: 100% !important;
+}
+
+.auth-login-google-btn iframe {
+  width: 100% !important;
+  min-height: 40px;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.08);
+  border: none;
+}
+
+.auth-login-button,
+.auth-login-google-btn iframe {
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  height: 40px;
+  background: linear-gradient(90deg, #1890ff 60%, #40a9ff 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.08);
+  transition: background 0.3s;
+}
+
+.auth-login-button:hover,
+.auth-login-google-btn iframe:hover {
+  background: linear-gradient(90deg, #096dd9 60%, #1890ff 100%);
+  color: #fff;
+}
+
 /* ================ REGISTER LINK ================ */
 .auth-login-register-link {
     text-align: center;

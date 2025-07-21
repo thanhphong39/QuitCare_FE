@@ -22,6 +22,8 @@ function CreatePlanning() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [deletedIds, setDeletedIds] = useState([]);
+  const [showStartModal, setShowStartModal] = useState(false);
+  const [canEdit, setCanEdit] = useState(true);
 
   const accountId = localStorage.getItem("accountId");
   const quitPlanId = localStorage.getItem("quitPlanId");
@@ -142,7 +144,7 @@ function CreatePlanning() {
     setStages([...stages, initialStage()]);
   };
 
-  // XÓA ROW: Lưu id vào deletedIds 
+  // XÓA ROW: Lưu id vào deletedIds
   // const handleDeleteRow = (stageIdx, rowIdx) => {
   //   if (mode === "view") return;
   //   const newStages = [...stages];
@@ -246,6 +248,7 @@ function CreatePlanning() {
       await reloadPlanFromServer();
       setDeletedIds([]);
       Modal.success({ content: "Lưu kế hoạch thành công!" });
+      setShowStartModal(true); // Hiện modal bắt đầu kế hoạch
     } catch (err) {
       Modal.error({ content: "Có lỗi khi lưu kế hoạch!" });
     } finally {
@@ -319,6 +322,17 @@ function CreatePlanning() {
       localStorage.setItem(LOCAL_KEY, JSON.stringify(stages));
     }
   }, [stages, mode]);
+
+  // Lưu ngày tạo kế hoạch vào localStorage khi lần đầu tiên truy cập trang tạo kế hoạch
+  useEffect(() => {
+    const createdDate = localStorage.getItem("plan_created_date");
+    const todayStr = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+    if (createdDate && createdDate !== todayStr) {
+      setCanEdit(false);
+    } else {
+      setCanEdit(true);
+    }
+  }, []);
 
   // ================ RENDER HELPERS ================
   const renderStageTable = (stage, stageIdx) => {
@@ -482,13 +496,15 @@ function CreatePlanning() {
         );
       case "view":
         return (
-          <Button
-            type="primary"
-            className="qc-planning-btn-edit"
-            onClick={handleEdit}
-          >
-            Chỉnh sửa
-          </Button>
+          canEdit && (
+            <Button
+              type="primary"
+              className="qc-planning-btn-edit"
+              onClick={handleEdit}
+            >
+              Chỉnh sửa
+            </Button>
+          )
         );
       case "edit":
         return (
@@ -620,6 +636,29 @@ function CreatePlanning() {
               ? "Bạn chắc chắn muốn lưu những thay đổi này?"
               : "Bạn chắc chắn muốn xác nhận và lưu kế hoạch này?"}
           </p>
+        </Modal>
+
+        {/* Start Plan Modal */}
+        <Modal
+          title="Bắt đầu kế hoạch cai thuốc"
+          open={showStartModal}
+          onCancel={() => setShowStartModal(false)}
+          footer={null}
+          className="qc-planning-start-modal"
+          centered
+        >
+          <div className="qc-planning-start-modal-body">
+            <p>
+              Kế hoạch của bạn đã bắt đầu từ hôm nay! Bạn chỉ có thể chỉnh sửa
+              kế hoạch trong ngày.
+            </p>
+            <button
+              className="qc-planning-btn-start-modal"
+              onClick={() => setShowStartModal(false)}
+            >
+              Đã hiểu
+            </button>
+          </div>
         </Modal>
       </div>
 

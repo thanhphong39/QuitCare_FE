@@ -48,10 +48,10 @@ const Navbar = () => {
             const membershipData = membershipRes.data;
   
             const { status, planId } = membershipData;
-            console.log("📄 Thông tin user-membership:", membershipData);
+            console.log(" Thông tin user-membership:", membershipData);
   
             if (status !== "ACTIVE") {
-              console.log("⚠️ Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo...");
+              console.log(" Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo...");
               continue;
             }
   

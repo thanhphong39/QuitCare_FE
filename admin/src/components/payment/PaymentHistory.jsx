@@ -331,7 +331,7 @@ const HistoryPayment = () => {
                         </span>
                       </Descriptions.Item>
                       <Descriptions.Item label="Ngày bắt đầu">
-                        <span style={{ color: "#1890ff" }}>
+                        <span >
                           {dayjs(selectedMembership.startDate).format(
                             "DD/MM/YYYY"
                           )}
@@ -339,7 +339,7 @@ const HistoryPayment = () => {
                       </Descriptions.Item>
 
                       <Descriptions.Item label="Ngày kết thúc">
-                        <span style={{ color: "#f5222d" }}>
+                        <span  >
                           {dayjs(selectedMembership.endDate).format(
                             "DD/MM/YYYY"
                           )}

@@ -33,6 +33,7 @@ const items = [
   getItem("Quản lý doanh thu", "revenue", <DesktopOutlined />),
   getItem("Quản lý gói", "packages", <DesktopOutlined />),
   getItem("Quản lý bài viết", "posts", <DesktopOutlined />),
+  getItem("Quản lý ngày nghỉ", "leavedays", <DesktopOutlined />),
 ];
 
 const Dashboard = () => {

@@ -41,6 +41,8 @@ import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import Blog from "./components/blog/Blog";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import LeaveDays from "./pages/dashboard-staff/leavedays";
+import ProfileCoach from "./pages/dashboard-coach/profile-coach/profile-coach";
 
 function App() {
   const router = createBrowserRouter([
@@ -267,6 +269,9 @@ function App() {
             {
               path: "posts",
               element: <PostsManagement />,
+            },{
+              path: "leavedays",
+              element: <LeaveDays />,
             },
           ],
         },
@@ -287,6 +292,10 @@ function App() {
             {
               path: "calendar",
               element: <AdviseUser />,
+            },
+            {
+              path: "profile-coach",
+              element: <ProfileCoach />,
             },
           ],
         },

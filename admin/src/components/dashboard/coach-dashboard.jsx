@@ -25,6 +25,7 @@ function getItem(label, key, icon, children) {
 const items = [
   getItem("Quản lý Tư Vấn", "calendar", <CalendarOutlined />),
   getItem("Đăng ký lịch làm", "register", <ClockCircleOutlined />),
+  getItem("Quản lý hồ sơ cá nhân", "profile-coach", <UserOutlined />),
 ];
 
 const CoachDashboard = () => {

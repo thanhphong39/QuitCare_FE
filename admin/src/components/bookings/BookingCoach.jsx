@@ -64,25 +64,10 @@ const Booking = () => {
       try {
         const res = await api.get("/session/coaches");
         const coachesData = res.data || [];
-        const descriptions = [
-          "Huấn luyện viên tận tâm với kiến thức sâu rộng.",
-          "Chuyên gia đồng hành cùng bạn vượt qua quá trình cai thuốc.",
-          "Giàu kinh nghiệm tư vấn cai nghiện nicotine.",
-        ];
-        const avatarMap = {
-          1: "https://htmediagroup.vn/wp-content/uploads/2023/03/Anh-bac-si-nam-4-min.jpg",
-          2: "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2023/12/25/1-17035025379211648167770.png",
-          7: "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/06/anh-bac-si-27.jpg",
-        };
+        
 
-        const updatedCoaches = coachesData.map((coach, index) => ({
-          ...coach,
-          description: descriptions[index % descriptions.length],
-          fixedAvatar: avatarMap[coach.id] || "/default-avatar.png",
-        }));
-
-        setCoaches(updatedCoaches);
-        await Promise.all(updatedCoaches.map((coach) => fetchAvailableSlots(coach)));
+        setCoaches(coachesData);
+        await Promise.all(coachesData.map((coach) => fetchAvailableSlots(coach)));
         setInitialLoad(false);
       } catch (err) {
         console.error("Lỗi khi lấy danh sách coach:", err);

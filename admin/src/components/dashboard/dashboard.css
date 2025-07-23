@@ -1,0 +1,267 @@
+/* ==== SIDEBAR TOGGLE BUTTON ==== */
+.qc-dashboard-toggle-btn {
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    width          : 36px;
+    height         : 36px;
+    margin         : 0 auto 12px auto;
+    background     : #fff;
+    border         : none;
+    border-radius  : 50%;
+    box-shadow     : 0 2px 8px rgba(24, 144, 255, 0.10);
+    color          : #1890ff;
+    font-size      : 20px;
+    cursor         : pointer;
+    transition     : background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.qc-dashboard-toggle-btn:hover {
+    background: #e6f7ff;
+    color     : #40a9ff;
+}
+
+/* Collapsed sidebar styles */
+.qc-dashboard-sider.collapsed {
+    width     : 60px !important;
+    min-width : 60px !important;
+    max-width : 60px !important;
+    transition: width 0.2s;
+}
+
+.qc-dashboard-sider.collapsed .qc-dashboard-logo {
+    height: 36px;
+    margin: 12px 4px 8px 4px;
+}
+
+.qc-dashboard-sider.collapsed .qc-dashboard-toggle-btn {
+    margin-bottom: 8px;
+}
+
+.qc-dashboard-sider.collapsed .qc-dashboard-menu .ant-menu-item {
+    padding-left: 8px !important;
+    font-size   : 0 !important;
+}
+
+.qc-dashboard-sider.collapsed .ant-menu-item .anticon {
+    font-size: 20px !important;
+}
+
+/* ==== DASHBOARD ROOT LAYOUT ==== */
+.qc-dashboard-root {
+    min-height: 100vh;
+    background: #f6f9fb;
+}
+
+.qc-dashboard-layout {
+    display   : flex;
+    min-height: 100vh;
+}
+
+/* ==== SIDEBAR ==== */
+.qc-dashboard-sider {
+    width         : 240px;
+    background    : linear-gradient(135deg, #1890ff 0%, #70c1ff 100%);
+    box-shadow    : 2px 0 16px 0 rgba(24, 144, 255, 0.08);
+    display       : flex;
+    flex-direction: column;
+    align-items   : stretch;
+    min-height    : 100vh;
+}
+
+.qc-dashboard-logo {
+    height       : 56px;
+    margin       : 24px 16px 16px 16px;
+    background   : url('/src/assets/images/logo.png') center/contain no-repeat, linear-gradient(135deg, #e0f0ff 0%, #f7faff 100%);
+    border-radius: 12px;
+    box-shadow   : 0 2px 8px rgba(24, 144, 255, 0.08);
+}
+
+.qc-dashboard-menu {
+    background: transparent !important;
+    border    : none;
+    flex      : 1;
+}
+
+.qc-dashboard-menu .ant-menu-item {
+    border-radius: 8px !important;
+    margin       : 6px 10px !important;
+    font-size    : 16px;
+    font-weight  : 500;
+    transition   : background 0.2s, color 0.2s;
+    padding-left : 18px !important;
+}
+
+.qc-dashboard-menu .ant-menu-item-selected {
+    background : linear-gradient(90deg, #e6f7ff 60%, #fff 100%) !important;
+    color      : #1890ff !important;
+    font-weight: 700;
+    box-shadow : 0 2px 8px rgba(24, 144, 255, 0.08);
+}
+
+.qc-dashboard-menu .ant-menu-item:hover {
+    background: #e6f7ff !important;
+    color     : #1890ff !important;
+}
+
+/* ==== MAIN LAYOUT ==== */
+.qc-dashboard-main {
+    flex          : 1;
+    display       : flex;
+    flex-direction: column;
+    min-width     : 0;
+}
+
+/* ==== HEADER ==== */
+.qc-dashboard-header {
+    background     : #fff;
+    border-bottom  : 1px solid #e6eaf1;
+    box-shadow     : 0 2px 12px rgba(24, 144, 255, 0.06);
+    z-index        : 10;
+    min-height     : 64px;
+    display        : flex;
+    align-items    : center;
+    justify-content: space-between;
+    padding        : 0 32px;
+}
+
+.qc-dashboard-title {
+    font-size     : 26px;
+    font-weight   : 800;
+    color         : #1890ff;
+    letter-spacing: 1.5px;
+    text-shadow   : 0 2px 12px rgba(24, 144, 255, 0.10);
+    margin-left   : 8px;
+}
+
+.qc-dashboard-actions {
+    display    : flex;
+    gap        : 14px;
+    align-items: center;
+}
+
+/* ==== CONTENT ==== */
+.qc-dashboard-content-wrapper {
+    flex          : 1;
+    display       : flex;
+    flex-direction: column;
+    min-width     : 0;
+    min-height    : 0;
+}
+
+.qc-dashboard-breadcrumb {
+    font-size  : 15px;
+    font-weight: 500;
+    margin     : 24px 0 8px 0;
+}
+
+.qc-dashboard-content {
+    background   : #fff;
+    border-radius: 18px;
+    box-shadow   : 0 6px 32px rgba(24, 144, 255, 0.10);
+    padding      : 40px 32px 32px 32px;
+    min-height   : 400px;
+    margin-bottom: 24px;
+    transition   : box-shadow 0.2s;
+}
+
+.qc-dashboard-content:focus-within {
+    box-shadow: 0 0 0 3px #bae7ff;
+}
+
+/* ==== BUTTONS ==== */
+.qc-dashboard-btn {
+    border-radius: 10px !important;
+    font-size    : 16px !important;
+    font-weight  : 700 !important;
+    padding      : 0 20px !important;
+    height       : 40px !important;
+    box-shadow   : 0 2px 8px rgba(24, 144, 255, 0.10);
+    transition   : box-shadow 0.2s, background 0.2s;
+}
+
+.qc-dashboard-btn-home {
+    background: #f0f8ff !important;
+    color     : #1890ff !important;
+    border    : 1.5px solid #1890ff !important;
+}
+
+.qc-dashboard-btn-home:hover {
+    background: #e6f7ff !important;
+    color     : #1890ff !important;
+}
+
+.qc-dashboard-btn-logout {
+    background: #1890ff !important;
+    color     : #fff !important;
+    border    : 1.5px solid #1890ff !important;
+}
+
+.qc-dashboard-btn-logout:hover {
+    background: #40a9ff !important;
+    color     : #fff !important;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 1200px) {
+    .qc-dashboard-content {
+        padding: 24px 10px;
+    }
+
+    .qc-dashboard-title {
+        font-size: 20px;
+    }
+
+    .qc-dashboard-header {
+        padding: 0 12px;
+    }
+}
+
+@media (max-width: 900px) {
+    .qc-dashboard-sider {
+        width    : 60px;
+        min-width: 60px;
+        max-width: 60px;
+    }
+
+    .qc-dashboard-logo {
+        margin: 12px 4px 8px 4px;
+        height: 36px;
+    }
+
+    .qc-dashboard-title {
+        font-size  : 15px;
+        margin-left: 0;
+    }
+
+    .qc-dashboard-header {
+        min-height: 48px;
+        padding   : 0 4px;
+    }
+}
+
+@media (max-width: 768px) {
+    .qc-dashboard-content {
+        padding      : 12px 2px;
+        margin-bottom: 12px;
+    }
+
+    .qc-dashboard-title {
+        font-size: 13px;
+    }
+
+    .qc-dashboard-header {
+        min-height: 40px;
+        padding   : 0 2px;
+    }
+}
+
+@media (max-width: 576px) {
+    .qc-dashboard-content {
+        padding: 4px 0;
+    }
+
+    .qc-dashboard-title {
+        font-size: 11px;
+    }
+}

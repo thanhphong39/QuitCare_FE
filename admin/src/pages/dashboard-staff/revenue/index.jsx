@@ -25,8 +25,8 @@ import {
   Title as ChartTitle,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
 import api from "../../../configs/axios";
 import "./RevenueManagement.css";
 
@@ -100,36 +100,42 @@ const RevenueManagement = () => {
 
   // ✅ Thêm các thống kê chi tiết về doanh thu
   const revenueStats = {
-    today: payments.filter(p => {
-      const paymentDate = new Date(p.createdAt);
-      const today = new Date();
-      return paymentDate.toDateString() === today.toDateString();
-    }).reduce((acc, p) => acc + p.amountPaid, 0),
+    today: payments
+      .filter((p) => {
+        const paymentDate = new Date(p.createdAt);
+        const today = new Date();
+        return paymentDate.toDateString() === today.toDateString();
+      })
+      .reduce((acc, p) => acc + p.amountPaid, 0),
 
-    thisWeek: payments.filter(p => {
-      const paymentDate = new Date(p.createdAt);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return paymentDate >= weekAgo;
-    }).reduce((acc, p) => acc + p.amountPaid, 0),
+    thisWeek: payments
+      .filter((p) => {
+        const paymentDate = new Date(p.createdAt);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return paymentDate >= weekAgo;
+      })
+      .reduce((acc, p) => acc + p.amountPaid, 0),
 
-    thisMonth: payments.filter(p => {
-      const paymentDate = new Date(p.createdAt);
-      const monthAgo = new Date();
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-      return paymentDate >= monthAgo;
-    }).reduce((acc, p) => acc + p.amountPaid, 0),
+    thisMonth: payments
+      .filter((p) => {
+        const paymentDate = new Date(p.createdAt);
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        return paymentDate >= monthAgo;
+      })
+      .reduce((acc, p) => acc + p.amountPaid, 0),
 
     averageOrderValue: payments.length > 0 ? totalRevenue / payments.length : 0,
 
-    completedPayments: payments.filter(p => p.status === "SUCCESS").length,
-    pendingPayments: payments.filter(p => p.status !== "SUCCESS").length,
+    completedPayments: payments.filter((p) => p.status === "SUCCESS").length,
+    pendingPayments: payments.filter((p) => p.status !== "SUCCESS").length,
   };
 
   // Debug: Log để kiểm tra dữ liệu
   console.log("Payments data:", payments);
   console.log("Revenue stats:", revenueStats);
-  console.log("Unique statuses:", [...new Set(payments.map(p => p.status))]);
+  console.log("Unique statuses:", [...new Set(payments.map((p) => p.status))]);
 
   const showPlanDetails = (plan) => {
     setSelectedPlan(plan);
@@ -138,36 +144,36 @@ const RevenueManagement = () => {
 
   // ✅ Helper function để lấy username từ accountId
   const getUsernameById = (accountId) => {
-    const user = users.find(u => u.id === accountId);
+    const user = users.find((u) => u.id === accountId);
     return user ? user.username : `User #${accountId}`;
   };
 
   // ✅ Chuẩn bị dữ liệu cho biểu đồ cột
   const chartData = {
-    labels: ['Doanh thu hôm nay', 'Doanh thu tuần này', 'Doanh thu tháng này'],
+    labels: ["Doanh thu hôm nay", "Doanh thu tuần này", "Doanh thu tháng này"],
     datasets: [
       {
-        label: 'Doanh thu (VND)',
+        label: "Doanh thu (VND)",
         data: [
           revenueStats.today,
           revenueStats.thisWeek,
           revenueStats.thisMonth,
         ],
         backgroundColor: [
-          'rgba(250, 173, 20, 0.8)',
-          'rgba(82, 196, 26, 0.8)',
-          'rgba(24, 144, 255, 0.8)',
+          "rgba(250, 173, 20, 0.8)",
+          "rgba(82, 196, 26, 0.8)",
+          "rgba(24, 144, 255, 0.8)",
         ],
         borderColor: [
-          'rgba(250, 173, 20, 1)',
-          'rgba(82, 196, 26, 1)',
-          'rgba(24, 144, 255, 1)',
+          "rgba(250, 173, 20, 1)",
+          "rgba(82, 196, 26, 1)",
+          "rgba(24, 144, 255, 1)",
         ],
         borderWidth: 2,
         borderRadius: 8,
         borderSkipped: false,
-      }
-    ]
+      },
+    ],
   };
 
   const chartOptions = {
@@ -175,36 +181,38 @@ const RevenueManagement = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
         labels: {
           font: {
             size: 14,
-            weight: 'bold'
-          }
-        }
+            weight: "bold",
+          },
+        },
       },
       title: {
         display: true,
-        text: '📊 Biểu đồ doanh thu chi tiết',
+        text: "📊 Biểu đồ doanh thu chi tiết",
         font: {
           size: 18,
-          weight: 'bold'
+          weight: "bold",
         },
         padding: {
           top: 10,
-          bottom: 30
-        }
+          bottom: 30,
+        },
       },
       tooltip: {
         callbacks: {
           label: function (context) {
             const value = context.parsed.y;
-            return `${context.dataset.label}: ${value >= 1000000
-              ? `${(value / 1000000).toFixed(1)}M`
-              : value.toLocaleString('vi-VN')} VND`;
-          }
-        }
-      }
+            return `${context.dataset.label}: ${
+              value >= 1000000
+                ? `${(value / 1000000).toFixed(1)}M`
+                : value.toLocaleString("vi-VN")
+            } VND`;
+          },
+        },
+      },
     },
     scales: {
       y: {
@@ -213,12 +221,12 @@ const RevenueManagement = () => {
           callback: function (value) {
             return value >= 1000000
               ? `${(value / 1000000).toFixed(1)}M`
-              : value.toLocaleString('vi-VN');
-          }
+              : value.toLocaleString("vi-VN");
+          },
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
-        }
+          color: "rgba(0, 0, 0, 0.1)",
+        },
       },
       x: {
         grid: {
@@ -226,36 +234,30 @@ const RevenueManagement = () => {
         },
         ticks: {
           maxRotation: 45,
-          minRotation: 0
-        }
-      }
+          minRotation: 0,
+        },
+      },
     },
     animation: {
       duration: 2000,
-      easing: 'easeInOutQuart'
-    }
+      easing: "easeInOutQuart",
+    },
   };
 
   // ✅ Biểu đồ trạng thái thanh toán
   const statusChartData = {
-    labels: ['Đã thanh toán', 'Chờ thanh toán'],
+    labels: ["Đã thanh toán", "Chờ thanh toán"],
     datasets: [
       {
-        label: 'Số đơn hàng',
+        label: "Số đơn hàng",
         data: [revenueStats.completedPayments, revenueStats.pendingPayments],
-        backgroundColor: [
-          'rgba(82, 196, 26, 0.8)',
-          'rgba(250, 173, 20, 0.8)',
-        ],
-        borderColor: [
-          'rgba(82, 196, 26, 1)',
-          'rgba(250, 173, 20, 1)',
-        ],
+        backgroundColor: ["rgba(82, 196, 26, 0.8)", "rgba(250, 173, 20, 0.8)"],
+        borderColor: ["rgba(82, 196, 26, 1)", "rgba(250, 173, 20, 1)"],
         borderWidth: 2,
         borderRadius: 8,
         borderSkipped: false,
-      }
-    ]
+      },
+    ],
   };
 
   const statusChartOptions = {
@@ -263,56 +265,58 @@ const RevenueManagement = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
         labels: {
           font: {
             size: 14,
-            weight: 'bold'
-          }
-        }
+            weight: "bold",
+          },
+        },
       },
       title: {
         display: true,
-        text: '💳 Trạng thái đơn hàng',
+        text: "💳 Trạng thái đơn hàng",
         font: {
           size: 16,
-          weight: 'bold'
+          weight: "bold",
         },
         padding: {
           top: 10,
-          bottom: 20
-        }
+          bottom: 20,
+        },
       },
       tooltip: {
         callbacks: {
           label: function (context) {
-            const total = revenueStats.completedPayments + revenueStats.pendingPayments;
-            const percentage = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
+            const total =
+              revenueStats.completedPayments + revenueStats.pendingPayments;
+            const percentage =
+              total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
             return `${context.label}: ${context.parsed.y} đơn (${percentage}%)`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 1
+          stepSize: 1,
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
-        }
+          color: "rgba(0, 0, 0, 0.1)",
+        },
       },
       x: {
         grid: {
           display: false,
-        }
-      }
+        },
+      },
     },
     animation: {
       duration: 1500,
-      easing: 'easeInOutQuart'
-    }
+      easing: "easeInOutQuart",
+    },
   };
 
   // ✅ Statistics với dữ liệu thực
@@ -463,14 +467,14 @@ const RevenueManagement = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} lg={16}>
           <Card>
-            <div style={{ height: '400px' }}>
+            <div style={{ height: "400px" }}>
               <Bar data={chartData} options={chartOptions} />
             </div>
           </Card>
         </Col>
         <Col xs={24} lg={8}>
           <Card>
-            <div style={{ height: '400px' }}>
+            <div style={{ height: "400px" }}>
               <Bar data={statusChartData} options={statusChartOptions} />
             </div>
           </Card>

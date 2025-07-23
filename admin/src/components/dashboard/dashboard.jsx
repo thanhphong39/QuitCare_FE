@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./dashboard.css";
 import {
   DesktopOutlined,
   FileOutlined,
@@ -7,6 +8,8 @@ import {
   UserOutlined,
   HomeOutlined,
   LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
 import { Link, Outlet, useNavigate } from "react-router-dom";
@@ -61,109 +64,59 @@ const Dashboard = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-      >
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={["1"]}
-          mode="inline"
-          items={items}
-          style={{ height: "100%" }} // ✅ Bỏ calc vì không cần space cho home button
-        />
-      </Sider>
-
-      <Layout>
-        {/* ✅ Header với cả hai nút */}
-        <Header
-          style={{
-            padding: "0 24px",
-            background: colorBgContainer,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-          }}
-        >
-          {/* Title ở giữa */}
-          <div
-            style={{
-              fontSize: "18px",
-              fontWeight: "600",
-              color: "#1890ff",
-            }}
+    <div className="qc-dashboard-root">
+      <div className="qc-dashboard-layout">
+        <aside className={`qc-dashboard-sider${collapsed ? " collapsed" : ""}`}>
+          <div className="qc-dashboard-logo" />
+          <button
+            className="qc-dashboard-toggle-btn"
+            onClick={() => setCollapsed((prev) => !prev)}
+            aria-label={collapsed ? "Mở rộng menu" : "Thu gọn menu"}
           >
-            QuitCare Dashboard
-          </div>
-
-          {/* ✅ Nhóm buttons ở bên phải */}
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            {/* Nút về trang chủ - chỉ hiển thị cho STAFF */}
-            {isStaff && (
+            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </button>
+          <Menu
+            theme="dark"
+            defaultSelectedKeys={["1"]}
+            mode="inline"
+            items={items}
+            className="qc-dashboard-menu"
+            inlineCollapsed={collapsed}
+          />
+        </aside>
+        <div className="qc-dashboard-main">
+          <header className="qc-dashboard-header">
+            <div className="qc-dashboard-title">QuitCare Dashboard</div>
+            <div className="qc-dashboard-actions">
+              {isStaff && (
+                <Button
+                  className="qc-dashboard-btn qc-dashboard-btn-home"
+                  type="default"
+                  icon={<HomeOutlined />}
+                  onClick={handleGoHome}
+                >
+                  Về trang chủ
+                </Button>
+              )}
               <Button
-                type="default"
-                icon={<HomeOutlined />}
-                onClick={handleGoHome}
-                style={{
-                  backgroundColor: "#f0f8ff",
-                  borderColor: "#1890ff",
-                  color: "#1890ff",
-                  borderRadius: "6px",
-                  height: "36px",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  boxShadow: "0 2px 8px rgba(24, 144, 255, 0.1)",
-                }}
+                className="qc-dashboard-btn qc-dashboard-btn-logout"
+                type="primary"
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
               >
-                Về trang chủ
+                Đăng xuất
               </Button>
-            )}
-
-            {/* Nút đăng xuất */}
-            <Button
-              type="primary"
-              icon={<LogoutOutlined />}
-              onClick={handleLogout}
-              style={{
-                backgroundColor: "#1890ff",
-                borderColor: "#1890ff",
-                borderRadius: "6px",
-                height: "36px",
-                fontSize: "14px",
-                fontWeight: "500",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                boxShadow: "0 2px 8px rgba(24, 144, 255, 0.3)",
-              }}
-            >
-              Đăng xuất
-            </Button>
-          </div>
-        </Header>
-
-        <Content style={{ margin: "0 16px" }}>
-          <Breadcrumb style={{ margin: "16px 0" }} />
-          <div
-            style={{
-              padding: 24,
-              minHeight: "calc(100vh - 112px)",
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            <Outlet />
-          </div>
-        </Content>
-      </Layout>
-    </Layout>
+            </div>
+          </header>
+          <main className="qc-dashboard-content-wrapper">
+            <Breadcrumb className="qc-dashboard-breadcrumb" />
+            <div className="qc-dashboard-content">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
   );
 };
 

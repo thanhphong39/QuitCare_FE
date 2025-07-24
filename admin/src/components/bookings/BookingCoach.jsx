@@ -64,10 +64,11 @@ const Booking = () => {
       try {
         const res = await api.get("/session/coaches");
         const coachesData = res.data || [];
-        
 
         setCoaches(coachesData);
-        await Promise.all(coachesData.map((coach) => fetchAvailableSlots(coach)));
+        await Promise.all(
+          coachesData.map((coach) => fetchAvailableSlots(coach))
+        );
         setInitialLoad(false);
       } catch (err) {
         console.error("Lỗi khi lấy danh sách coach:", err);
@@ -175,12 +176,17 @@ const Booking = () => {
         const newDisabled = { ...disabledSlots, [slotKey]: true };
         setDisabledSlots(newDisabled);
         localStorage.setItem("disabledSlots", JSON.stringify(newDisabled));
-      }else if (err.response?.status === 400) {
-        toast.error("❌ Xin lỗi! Bạn chỉ có thể đặt lịch 4 lần.", { duration: 3000 });
+      } else if (err.response?.status === 400) {
+        toast.error("❌ Xin lỗi! Bạn chỉ có thể đặt lịch 4 lần.", {
+          duration: 3000,
+        });
 
-setTimeout(() => {
-  toast.error("❗ Xin hãy đăng ký gói Premium mới để sử dụng chức năng đặt lịch.", { duration: 5000 });
-}, 3200); // Hiển thị cái thứ hai sau 3.2 giây
+        setTimeout(() => {
+          toast.error(
+            "❗ Xin hãy đăng ký gói Premium mới để sử dụng chức năng đặt lịch.",
+            { duration: 5000 }
+          );
+        }, 3200); // Hiển thị cái thứ hai sau 3.2 giây
         // const newDisabled = { ...disabledSlots, [slotKey]: true };
         // setDisabledSlots(newDisabled);
         // localStorage.setItem("disabledSlots", JSON.stringify(newDisabled));
@@ -221,10 +227,11 @@ setTimeout(() => {
             <div style={{ flex: 1 }}>
               <div className="booking-left">
                 <img
-                  src={coach.fixedAvatar || "/default-avatar.png"}
+                  src={coach.avatar || "/default-avatar.png"}
                   alt={coach.fullName}
                   className="booking-img"
                 />
+
                 <div className="booking-info">
                   <div className="booking-brand">QUITCARE</div>
                   <div className="booking-name">{coach.fullName}</div>
@@ -239,7 +246,8 @@ setTimeout(() => {
                 <DatePicker
                   value={selectedDate ? dayjs(selectedDate) : null}
                   onChange={(date) =>
-                    date && handleDateChange(coach.id, date.format("YYYY-MM-DD"))
+                    date &&
+                    handleDateChange(coach.id, date.format("YYYY-MM-DD"))
                   }
                   disabledDate={(current) => {
                     const today = dayjs().startOf("day");
@@ -249,7 +257,9 @@ setTimeout(() => {
                         .filter(([, slots]) => slots.some((s) => s.available))
                         .map(([d]) => d)
                     );
-                    return current.isBefore(today) || !validDatesSet.has(currentStr);
+                    return (
+                      current.isBefore(today) || !validDatesSet.has(currentStr)
+                    );
                   }}
                   format="YYYY-MM-DD"
                   popupClassName="custom-datepicker-popup"
@@ -258,8 +268,13 @@ setTimeout(() => {
 
               <div className="booking-times">
                 {slotList.map((slot, i) => {
-                  const slotLabel = typeof slot === "string" ? slot : slot.label;
-                  const isDisabled = isSlotDisabled(coach.id, slot, selectedDate);
+                  const slotLabel =
+                    typeof slot === "string" ? slot : slot.label;
+                  const isDisabled = isSlotDisabled(
+                    coach.id,
+                    slot,
+                    selectedDate
+                  );
                   const isSelected = selectedSlots[coach.id] === slotLabel;
                   return (
                     <button
@@ -267,7 +282,9 @@ setTimeout(() => {
                       className={`booking-slot ${isSelected ? "active" : ""} ${
                         isDisabled ? "disabled" : ""
                       }`}
-                      onClick={() => !isDisabled && handleSlotSelect(coach.id, slot)}
+                      onClick={() =>
+                        !isDisabled && handleSlotSelect(coach.id, slot)
+                      }
                       disabled={isDisabled}
                       style={{
                         opacity: isDisabled ? 0.5 : 1,
@@ -298,7 +315,6 @@ setTimeout(() => {
                   className={`booking-btn booking-btn-primary ${
                     loadingState[coach.id] ? "loading" : ""
                   }`}
-                  
                   onClick={() => handleBooking(coach)}
                   disabled={loadingState[coach.id]}
                 >

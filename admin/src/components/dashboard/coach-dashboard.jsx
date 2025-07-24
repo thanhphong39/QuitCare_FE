@@ -117,7 +117,7 @@ const CoachDashboard = () => {
               <Space>
                 <UserOutlined style={{ fontSize: 18, color: "#666" }} />
                 <span style={{ color: "#666", fontWeight: 500 }}>
-                  {user?.fullName || user?.name || "Coach Dashboard"}
+                  {user?.fullName || user?.userName || "Coach Dashboard"}
                 </span>
                 <DownOutlined style={{ fontSize: 12, color: "#999" }} />
               </Space>

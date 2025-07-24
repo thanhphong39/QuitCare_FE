@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Select, Button, message, Card, Spin } from "antd";
+import { useSelector } from "react-redux";
 import api from "../../../configs/axios";
+import { toast } from "react-toastify";
 
 const { Option } = Select;
 
@@ -8,85 +10,95 @@ function ProfileCoach() {
   const [form] = Form.useForm();
   const [coachInfo, setCoachInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const user = useSelector((state) => state.user); // user đang đăng nhập
+
+  const fetchCoachData = async () => {
+    setLoading(true);
+    try {
+      const [coachRes] = await Promise.all([
+        api.get("/session/coaches"),
+      ]);
+
+      const coachList = coachRes.data;
+      const matchedCoach = coachList.find((coach) => coach.id === user.id);
+
+      if (!matchedCoach) {
+        message.warning("Không tìm thấy thông tin coach.");
+        return;
+      }
+
+      setCoachInfo(matchedCoach);
+      form.setFieldsValue(matchedCoach);
+    } catch (err) {
+      console.error("Lỗi khi lấy dữ liệu:", err);
+      message.error("Đã xảy ra lỗi khi tải thông tin coach.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCoachData = async () => {
-      try {
-        const [coachRes, usersRes] = await Promise.all([
-          api.get("/session/coaches"),
-          api.get("/admin/user"),
-        ]);
-
-        const coachList = coachRes.data; // danh sách coaches (id, email, avatar,...)
-        const userList = usersRes.data; // danh sách users có role, status,...
-
-        // tìm các user có role = 'COACH' và id có tồn tại trong danh sách coachList
-        const matchedCoach = userList.find(
-          (user) =>
-            user.role === "COACH" &&
-            coachList.some((coach) => coach.id === user.id)
-        );
-
-        if (matchedCoach) {
-          // tìm thêm thông tin chi tiết từ coachList (avatar, description,...)
-          const coachExtra = coachList.find((c) => c.id === matchedCoach.id);
-
-          const fullCoach = {
-            ...matchedCoach,
-            avatar: coachExtra?.avatar || "",
-            description: coachExtra?.description || "",
-          };
-
-          setCoachInfo(fullCoach);
-          form.setFieldsValue(fullCoach);
-        } else {
-          message.warning("Không tìm thấy coach phù hợp.");
-        }
-      } catch (err) {
-        console.error("Lỗi khi lấy dữ liệu:", err);
-        message.error("Đã có lỗi xảy ra khi tải thông tin.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCoachData();
-  }, [form]);
+    if (user?.id) {
+      fetchCoachData();
+    }
+  }, [user]);
 
   const onFinish = async (values) => {
     if (!coachInfo) return;
 
     const payload = {
       id: coachInfo.id,
-      email: coachInfo.email, // không cho sửa
+      email: coachInfo.email,
       username: coachInfo.username || "",
-      role: "COACH",
-      status: coachInfo.status || "ACTIVE",
       fullName: values.fullName,
       gender: values.gender,
-      avatar: values.avatar,
-      description: values.description,
+      role: coachInfo.role || "COACH",
+      status: coachInfo.status || "ACTIVE",
+      avatar: values.avatar || "",
+      description: values.description || "",
     };
 
     try {
       await api.put(`/admin/user/${coachInfo.id}`, payload);
-      message.success("Cập nhật thành công!");
+      toast.success("Cập nhật hồ sơ thành công!");
+      fetchCoachData(); // Reload lại avatar mới
     } catch (err) {
       console.error("Lỗi cập nhật:", err);
-      message.error("Cập nhật thất bại.");
+      message.error("Cập nhật hồ sơ thất bại.");
     }
   };
 
   if (loading) {
-    return <Spin tip="Đang tải dữ liệu..." />;
+    return (
+      <div style={{ textAlign: "center", marginTop: 50 }}>
+        <Spin tip="Đang tải dữ liệu..." />
+      </div>
+    );
   }
 
   if (!coachInfo) {
-    return <div>Không có thông tin coach để hiển thị.</div>;
+    return (
+      <div style={{ textAlign: "center", marginTop: 50 }}>
+        Không có thông tin coach để hiển thị.
+      </div>
+    );
   }
 
   return (
     <Card title="Thông tin Coach" style={{ maxWidth: 600, margin: "auto" }}>
+      <div style={{ textAlign: "center", marginBottom: 16 }}>
+        <img
+          src={coachInfo.avatar || "/default-avatar.png"}
+          alt="Avatar"
+          style={{
+            width: 120,
+            height: 120,
+            objectFit: "cover",
+            borderRadius: "50%",
+            border: "2px solid #eee",
+          }}
+        />
+      </div>
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item label="Email" name="email">
           <Input disabled />
@@ -95,7 +107,7 @@ function ProfileCoach() {
         <Form.Item
           label="Họ và tên"
           name="fullName"
-          rules={[{ required: true, message: "Vui lòng nhập tên" }]}
+          rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}
         >
           <Input />
         </Form.Item>
@@ -103,7 +115,7 @@ function ProfileCoach() {
         <Form.Item
           label="Giới tính"
           name="gender"
-          rules={[{ required: true, message: "Chọn giới tính" }]}
+          rules={[{ required: true, message: "Vui lòng chọn giới tính" }]}
         >
           <Select>
             <Option value="MALE">Nam</Option>

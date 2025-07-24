@@ -5,7 +5,6 @@ import premiumCard from "../../assets/images/pack1.png";
 import api from "../../configs/axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-// Giả sử bạn có context để lấy user
 import { useSelector } from "react-redux";
 
 const Package = () => {

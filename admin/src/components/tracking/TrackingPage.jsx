@@ -96,78 +96,84 @@ const TrackingPage = () => {
   const [showlinkBooking, setShowBooking] = useState(false);
   const BOOKING_LINK = "http://localhost:5173/booking";
 
-//keiemr tra user có gói thanh viên để Booking không
-useEffect(() => {
-  const fetchMembershipPlan = async () => {
-    try {
-      if (!user?.id) {
-        console.log("⚠️ Không có accountId.");
-        return;
-      }
-
-      console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
-      const historyRes = await api.get(`/v1/payments/history/account/${user.id}`);
-      const transactions = historyRes.data || [];
-
-      // Lọc các giao dịch SUCCESS và có userMembershipId
-      const successTransactions = transactions
-        .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Mới nhất trước
-
-      if (successTransactions.length === 0) {
-        console.log("⛔ Không có giao dịch SUCCESS hợp lệ.");
-        return;
-      }
-
-      // Duyệt các giao dịch thành công mới nhất
-      for (const tx of successTransactions) {
-        const { userMembershipId } = tx;
-
-        try {
-          // Lấy thông tin user-membership
-          const membershipRes = await api.get(`/user-memberships/${userMembershipId}`);
-          const membershipData = membershipRes.data;
-
-          const { status, planId } = membershipData;
-          console.log("📄 Thông tin user-membership:", membershipData);
-
-          if (status !== "ACTIVE") {
-            console.log("⚠️ Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo...");
-            continue;
-          }
-
-          // Lấy thông tin gói
-          const planRes = await api.get(`/membership-plans/${planId}`);
-          const plan = planRes.data;
-
-          console.log("🎯 Gói hội viên:", plan);
-
-          if (plan?.name === "Premium") {
-            console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
-            setShowBooking(true);
-            return;
-          } else {
-            console.log("ℹ️ Không phải gói Premium.");
-          }
-        } catch (innerErr) {
-          console.warn("⚠️ Lỗi khi xử lý userMembership hoặc plan:", innerErr);
-          continue; // Nếu lỗi thì bỏ qua và thử giao dịch tiếp theo
+  //keiemr tra user có gói thanh viên để Booking không
+  useEffect(() => {
+    const fetchMembershipPlan = async () => {
+      try {
+        if (!user?.id) {
+          console.log("⚠️ Không có accountId.");
+          return;
         }
+
+        console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
+        const historyRes = await api.get(
+          `/v1/payments/history/account/${user.id}`
+        );
+        const transactions = historyRes.data || [];
+
+        // Lọc các giao dịch SUCCESS và có userMembershipId
+        const successTransactions = transactions
+          .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Mới nhất trước
+
+        if (successTransactions.length === 0) {
+          console.log("⛔ Không có giao dịch SUCCESS hợp lệ.");
+          return;
+        }
+
+        // Duyệt các giao dịch thành công mới nhất
+        for (const tx of successTransactions) {
+          const { userMembershipId } = tx;
+
+          try {
+            // Lấy thông tin user-membership
+            const membershipRes = await api.get(
+              `/user-memberships/${userMembershipId}`
+            );
+            const membershipData = membershipRes.data;
+
+            const { status, planId } = membershipData;
+            console.log("📄 Thông tin user-membership:", membershipData);
+
+            if (status !== "ACTIVE") {
+              console.log(
+                "⚠️ Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo..."
+              );
+              continue;
+            }
+
+            // Lấy thông tin gói
+            const planRes = await api.get(`/membership-plans/${planId}`);
+            const plan = planRes.data;
+
+            console.log("🎯 Gói hội viên:", plan);
+
+            if (plan?.name === "Premium") {
+              console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
+              setShowBooking(true);
+              return;
+            } else {
+              console.log("ℹ️ Không phải gói Premium.");
+            }
+          } catch (innerErr) {
+            console.warn(
+              "⚠️ Lỗi khi xử lý userMembership hoặc plan:",
+              innerErr
+            );
+            continue; // Nếu lỗi thì bỏ qua và thử giao dịch tiếp theo
+          }
+        }
+
+        // Nếu không có gói Premium nào đang active
+        console.log("❌ Không tìm thấy gói Premium đang ACTIVE.");
+        setShowBooking(false);
+      } catch (err) {
+        console.error("❌ Lỗi khi kiểm tra gói hội viên:", err);
       }
+    };
 
-      // Nếu không có gói Premium nào đang active
-      console.log("❌ Không tìm thấy gói Premium đang ACTIVE.");
-      setShowBooking(false);
-    } catch (err) {
-      console.error("❌ Lỗi khi kiểm tra gói hội viên:", err);
-    }
-  };
-
-  fetchMembershipPlan();
-}, [user?.id]);
-
-
-
+    fetchMembershipPlan();
+  }, [user?.id]);
 
   // Script tự động điền dữ liệu
   const [isAutoFilling, setIsAutoFilling] = useState(false);
@@ -1540,7 +1546,7 @@ useEffect(() => {
                 borderRadius: "6px",
               }}
             >
-              <h4 style={{ margin: "0 0 8px 0", color: "#1890ff" }}>🔧 Test</h4>
+              <h4 style={{ margin: "0 0 8px 0", color: "#1890ff" }}>🔧</h4>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <Button
                   type="primary"
@@ -1549,17 +1555,17 @@ useEffect(() => {
                   disabled={!plan || !smokingStatusId}
                   size="small"
                 >
-                  🤖 Điền dữ liệu 2 tuần
+                  🤖 Điền dữ liệu
                 </Button>
-                <Button
+                {/* <Button
                   danger
                   onClick={clearAllTrackingData}
                   disabled={isAutoFilling}
                   size="small"
                 >
                   🗑️ Xóa tất cả dữ liệu
-                </Button>
-                <span style={{ fontSize: "12px", color: "#666" }}>
+                </Button> */}
+                {/* <span style={{ fontSize: "12px", color: "#666" }}>
                   Script sẽ tạo dữ liệu mẫu cho{" "}
                   {plan && getPlanEndDate()
                     ? (() => {
@@ -1571,7 +1577,7 @@ useEffect(() => {
                       })()
                     : "?"}{" "}
                   ngày
-                </span>
+                </span> */}
               </div>
             </div>
           )}

@@ -1,7 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Compare.css";
+import api from "../../configs/axios";
 
 function MemberComparison() {
+  const [plans, setPlans] = useState([]);
+  useEffect(() => {
+    async function fetchPlans() {
+      try {
+        const res = await api.get("/membership-plans");
+        setPlans(res.data);
+      } catch (err) {
+        setPlans([]);
+      }
+    }
+    fetchPlans();
+  }, []);
+
+  // Lấy ra 2 gói: Basic và Premium (theo thứ tự hoặc name)
+  const basic =
+    plans.find((p) => p.name?.toLowerCase().includes("basic")) || plans[0];
+  const premium =
+    plans.find((p) => p.name?.toLowerCase().includes("premium")) || plans[1];
+
   return (
     <div className="compare-container">
       <div className="compare-content">
@@ -22,8 +42,8 @@ function MemberComparison() {
             <thead>
               <tr>
                 <th>Phúc lợi</th>
-                <th>Basic</th>
-                <th>Premium</th>
+                <th>{basic ? basic.name : "Basic"}</th>
+                <th>{premium ? premium.name : "Premium"}</th>
               </tr>
             </thead>
             <tbody>
@@ -42,7 +62,6 @@ function MemberComparison() {
                 <td>✅</td>
                 <td>✅</td>
               </tr>
-             
               <tr>
                 <td>Cuộc gọi tư vấn định kỳ với huấn luyện viên</td>
                 <td>❌</td>
@@ -50,8 +69,14 @@ function MemberComparison() {
               </tr>
               <tr>
                 <td>Chi phí</td>
-                <td>69.000 VND</td>
-                <td>269.000 VND</td>
+                <td>
+                  {basic ? basic.price.toLocaleString("vi-VN") + " VND" : "-"}
+                </td>
+                <td>
+                  {premium
+                    ? premium.price.toLocaleString("vi-VN") + " VND"
+                    : "-"}
+                </td>
               </tr>
             </tbody>
           </table>

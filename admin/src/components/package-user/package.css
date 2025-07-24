@@ -541,3 +541,7 @@ screen and (min-resolution: 192dpi) {
         display: none;
     }
 }
+.card {
+    margin-right: 60px;
+    margin-left: 60px;
+  }

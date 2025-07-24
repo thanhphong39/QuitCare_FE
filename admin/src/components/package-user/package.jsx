@@ -108,7 +108,7 @@ const Package = () => {
         Đặc Quyền <br /> Hội Viên
       </h2>
       <p className="desc">
-        Chúng tôi cung cấp các gói hỗ trợ linh hoạt, phù hợp với nhu cầu của từng cá nhân...
+      Chúng tôi cung cấp các gói hỗ trợ linh hoạt, được thiết kế chuyên biệt nhằm đáp ứng từng mức độ nghiện và nhu cầu cá nhân hóa của mỗi người dùng. Từ những người mới bắt đầu hành trình cai thuốc đến những người đã từng thất bại và cần sự đồng hành chuyên sâu, mỗi gói thành viên đều bao gồm các dịch vụ tư vấn chuyên môn, tài liệu hướng dẫn, hỗ trợ 24/7, cũng như các công cụ theo dõi tiến trình và động viên hàng ngày. Mục tiêu của chúng tôi là giúp bạn không chỉ từ bỏ thuốc lá một cách bền vững mà còn lấy lại chất lượng cuộc sống và sức khỏe toàn diện.
       </p>
 
       <div className="card-wrapper">

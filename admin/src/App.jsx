@@ -219,13 +219,12 @@ function App() {
         {
           path: "profile",
           element: (
-            <ProtectedRoute
-              allowedRoles={["STAFF", "GUEST", "CUSTOMER", "COACH", "ADMIN"]}
-            >
-              <Profile />
+            <ProtectedRoute allowedRoles={["STAFF", "GUEST", "CUSTOMER"]}>
+              <Profile />          
             </ProtectedRoute>
           ),
         },
+
         {
           path: "noti",
           element: (
@@ -269,7 +268,8 @@ function App() {
             {
               path: "posts",
               element: <PostsManagement />,
-            },{
+            },
+            {
               path: "leavedays",
               element: <LeaveDays />,
             },
@@ -306,7 +306,7 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <GoogleOAuthProvider clientId="708220740394-18bkkdtfs5c1sim8a4vg8aialu1955tf.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId="872875496578-lpgf5vvnfhbmhrl0glq60k0bcm453idm.apps.googleusercontent.com">
           <RouterProvider router={router} />
         </GoogleOAuthProvider>
         <BackToTopButton />

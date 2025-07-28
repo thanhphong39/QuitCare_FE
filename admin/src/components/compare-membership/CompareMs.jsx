@@ -7,7 +7,7 @@ function MemberComparison() {
   useEffect(() => {
     async function fetchPlans() {
       try {
-        const res = await api.get("/membership-plans");
+        const res = await api.get("/auth/api/membership-plans");
         setPlans(res.data);
       } catch (err) {
         setPlans([]);

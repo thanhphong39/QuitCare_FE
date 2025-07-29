@@ -16,12 +16,18 @@ function MemberComparison() {
     fetchPlans();
   }, []);
 
-  // Lấy ra 2 gói: Basic và Premium (theo thứ tự hoặc name)
   const basic =
-    plans.find((p) => p.name?.toLowerCase().includes("basic")) || plans[0];
-  const premium =
-    plans.find((p) => p.name?.toLowerCase().includes("premium")) || plans[1];
+  (Array.isArray(plans) &&
+    plans.find((p) => p.name?.toLowerCase().includes("basic"))) ||
+  (Array.isArray(plans) ? plans[0] : null);
 
+const premium =
+  (Array.isArray(plans) &&
+    plans.find((p) => p.name?.toLowerCase().includes("premium"))) ||
+  (Array.isArray(plans) ? plans[1] : null);
+  console.log("Plans nhận được:", plans);
+  console.log("Loại:", typeof plans);
+  console.log("Có phải mảng không:", Array.isArray(plans));
   return (
     <div className="compare-container">
       <div className="compare-content">

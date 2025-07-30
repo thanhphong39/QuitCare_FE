@@ -43,32 +43,7 @@ const LoginForm = ({ onLogin, errorMessage }) => {
   const onFinishFailed = (errorInfo) => {
     console.log("Login failed:", errorInfo);
   };
-
-  const handleGoogleLoginSuccess = async (credentialResponse) => {
-    try {
-      // Gọi API backend để xác thực Google (không cần truyền body nếu backend không yêu cầu)
-      const response = await api.post("/api/auth/oauth2/login/success");
-      const user = response.data;
-      dispatch(login(user));
-      localStorage.setItem("token", user.token);
-      localStorage.setItem("accountId", user.id);
-
-      // Điều hướng như login thường
-      if (user.role === "ADMIN") {
-        navigate("/dashboard");
-      } else if (
-        user.role === "GUEST" ||
-        user.role === "CUSTOMER" ||
-        user.role === "STAFF"
-      ) {
-        navigate("/");
-      } else if (user.role === "COACH") {
-        navigate("/dashboard-coach");
-      }
-    } catch (error) {
-      toast.error("Đăng nhập Google thất bại!");
-    }
-  };
+       
 
   return (
     <div className="auth-login-container">
@@ -195,13 +170,13 @@ const LoginForm = ({ onLogin, errorMessage }) => {
               </Form.Item>
 
               {/* Nút đăng nhập Google */}
-              <div style={{ marginBottom: 16, textAlign: "center"  }}>
+              {/* <div style={{ marginBottom: 16, textAlign: "center"  }}>
                 <GoogleLogin
                   onSuccess={handleGoogleLoginSuccess}
                   onError={() => toast.error("Đăng nhập Google thất bại!")}
                   width="100%"
                 />
-              </div>
+              </div> */}
 
               <div className="auth-login-register-link">
                 Chưa có tài khoản?

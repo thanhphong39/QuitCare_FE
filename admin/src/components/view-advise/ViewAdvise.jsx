@@ -57,30 +57,48 @@ function ViewAdvise() {
   const fetchConsultations = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/booking/customer");
+      const token = localStorage.getItem("token");
+
+      // 1. Lấy danh sách tư vấn
+      const response = await api.get("/booking/customer", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = response.data;
 
-      const transformedData = data.map((item, index) => ({
-        id: index,
-        coachName: item.coachName,
-        date: item.appointmentDate,
-        time: item.startTime,
-        endTime: dayjs(item.startTime, "HH:mm:ss")
-          .add(60, "minute")
-          .format("HH:mm:ss"),
-        status: item.status,
-        meetingLink: item.googleMeetLink,
-        platform: "Google Meet",
-        notes: "",
-        coachAvatar: "",
-        createdAt: new Date().toISOString(),
-        completedAt:
-          item.status === "COMPLETED"
-            ? dayjs(`${item.appointmentDate} ${item.startTime}`)
-                .add(60, "minute")
-                .toISOString()
-            : null,
-      }));
+      // 2. Lấy danh sách huấn luyện viên
+      const userResponse = await api.get("/admin/user", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const users = userResponse.data;
+
+      // 3. Ghép avatar huấn luyện viên vào tư vấn
+      const transformedData = data.map((item, index) => {
+        const matchedCoach = users.find(
+          (u) => u.fullName === item.coachName // Hoặc dùng id nếu có
+        );
+
+        return {
+          id: index,
+          coachName: item.coachName,
+          date: item.appointmentDate,
+          time: item.startTime,
+          endTime: dayjs(item.startTime, "HH:mm:ss")
+            .add(60, "minute")
+            .format("HH:mm:ss"),
+          status: item.status,
+          meetingLink: item.googleMeetLink,
+          platform: "Google Meet",
+          notes: "",
+          coachAvatar: matchedCoach?.avatar || null,
+          createdAt: new Date().toISOString(),
+          completedAt:
+            item.status === "COMPLETED"
+              ? dayjs(`${item.appointmentDate} ${item.startTime}`)
+                  .add(60, "minute")
+                  .toISOString()
+              : null,
+        };
+      });
 
       setConsultations(transformedData);
     } catch (error) {
@@ -139,7 +157,11 @@ function ViewAdvise() {
       key: "coachName",
       render: (name, record) => (
         <div className="coach-info">
-          <Avatar size={40} icon={<UserOutlined />} />
+          <Avatar
+            src={record.coachAvatar}
+            icon={!record.coachAvatar && <UserOutlined />}
+            size={40}
+          />
           <div className="coach-details">
             <Text strong>{name}</Text>
             <Text type="secondary">{record.platform}</Text>
@@ -193,7 +215,10 @@ function ViewAdvise() {
   return (
     <>
       <Navbar />
-      <div className="view-advise-page" style={{ maxWidth: 1000, margin: "0 auto", padding: 20 }}>
+      <div
+        className="view-advise-page"
+        style={{ maxWidth: 1000, margin: "0 auto", padding: 20 }}
+      >
         <Card
           title={
             <div>
@@ -265,25 +290,36 @@ function ViewAdvise() {
           </Button>,
         ]}
       >
-        {selectedConsultation &&
-  <>
-    <p><strong>Coach:</strong> {selectedConsultation.coachName}</p>
-    <p>
-      <strong>Ngày giờ:</strong> {dayjs(selectedConsultation.date).format("DD/MM/YYYY")} {selectedConsultation.time}
-    </p>
-    <p>
-      <strong>Trạng thái:</strong> {getStatusConfig(selectedConsultation.status).text}
-    </p>
+        {selectedConsultation && (
+          <>
+            <p>
+              <strong>Coach:</strong> {selectedConsultation.coachName}
+            </p>
+            <p>
+              <strong>Ngày giờ:</strong>{" "}
+              {dayjs(selectedConsultation.date).format("DD/MM/YYYY")}{" "}
+              {selectedConsultation.time}
+            </p>
+            <p>
+              <strong>Trạng thái:</strong>{" "}
+              {getStatusConfig(selectedConsultation.status).text}
+            </p>
 
-    {selectedConsultation.status === "PENDING" && selectedConsultation.meetingLink && (
-      <p>
-        <strong>Link:</strong> <a href={selectedConsultation.meetingLink} target="_blank" rel="noopener noreferrer">
-          {selectedConsultation.meetingLink}
-        </a>
-      </p>
-    )}
-  </>
-}
+            {selectedConsultation.status === "PENDING" &&
+              selectedConsultation.meetingLink && (
+                <p>
+                  <strong>Link:</strong>{" "}
+                  <a
+                    href={selectedConsultation.meetingLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {selectedConsultation.meetingLink}
+                  </a>
+                </p>
+              )}
+          </>
+        )}
       </Modal>
       <Footer />
     </>

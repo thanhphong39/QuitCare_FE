@@ -15,6 +15,28 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const [apiUser, setApiUser] = useState(null);
+  useEffect(() => {
+    const fetchApiUser = async () => {
+      try {
+        const res = await api.get("/admin/user");
+        const users = res.data || [];
+
+        const currentUser = users.find((u) => u.id === user?.id);
+        if (currentUser) {
+          setApiUser(currentUser);
+        } else {
+          console.warn("❌ Không tìm thấy user với ID:", user?.id);
+        }
+      } catch (err) {
+        console.error("❌ Lỗi khi lấy danh sách user từ API:", err);
+      }
+    };
+
+    if (user?.id) {
+      fetchApiUser();
+    }
+  }, [user?.id]);
 
   // 👉 Lấy và kiểm tra giao dịch
   useEffect(() => {
@@ -262,12 +284,12 @@ const Navbar = () => {
               <div className="qc-navbar-user-button">
                 <img
                   src={
-                    user.avatar?.trim() ||
+                    apiUser?.avatar?.trim() ||
                     `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      user.fullName?.trim() || "User"
+                      apiUser?.fullName?.trim() || "User"
                     )}&background=ececec&color=555&size=64&rounded=true`
                   }
-                  alt={user.fullName?.trim() || "User"}
+                  alt={apiUser?.fullName?.trim() || "User"}
                   className="qc-navbar-avatar"
                   onError={(e) => {
                     e.target.onerror = null;
@@ -276,7 +298,7 @@ const Navbar = () => {
                   }}
                 />
                 <span className="qc-navbar-fullname">
-                  {user.fullName?.trim() || "Guest"}
+                  {apiUser?.fullName?.trim() || "Guest"}
                 </span>
               </div>
 

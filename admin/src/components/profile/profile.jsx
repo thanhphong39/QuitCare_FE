@@ -16,9 +16,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Footer from "../footer/Footer";
 import Navbar from "../navbar/Navbar";
 import api from "../../configs/axios";
-import { login } from "../../redux/features/userSlice";
-import "./profile.css";
 import { toast } from "react-toastify";
+import "./profile.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -27,28 +26,37 @@ const Profile = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  // State for profile editing
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    fullname: "",
+    fullName: user?.fullName || "",
     username: "",
     gender: "MALE",
     avatar: "",
   });
   const [account, setAccount] = useState(null);
+
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/admin/user");
-      const userList = response.data;
+      const [userRes] = await Promise.all([
+        api.get(`/admin/user`),
+      ]);
+      const listUser = userRes.data;
+      const matchedUser = listUser.find((u) => u.id === user.id);
   
-      const foundUser = userList.find((u) => u.id === user.id);
-  
-      if (foundUser) {
-        setAccount(foundUser);
-        
+      if (!matchedUser) {
+        message.warning("Không tìm thấy thông tin người dùng.");
+        return;
       }
+  
+      setAccount(matchedUser);
+      setForm({
+        fullName: matchedUser.fullName || "",
+        username: matchedUser.username || "",
+        gender: matchedUser.gender || "MALE",
+        avatar: matchedUser.avatar || "",
+      });
     } catch (err) {
       console.error("Lỗi khi lấy dữ liệu:", err);
       message.error("Đã xảy ra lỗi khi tải thông tin người dùng.");
@@ -57,39 +65,39 @@ const Profile = () => {
     }
   };
   
-  // Gọi hàm trong useEffect
+  
   useEffect(() => {
     if (user?.id) {
       fetchUserData();
-      
     }
   }, [user]);
-  console.log("account", account);
+
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
   };
 
   const handleSubmit = async () => {
     setLoading(true);
+    const payload = {
+      id: account.id,
+      email: account.email,
+      username: form.username || "",
+      fullName: form.fullName,
+      gender: form.gender,
+      role: account.role || "COACH",
+      status: account.status || "ACTIVE",
+      avatar: form.avatar || "",
+      description: account.description || "",
+    };
     try {
-      const response = await api.put(`user/${user.id}`, {
-        fullname: form.fullname,
-        username: form.username,
-        gender: form.gender,
-        avatar: form.avatar,
-      });
-
-      // dispatch(
-      //   login({
-      //     ...response.data,
-      //     avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      //       response.data.fullname
-      //     )}&background=4f46e5&color=ffffff&size=128&rounded=true`,
-      //   })
-      // );
+      const response = await api.put(`/admin/user/${user.id}`, payload);
 
       toast.success("Cập nhật thông tin thành công!");
       setIsEditing(false);
+      fetchUserData(); // reload lại dữ liệu mới
+      setTimeout(() => {
+        window.location.reload();
+      }, 100); 
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);
       toast.error("Cập nhật thất bại!");
@@ -105,15 +113,9 @@ const Profile = () => {
           <div className="avatar-section">
             <Avatar
               size={120}
-              src={account?.avatar || "/default-avatar.png"}
+              src={form.avatar || "/default-avatar.png"}
               className="profile-avatar"
             />
-            {/* <div className="avatar-info">
-              <Title level={4} className="mb-1">
-                {user?.fullName || "Người dùng"}
-              </Title>
-              <Text type="secondary">{user?.email}</Text>
-            </div> */}
           </div>
         </Col>
 
@@ -136,7 +138,8 @@ const Profile = () => {
                 <div className="form-group">
                   <label className="form-label">Tên đăng nhập</label>
                   <Input
-                    value={account?.username || ""}
+                    value={form.username}
+                    onChange={(e) => handleChange("username", e.target.value)}
                     disabled={!isEditing}
                     className={isEditing ? "editable-input" : "readonly-input"}
                     prefix={<UserOutlined />}
@@ -148,8 +151,8 @@ const Profile = () => {
                 <div className="form-group">
                   <label className="form-label">Tên đầy đủ</label>
                   <Input
-                    value={account?.fullname}
-                    onChange={(e) => handleChange("fullname", e.target.value)}
+                    value={form.fullName}
+                    onChange={(e) => handleChange("fullName", e.target.value)}
                     disabled={!isEditing}
                     className={isEditing ? "editable-input" : "readonly-input"}
                     placeholder="Nhập tên đầy đủ"
@@ -161,7 +164,7 @@ const Profile = () => {
                 <div className="form-group">
                   <label className="form-label">Giới tính</label>
                   <Select
-                    value={account?.gender}
+                    value={form.gender}
                     onChange={(value) => handleChange("gender", value)}
                     disabled={!isEditing}
                     className={
@@ -174,18 +177,19 @@ const Profile = () => {
                   </Select>
                 </div>
               </Col>
+
               <Col xs={24} sm={12}>
-  <div className="form-group">
-    <label className="form-label">URL ảnh đại diện</label>
-    <Input
-      value={form.avatar}
-      onChange={(e) => handleChange("avatar", e.target.value)}
-      disabled={!isEditing}
-      className={isEditing ? "editable-input" : "readonly-input"}
-      placeholder="Nhập đường dẫn ảnh"
-    />
-  </div>
-</Col>
+                <div className="form-group">
+                  <label className="form-label">URL ảnh đại diện</label>
+                  <Input
+                    value={form.avatar}
+                    onChange={(e) => handleChange("avatar", e.target.value)}
+                    disabled={!isEditing}
+                    className={isEditing ? "editable-input" : "readonly-input"}
+                    placeholder="Nhập đường dẫn ảnh"
+                  />
+                </div>
+              </Col>
             </Row>
 
             <div className="action-buttons">
@@ -203,7 +207,7 @@ const Profile = () => {
                   <Button
                     onClick={() => {
                       setForm({
-                        fullname: account.fullname || "",
+                        fullName: account.fullName || "",
                         username: account.username || "",
                         gender: account.gender || "MALE",
                         avatar: account.avatar || "",
@@ -236,7 +240,6 @@ const Profile = () => {
       <Navbar />
       <div className="profile-page">
         <div className="profile-container">
-          {/* Page Header */}
           <div className="page-header">
             <Title level={2} className="page-title">
               <UserOutlined className="title-icon" />
@@ -247,11 +250,9 @@ const Profile = () => {
             </Text>
           </div>
 
-          {/* Personal Information */}
           <div className="personal-info-section">{renderPersonalInfo()}</div>
         </div>
       </div>
-
       <Footer />
     </>
   );

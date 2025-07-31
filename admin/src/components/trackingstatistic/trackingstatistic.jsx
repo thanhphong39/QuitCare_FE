@@ -8,6 +8,7 @@ import {
   Spin,
   message,
   Typography,
+  Button,
 } from "antd";
 import {
   DollarOutlined,
@@ -34,6 +35,7 @@ import "./trackingstatistic.css";
 import api from "../../configs/axios";
 import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -43,6 +45,7 @@ function TrackingStatistic() {
   const accountId = localStorage.getItem("accountId");
   const [loading, setLoading] = useState(true);
   const [stat, setStat] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchStatistic() {
@@ -76,15 +79,22 @@ function TrackingStatistic() {
     );
   }
 
-  if (!stat) {
+  // Nếu không có kế hoạch hoặc không có thống kê
+  if (!stat || stat.daysWithoutSmoking === undefined) {
     return (
       <>
         <Navbar />
         <div className="tracking-statistic-empty">
-          <Card>
-            <h2>Không có dữ liệu thống kê</h2>
-            <p>Bạn chưa hoàn thành kế hoạch nào để xem thống kê.</p>
-          </Card>
+            <h2>Chưa có dữ liệu thống kê</h2>
+            <p>Bạn chưa có kế hoạch hoặc chưa theo dõi tiến trình cai thuốc.</p>
+            <Button
+              type="primary"
+              size="large"
+              onClick={() => navigate("/planning")}
+              style={{ marginTop: 16 }}
+            >
+              Tạo kế hoạch ngay
+            </Button>
         </div>
         <Footer />
       </>

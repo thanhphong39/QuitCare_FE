@@ -22,6 +22,13 @@
     z-index        : 1000;
     box-shadow     : 0 4px 20px rgba(0, 0, 0, 0.1);
     border-bottom  : 1px solid rgba(255, 255, 255, 0.1);
+    transition: top 2s cubic-bezier(0.22, 0.68, 0.45, 1), opacity 0.4s;
+}
+
+.qc-navbar.hide-on-scroll {
+    top: -90px;      /* Ẩn lên trên, lớn hơn chiều cao navbar */
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* =========================

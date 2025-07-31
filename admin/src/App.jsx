@@ -39,7 +39,6 @@ import Unauthorized from "./pages/Unauthorized";
 import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
-import Blog from "./components/blog/Blog";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import LeaveDays from "./pages/dashboard-staff/leavedays";
 import ProfileCoach from "./pages/dashboard-coach/profile-coach/profile-coach";

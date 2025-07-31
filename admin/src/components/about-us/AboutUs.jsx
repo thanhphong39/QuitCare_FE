@@ -1,9 +1,9 @@
 import React from "react";
 import "./AboutUs.css";
-import quitImage1 from "../../assets/images/Home1.png";
-import quitImage2 from "../../assets/images/Home2.png";
 import { Link, useNavigate } from "react-router-dom";
 import CrossBanner from "../fitnessTape/CrossBanner";
+import aboutVideo1 from "../../../public/videos/blog1.mp4";
+import aboutVideo2 from "../../../public/videos/blog2.mp4";
 
 function AboutUs() {
   const navigate = useNavigate();
@@ -54,7 +54,19 @@ function AboutUs() {
           </div>
 
           <div className="aboutus-image">
-            <img src={quitImage1} alt="Quit Smoking" />
+            <video
+              src={aboutVideo1}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="aboutus-video"
+              style={{
+                width: "100%",
+                borderRadius: "18px",
+                objectFit: "cover",
+              }}
+            />
           </div>
 
           <div className="aboutus-section">
@@ -91,7 +103,19 @@ function AboutUs() {
               </Link>
             </div>
             <div className="aboutus-image">
-              <img src={quitImage2} alt="Quit Smoking" />
+              <video
+                src={aboutVideo2}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="aboutus-video"
+                style={{
+                  width: "100%",
+                  borderRadius: "18px",
+                  objectFit: "cover",
+                }}
+              />
             </div>
           </div>
         </div>

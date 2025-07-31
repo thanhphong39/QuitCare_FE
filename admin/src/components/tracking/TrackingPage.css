@@ -776,9 +776,64 @@
     }
 }
 
+.quit-tracking-error-container {
+    background      : linear-gradient(135deg, #e0f7fa 0%, #f5fafd 100%);
+    border-radius   : 18px;
+    box-shadow      : 0 8px 32px rgba(24, 144, 255, 0.10);
+    padding         : 48px 32px 40px 32px;
+    margin          : 40px auto 0 auto;
+    max-width       : 480px;
+    text-align      : center;
+    border          : 1.5px solid #b3e5fc;
+    position        : relative;
+    overflow        : hidden;
+    animation       : fadeInDown 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 .quit-tracking-error-container h3 {
-    color        : #ff4d4f;
-    margin-bottom: 15px;
+    color        : #1890ff;
+    font-size    : 2rem;
+    font-weight  : 800;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    text-shadow  : 0 2px 12px #b3e5fc55;
+}
+
+.quit-tracking-error-container p {
+    color      : #374151;
+    font-size  : 1.1rem;
+    margin     : 0 0 28px 0;
+    font-weight: 500;
+}
+
+.quit-tracking-error-container .ant-btn[type="primary"] {
+    background     : linear-gradient(90deg, #40aaec 60%, #1890ff 100%);
+    color          : #fff;
+    font-size      : 1.1rem;
+    font-weight    : 700;
+    border         : none;
+    border-radius  : 24px;
+    padding        : 12px 36px;
+    box-shadow     : 0 4px 16px rgba(24, 144, 255, 0.13);
+    transition     : background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.quit-tracking-error-container .ant-btn[type="primary"]:hover {
+    background : linear-gradient(90deg, #1890ff 60%, #40aaec 100%);
+    color      : #fff;
+    transform  : translateY(-2px) scale(1.04);
+    box-shadow : 0 8px 32px rgba(24, 144, 255, 0.18);
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity  : 0;
+        transform: translateY(-40px);
+    }
+    to {
+        opacity  : 1;
+        transform: translateY(0);
+    }
 }
 
 /* Popup Styles */

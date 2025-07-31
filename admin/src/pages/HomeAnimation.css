@@ -1,0 +1,15 @@
+body {
+  overflow: hidden;
+}
+
+.section-animate {
+
+  transform: translateY(60px) scale(0.98);
+  transition: opacity 2s cubic-bezier(0.22, 0.68, 0.45, 1),
+    transform 2s cubic-bezier(0.22, 0.68, 0.45, 1);
+  will-change:  transform;
+}
+
+.section-animate.visible {
+  transform: translateY(0) scale(1);
+}

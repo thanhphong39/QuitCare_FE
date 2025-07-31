@@ -11,6 +11,7 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
+  const [hideOnScroll, setHideOnScroll] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
@@ -23,44 +24,50 @@ const Navbar = () => {
           console.log("⚠️ Không có accountId.");
           return;
         }
-  
+
         console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
-        const historyRes = await api.get(`/v1/payments/history/account/${user.id}`);
+        const historyRes = await api.get(
+          `/v1/payments/history/account/${user.id}`
+        );
         const transactions = historyRes.data || [];
-  
+
         // Lọc các giao dịch SUCCESS và có userMembershipId
         const successTransactions = transactions
           .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Mới nhất trước
-  
+
         if (successTransactions.length === 0) {
           console.log("⛔ Không có giao dịch SUCCESS hợp lệ.");
           return;
         }
-  
+
         // Duyệt các giao dịch thành công mới nhất
         for (const tx of successTransactions) {
           const { userMembershipId } = tx;
-  
+
           try {
             // Lấy thông tin user-membership
-            const membershipRes = await api.get(`/user-memberships/${userMembershipId}`);
+            const membershipRes = await api.get(
+              `/user-memberships/${userMembershipId}`
+            );
             const membershipData = membershipRes.data;
-  
+
             const { status, planId } = membershipData;
             console.log(" Thông tin user-membership:", membershipData);
-  
+
             if (status !== "ACTIVE") {
-              console.log(" Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo...");
+              console.log(
+                " Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo..."
+              );
               continue;
             }
-  
+
             // Lấy thông tin gói
             const planRes = await api.get(`/membership-plans/${planId}`);
             const plan = planRes.data;
-  
+
             console.log("🎯 Gói hội viên:", plan);
-  
+
             if (plan?.name === "Premium") {
               console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
               setShowBooking(true);
@@ -69,11 +76,14 @@ const Navbar = () => {
               console.log("ℹ️ Không phải gói Premium.");
             }
           } catch (innerErr) {
-            console.warn("⚠️ Lỗi khi xử lý userMembership hoặc plan:", innerErr);
+            console.warn(
+              "⚠️ Lỗi khi xử lý userMembership hoặc plan:",
+              innerErr
+            );
             continue; // Nếu lỗi thì bỏ qua và thử giao dịch tiếp theo
           }
         }
-  
+
         // Nếu không có gói Premium nào đang active
         console.log("❌ Không tìm thấy gói Premium đang ACTIVE.");
         setShowBooking(false);
@@ -81,10 +91,9 @@ const Navbar = () => {
         console.error("❌ Lỗi khi kiểm tra gói hội viên:", err);
       }
     };
-  
+
     fetchMembershipPlan();
   }, [user?.id]);
-  
 
   // 👉 Scroll Lock cho Mobile Menu
   useEffect(() => {
@@ -98,6 +107,31 @@ const Navbar = () => {
       document.body.classList.remove("mobile-menu-open");
     };
   }, [mobileMenuOpen]);
+
+  // 👉 Ẩn hiện Navbar khi cuộn trang
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          if (currentScrollY > lastScrollY && currentScrollY > 80) {
+            setHideOnScroll(true); // Lăn xuống: ẩn
+          } else {
+            setHideOnScroll(false); // Lăn lên: hiện
+          }
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -117,7 +151,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="qc-navbar">
+      <nav className={`qc-navbar${hideOnScroll ? " hide-on-scroll" : ""}`}>
         <div className="qc-navbar-left">
           <img src={logo} alt="Quit Care Logo" className="qc-logo" />
           <div className="qc-brand-text">

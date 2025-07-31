@@ -394,9 +394,7 @@ function SuggestPlaning() {
                 <div className="suggest-question">
                   <h3>🤔 Bạn có chắc chắn xác nhận kế hoạch này không?</h3>
                   <p>
-                    Nếu đồng ý, kế hoạch sẽ được lưu và bạn có thể bắt đầu theo
-                    dõi tiến trình cai thuốc. Nếu không, bạn có thể tự lập kế
-                    hoạch khác.
+                    Nếu đồng ý, Kế hoạch không được sửa và tạo thêm. Nếu không, bạn có thể tự lập kế hoạch khác.
                   </p>
                 </div>
 

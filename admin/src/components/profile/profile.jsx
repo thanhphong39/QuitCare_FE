@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Input,
@@ -31,10 +31,40 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    fullname: user?.fullName || "",
-    gender: user?.gender || "MALE",
+    fullname: "",
+    username: "",
+    gender: "MALE",
+    avatar: "",
   });
-
+  const [account, setAccount] = useState(null);
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/admin/user");
+      const userList = response.data;
+  
+      const foundUser = userList.find((u) => u.id === user.id);
+  
+      if (foundUser) {
+        setAccount(foundUser);
+        
+      }
+    } catch (err) {
+      console.error("Lỗi khi lấy dữ liệu:", err);
+      message.error("Đã xảy ra lỗi khi tải thông tin người dùng.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Gọi hàm trong useEffect
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserData();
+      
+    }
+  }, [user]);
+  console.log("account", account);
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
   };
@@ -44,7 +74,9 @@ const Profile = () => {
     try {
       const response = await api.put(`user/${user.id}`, {
         fullname: form.fullname,
+        username: form.username,
         gender: form.gender,
+        avatar: form.avatar,
       });
 
       // dispatch(
@@ -73,9 +105,7 @@ const Profile = () => {
           <div className="avatar-section">
             <Avatar
               size={120}
-              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                form.fullname || "User"
-              )}&background=4f46e5&color=ffffff&size=120&rounded=true`}
+              src={account?.avatar || "/default-avatar.png"}
               className="profile-avatar"
             />
             {/* <div className="avatar-info">
@@ -94,7 +124,7 @@ const Profile = () => {
                 <div className="form-group">
                   <label className="form-label">Email</label>
                   <Input
-                    value={user?.email || ""}
+                    value={account?.email || ""}
                     disabled
                     className="readonly-input"
                     prefix={<UserOutlined />}
@@ -106,9 +136,9 @@ const Profile = () => {
                 <div className="form-group">
                   <label className="form-label">Tên đăng nhập</label>
                   <Input
-                    value={user?.username || ""}
-                    disabled
-                    className="readonly-input"
+                    value={account?.username || ""}
+                    disabled={!isEditing}
+                    className={isEditing ? "editable-input" : "readonly-input"}
                     prefix={<UserOutlined />}
                   />
                 </div>
@@ -118,7 +148,7 @@ const Profile = () => {
                 <div className="form-group">
                   <label className="form-label">Tên đầy đủ</label>
                   <Input
-                    value={form.fullname}
+                    value={account?.fullname}
                     onChange={(e) => handleChange("fullname", e.target.value)}
                     disabled={!isEditing}
                     className={isEditing ? "editable-input" : "readonly-input"}
@@ -131,7 +161,7 @@ const Profile = () => {
                 <div className="form-group">
                   <label className="form-label">Giới tính</label>
                   <Select
-                    value={form.gender}
+                    value={account?.gender}
                     onChange={(value) => handleChange("gender", value)}
                     disabled={!isEditing}
                     className={
@@ -144,6 +174,18 @@ const Profile = () => {
                   </Select>
                 </div>
               </Col>
+              <Col xs={24} sm={12}>
+  <div className="form-group">
+    <label className="form-label">URL ảnh đại diện</label>
+    <Input
+      value={form.avatar}
+      onChange={(e) => handleChange("avatar", e.target.value)}
+      disabled={!isEditing}
+      className={isEditing ? "editable-input" : "readonly-input"}
+      placeholder="Nhập đường dẫn ảnh"
+    />
+  </div>
+</Col>
             </Row>
 
             <div className="action-buttons">
@@ -161,8 +203,10 @@ const Profile = () => {
                   <Button
                     onClick={() => {
                       setForm({
-                        fullname: user?.fullName || "",
-                        gender: user?.gender || "MALE",
+                        fullname: account.fullname || "",
+                        username: account.username || "",
+                        gender: account.gender || "MALE",
+                        avatar: account.avatar || "",
                       });
                       setIsEditing(false);
                     }}

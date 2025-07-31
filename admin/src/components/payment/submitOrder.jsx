@@ -60,16 +60,16 @@ const PaymentPage = () => {
           const plan = planRes.data;
   
           if (plan.name === "Premium") {
-            console.log("✅ Có gói Premium đang ACTIVE và mới nhất.");
+            console.log(" Có gói Premium đang ACTIVE và mới nhất.");
             setHasActivePremium(true);
             return;
           }
         }
   
-        console.log("⛔ Không tìm thấy gói Premium ACTIVE.");
+        console.log("Không tìm thấy gói Premium ACTIVE.");
         setHasActivePremium(false);
       } catch (error) {
-        console.error("❌ Lỗi khi kiểm tra Premium:", error);
+        console.error(" Lỗi khi kiểm tra Premium:", error);
         setHasActivePremium(false);
       }
     };
@@ -154,11 +154,11 @@ const PaymentPage = () => {
         console.log("🌐 Điều hướng đến:", paymentUrl);
         window.location.href = paymentUrl;
       } else {
-        setError("❌ Không tìm thấy URL thanh toán hợp lệ.");
-        console.warn("🚫 Không có URL hợp lệ:", paymentUrl);
+        setError(" Không tìm thấy URL thanh toán hợp lệ.");
+        console.warn(" Không có URL hợp lệ:", paymentUrl);
       }
     } catch (err) {
-      console.error("❌ Lỗi khi gửi yêu cầu thanh toán:", err);
+      console.error(" Lỗi khi gửi yêu cầu thanh toán:", err);
       setError("Không thể gửi yêu cầu thanh toán.");
     } finally {
       setLoading(false);

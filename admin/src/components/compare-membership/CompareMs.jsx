@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Compare.css";
 import api from "../../configs/axios";
+import { message } from "antd";
 
 function MemberComparison() {
   const [plans, setPlans] = useState([]);
@@ -10,6 +11,7 @@ function MemberComparison() {
         const res = await api.get("/auth/api/membership-plans");
         setPlans(res.data);
       } catch (err) {
+        message.error("Lỗi khi lấy danh sách gói hội viên. Vui lòng thử lại sau.");
         setPlans([]);
       }
     }

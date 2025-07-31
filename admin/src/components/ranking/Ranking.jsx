@@ -25,12 +25,10 @@ function Ranking() {
       console.log("🔍 Đang tải bảng xếp hạng từ API...");
 
       const response = await api.get("/auth/ranking");
-      console.log("📊 Dữ liệu ranking từ API:", response.data);
 
       if (!response.data || response.data.length === 0) {
         setUsers([]);
         setLoading(false);
-        console.log("ℹ️ Không có dữ liệu ranking");
         return;
       }
 

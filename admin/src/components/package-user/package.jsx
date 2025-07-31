@@ -68,7 +68,7 @@ const Package = () => {
         const currentPlanName = currentPlan.name.toLowerCase();
         const selectedPlanName = pkg.name.toLowerCase();
   
-        // ❌ Nếu đã có cùng gói
+        //  Nếu đã có cùng gói
         if (currentPlan.id === pkg.id) {
           await Swal.fire({
             title: "Gói đã hoạt động",
@@ -79,7 +79,7 @@ const Package = () => {
           return;
         }
   
-        // ❌ Nếu đang dùng Premium mà muốn mua Basic
+        //  Nếu đang dùng Premium mà muốn mua Basic
         if (currentPlanName === "premium" && selectedPlanName === "basic") {
           await Swal.fire({
             title: "Không thể mua gói Basic",
@@ -90,11 +90,11 @@ const Package = () => {
           return;
         }
   
-        // ✅ Nếu người dùng đang dùng Basic mà muốn mua Premium → cho phép
+        //  Nếu người dùng đang dùng Basic mà muốn mua Premium → cho phép
         break;
       }
   
-      // ✅ Cho phép mua
+      //  Cho phép mua
       navigate(`/payment?membershipPlanId=${pkg.id}`);
     } catch (error) {
       console.error("❌ Lỗi khi kiểm tra gói đang hoạt động:", error);

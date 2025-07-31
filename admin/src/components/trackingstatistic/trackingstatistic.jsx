@@ -154,7 +154,7 @@ function TrackingStatistic() {
           <Col xs={24} md={12} lg={6}>
             <Card className="stat-box smoke">
               <Statistic
-                title="Số ngày không hút"
+                title="Số ngày hoàn thành chỉ tiêu"
                 value={stat.daysWithoutSmoking}
                 prefix={<FireFilled />}
               />
@@ -178,7 +178,7 @@ function TrackingStatistic() {
               />
             </Card>
           </Col>
-          <Col xs={24} lg={18}>
+          {/* <Col xs={24} lg={18}>
             <Card className="stat-box progress">
               <Text strong>Tiến độ hoàn thành:</Text>
               <Progress
@@ -188,9 +188,9 @@ function TrackingStatistic() {
                 showInfo
               />
             </Card>
-          </Col>
+          </Col> */}
 
-          {showBadge && (
+          {/* {showBadge && (
             <Col span={24}>
               <Card className="badge-card" bordered={false}>
                 <TrophyFilled
@@ -201,7 +201,7 @@ function TrackingStatistic() {
                 </span>
               </Card>
             </Col>
-          )}
+          )} */}
 
           {stat.daysNotTracked > 0 && (
             <Col span={24}>
@@ -212,7 +212,7 @@ function TrackingStatistic() {
             </Col>
           )}
 
-          <Col span={24} md={12}>
+          {/* <Col span={24} md={12}>
             <Card title="Tỷ lệ theo dõi (Pie Chart)" className="chart-card">
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -239,7 +239,7 @@ function TrackingStatistic() {
                 </PieChart>
               </ResponsiveContainer>
             </Card>
-          </Col>
+          </Col> */}
 
           <Col span={24} md={12}>
             <Card title="So sánh theo dõi (Bar Chart)" className="chart-card">

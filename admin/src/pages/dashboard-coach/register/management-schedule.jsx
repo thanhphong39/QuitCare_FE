@@ -109,10 +109,9 @@ const WorkScheduleManagement = () => {
     const result = await Swal.fire({
       title: "Xác nhận cập nhật ngày nghỉ",
       html: `
-        <p>Bạn có chắc chắn muốn cập nhật danh sách ngày nghỉ đã chọn cho tháng <strong>${currentMonth.format(
-          "MM/YYYY"
-        )}</strong> không?</p>
-        <p style="color: red; font-weight: bold;">Lưu ý: Những ngày nghỉ đã lưu sẽ <u>không thể thay đổi</u>. Xin hãy cân nhắc kỹ!</p>
+        
+        <p style="color: red; font-weight: bold;">🔔 Lưu ý: Yêu cầu nghỉ phép của bạn đang được xử lý. Vui lòng đợi trong giây lát để hệ thống xác nhận.
+Cảm ơn bạn đã thông báo sớm!</p>
       `,
       icon: "warning",
       showCancelButton: true,

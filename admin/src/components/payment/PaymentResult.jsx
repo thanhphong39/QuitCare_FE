@@ -11,7 +11,7 @@ import api from "../../configs/axios";
 const PaymentResult = () => {
   const getParam = useGetParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // ✅ Khởi tạo dispatch
+  const dispatch = useDispatch(); // 
 
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("success");

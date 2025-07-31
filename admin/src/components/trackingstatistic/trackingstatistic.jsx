@@ -59,7 +59,7 @@ function TrackingStatistic() {
         }
         const lastStage = plan.stages[plan.stages.length - 1];
         const response = await api.get(
-          `/quit-progress/stage/${lastStage.id}/user/${accountId}`
+          `/quit-progress/user/${accountId}/summary`
         );
         setStat(response.data);
       } catch (err) {
@@ -85,16 +85,16 @@ function TrackingStatistic() {
       <>
         <Navbar />
         <div className="tracking-statistic-empty">
-            <h2>Chưa có dữ liệu thống kê</h2>
-            <p>Bạn chưa có kế hoạch hoặc chưa theo dõi tiến trình cai thuốc.</p>
-            <Button
-              type="primary"
-              size="large"
-              onClick={() => navigate("/planning")}
-              style={{ marginTop: 16 }}
-            >
-              Tạo kế hoạch ngay
-            </Button>
+          <h2>Chưa có dữ liệu thống kê</h2>
+          <p>Bạn chưa có kế hoạch hoặc chưa theo dõi tiến trình cai thuốc.</p>
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => navigate("/planning")}
+            style={{ marginTop: 16 }}
+          >
+            Tạo kế hoạch ngay
+          </Button>
         </div>
         <Footer />
       </>
@@ -203,14 +203,16 @@ function TrackingStatistic() {
             </Col>
           )} */}
 
-          {stat.daysNotTracked > 0 && (
-            <Col span={24}>
+          <Col span={24}>
+            {stat.daysNotTracked > 0 ? (
               <div className="warning-banner">
                 <WarningFilled style={{ marginRight: 8 }} />
                 Có {stat.daysNotTracked} ngày bạn chưa theo dõi.
               </div>
-            </Col>
-          )}
+            ) : (
+              <div className="warning-banner placeholder" />
+            )}
+          </Col>
 
           {/* <Col span={24} md={12}>
             <Card title="Tỷ lệ theo dõi (Pie Chart)" className="chart-card">

@@ -183,7 +183,7 @@ const TrackingPage = () => {
     if (!plan || isAutoFilling) return;
 
     setIsAutoFilling(true);
-    message.info("🤖 Bắt đầu điền dữ liệu tự động...");
+    message.info(" Bắt đầu điền dữ liệu tự động...");
 
     try {
       const planStartDate = startOfDay(new Date(plan.localDateTime));
@@ -982,7 +982,7 @@ const TrackingPage = () => {
       if (!currentStage) return;
 
       const response = await api.get(
-        `/quit-progress/stage/${currentStage.id}/user/${accountId}`
+        `/quit-progress/user/${accountId}/summary`
       );
       const apiData = response.data;
 
@@ -1315,7 +1315,7 @@ const TrackingPage = () => {
                 parseInt(todayData.cigarettes_smoked) > 50
               }
             >
-              💾 Lưu dữ liệu
+              Lưu dữ liệu
             </Button>
           </div>
         </div>
@@ -1555,7 +1555,7 @@ const TrackingPage = () => {
                   disabled={!plan || !smokingStatusId}
                   size="small"
                 >
-                  🤖 Điền dữ liệu
+                  Điền dữ liệu
                 </Button>
                 {/* <Button
                   danger
@@ -1835,7 +1835,7 @@ const TrackingPage = () => {
                     >
                       <div
                         style={{
-                          fontSize: "32px",
+                          fontSize: "24px",
                           fontWeight: "800",
                           color: "#1976d2",
                           marginBottom: "8px",
@@ -1874,7 +1874,7 @@ const TrackingPage = () => {
                     >
                       <div
                         style={{
-                          fontSize: "32px",
+                          fontSize: "24px",
                           fontWeight: "800",
                           color: "#2e7d32",
                           marginBottom: "8px",
@@ -1913,7 +1913,7 @@ const TrackingPage = () => {
                     >
                       <div
                         style={{
-                          fontSize: "28px",
+                          fontSize: "24px",
                           fontWeight: "800",
                           color: "#f57c00",
                           marginBottom: "8px",
@@ -1952,7 +1952,7 @@ const TrackingPage = () => {
                     >
                       <div
                         style={{
-                          fontSize: "28px",
+                          fontSize: "24px",
                           fontWeight: "800",
                           color: "#d84315",
                           marginBottom: "8px",

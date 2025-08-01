@@ -91,8 +91,8 @@ const TrackingPage = () => {
   const [completionData, setCompletionData] = useState(null);
   const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
   const user = useSelector((state) => state.user);
-  // Thêm test mode - chỉnh true/false tùy ý
-  const isTestMode = true; // Đặt true khi muốn test, false khi production
+
+  const isTestMode = false;
   const [showlinkBooking, setShowBooking] = useState(false);
   const BOOKING_LINK = "http://localhost:5173/booking";
 
@@ -194,11 +194,11 @@ const TrackingPage = () => {
         return;
       }
 
-      // Tạo danh sách tất cả ngày trong kế hoạch (trừ ngày cuối để người dùng tự nhập)
+      // Tạo danh sách tất cả ngày trong kế hoạch (trừ ngày cuối)
       const allDays = [];
       let currentDate = planStartDate;
 
-      // Điền tất cả ngày trừ ngày cuối cùng (để lại ngày cuối cho người dùng tự nhập)
+      // Điền tất cả ngày trừ ngày cuối cùng (để lại ngày cuối)
       while (isBefore(currentDate, planEndDate)) {
         allDays.push(new Date(currentDate));
         currentDate = addDays(currentDate, 1);

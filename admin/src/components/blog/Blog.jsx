@@ -67,7 +67,11 @@ function Blog() {
       const response = await api.get("/community-posts");
 
       if (response.data && Array.isArray(response.data)) {
-        setPosts(response.data);
+        // Chỉ hiển thị những bài viết có status là APPROVED
+        const approvedPosts = response.data.filter(
+          (post) => post.status === "APPROVED"
+        );
+        setPosts(approvedPosts);
       }
     } catch (error) {
       console.error("Lỗi khi tải bài viết:", error);

@@ -17,6 +17,13 @@ function BlogDetail() {
       const res = await api.get(`/community-posts/${id}`);
       const post = res.data;
 
+      // Kiểm tra nếu bài viết chưa được phê duyệt thì không hiển thị
+      if (post.status !== "APPROVED") {
+        setBlog(null);
+        toast.error("Bài viết này chưa được phê duyệt hoặc không tồn tại!");
+        return;
+      }
+
       // Nếu có custom description cho bài này thì dùng, còn không thì giữ nguyên từ API
       // const custom = customDescriptions[post.id];
       // setBlog({
@@ -26,6 +33,8 @@ function BlogDetail() {
       setBlog(post);
     } catch (err) {
       console.error("Lỗi khi tải bài viết:", err);
+      setBlog(null);
+      toast.error("Không thể tải bài viết!");
     } finally {
       setLoading(false);
     }

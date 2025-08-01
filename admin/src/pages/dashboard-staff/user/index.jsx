@@ -51,8 +51,11 @@ function UserManagement() {
     setLoading(true);
     try {
       const response = await api.get("/admin/user");
-      setUsers(response.data);
-      setFilteredUsers(response.data);
+      const filteredData = response.data.filter(
+        (user) => user.role !== "ADMIN"
+      );
+      setUsers(filteredData);
+      setFilteredUsers(filteredData);
     } catch (error) {
       toast.error("Lỗi khi lấy danh sách người dùng!");
     } finally {
@@ -219,27 +222,34 @@ function UserManagement() {
         ),
     },
     // Chỉ hiển thị cột hành động nếu user là ADMIN
-    ...(isAdmin ? [{
-      title: "Hành động",
-      key: "actions",
-      render: (_, record) => (
-        <Space size="middle">
-          <Button icon={<EditOutlined />} onClick={() => showEditModal(record)}>
-            Sửa
-          </Button>
-          <Popconfirm
-            title="Bạn có chắc muốn xoá người dùng này không?"
-            onConfirm={() => deleteUser(record.id)}
-            okText="Xoá"
-            cancelText="Huỷ"
-          >
-            <Button icon={<DeleteOutlined />} danger>
-              Xoá
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    }] : []),
+    ...(isAdmin
+      ? [
+          {
+            title: "Hành động",
+            key: "actions",
+            render: (_, record) => (
+              <Space size="middle">
+                <Button
+                  icon={<EditOutlined />}
+                  onClick={() => showEditModal(record)}
+                >
+                  Sửa
+                </Button>
+                <Popconfirm
+                  title="Bạn có chắc muốn xoá người dùng này không?"
+                  onConfirm={() => deleteUser(record.id)}
+                  okText="Xoá"
+                  cancelText="Huỷ"
+                >
+                  <Button icon={<DeleteOutlined />} danger>
+                    Xoá
+                  </Button>
+                </Popconfirm>
+              </Space>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -264,7 +274,7 @@ function UserManagement() {
 
       {/* Thống kê tổng số người dùng */}
       <Row gutter={16} style={{ marginBottom: "16px" }}>
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Tổng số người dùng"
@@ -274,21 +284,31 @@ function UserManagement() {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Khách hàng"
-              value={users.filter(user => user.role === "CUSTOMER").length}
+              value={users.filter((user) => user.role === "CUSTOMER").length}
               prefix={<UserOutlined />}
               valueStyle={{ color: "#52c41a" }}
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
               title="Huấn luyện viên"
-              value={users.filter(user => user.role === "COACH").length}
+              value={users.filter((user) => user.role === "COACH").length}
+              prefix={<UserOutlined />}
+              valueStyle={{ color: "#13c2c2" }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Statistic
+              title="Nhân viên"
+              value={users.filter((user) => user.role === "STAFF").length}
               prefix={<UserOutlined />}
               valueStyle={{ color: "#13c2c2" }}
             />
@@ -316,7 +336,6 @@ function UserManagement() {
               allowClear
               style={{ width: "100%" }}
             >
-              <Option value="ADMIN">ADMIN</Option>
               <Option value="COACH">COACH</Option>
               <Option value="STAFF">STAFF</Option>
               <Option value="CUSTOMER">CUSTOMER</Option>
@@ -387,15 +406,8 @@ function UserManagement() {
             >
               <Input />
             </Form.Item>
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[
-                { required: true, message: "Vui lòng nhập email" },
-                { type: "email", message: "Email không hợp lệ" },
-              ]}
-            >
-              <Input />
+            <Form.Item name="email" label="Email">
+              <Input disabled />
             </Form.Item>
             <Form.Item
               name="username"
@@ -422,7 +434,6 @@ function UserManagement() {
               rules={[{ required: true, message: "Chọn vai trò" }]}
             >
               <Select>
-                <Select.Option value="ADMIN">ADMIN</Select.Option>
                 <Select.Option value="COACH">COACH</Select.Option>
                 <Select.Option value="STAFF">STAFF</Select.Option>
                 <Select.Option value="CUSTOMER">CUSTOMER</Select.Option>

@@ -44,22 +44,20 @@ const { Title } = Typography;
 const { Option } = Select;
 
 const RevenueManagement = () => {
-  // ✅ State từ code gốc
   const [plans, setPlans] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [users, setUsers] = useState([]); // Thêm state để lưu thông tin users
+  const [users, setUsers] = useState([]);
 
-  // ✅ Fetch data từ API
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [planRes, paymentRes, userRes] = await Promise.all([
           api.get("/membership-plans"),
           api.get("/v1/payments/history"),
-          api.get("/admin/user"), // Lấy danh sách users để map username
+          api.get("/admin/user"),
         ]);
 
         setPlans(planRes.data);
@@ -75,7 +73,6 @@ const RevenueManagement = () => {
     fetchData();
   }, []);
 
-  // ✅ Helper functions từ code gốc
   const getPaymentsByPlan = (planId) => {
     return payments.filter((p) => {
       const membership = plans.find((plan) => plan.id === planId);
@@ -98,7 +95,7 @@ const RevenueManagement = () => {
     0
   );
 
-  // ✅ Thêm các thống kê chi tiết về doanh thu
+  //  Thêm các thống kê chi tiết về doanh thu
   const revenueStats = {
     today: payments
       .filter((p) => {
@@ -132,23 +129,18 @@ const RevenueManagement = () => {
     pendingPayments: payments.filter((p) => p.status !== "SUCCESS").length,
   };
 
-  // Debug: Log để kiểm tra dữ liệu
-  console.log("Payments data:", payments);
-  console.log("Revenue stats:", revenueStats);
-  console.log("Unique statuses:", [...new Set(payments.map((p) => p.status))]);
-
   const showPlanDetails = (plan) => {
     setSelectedPlan(plan);
     setModalVisible(true);
   };
 
-  // ✅ Helper function để lấy username từ accountId
+  //  Helper function để lấy username từ accountId
   const getUsernameById = (accountId) => {
     const user = users.find((u) => u.id === accountId);
     return user ? user.username : `User #${accountId}`;
   };
 
-  // ✅ Chuẩn bị dữ liệu cho biểu đồ cột
+  // dữ liệu cho biểu đồ cột
   const chartData = {
     labels: ["Doanh thu hôm nay", "Doanh thu tuần này", "Doanh thu tháng này"],
     datasets: [
@@ -205,11 +197,9 @@ const RevenueManagement = () => {
         callbacks: {
           label: function (context) {
             const value = context.parsed.y;
-            return `${context.dataset.label}: ${
-              value >= 1000000
-                ? `${(value / 1000000).toFixed(1)}M`
-                : value.toLocaleString("vi-VN")
-            } VND`;
+            return `${context.dataset.label}: ${value.toLocaleString(
+              "vi-VN"
+            )} VND`;
           },
         },
       },
@@ -219,9 +209,7 @@ const RevenueManagement = () => {
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return value >= 1000000
-              ? `${(value / 1000000).toFixed(1)}M`
-              : value.toLocaleString("vi-VN");
+            return value.toLocaleString("vi-VN");
           },
         },
         grid: {
@@ -328,15 +316,15 @@ const RevenueManagement = () => {
       color: "#1890ff",
     },
     {
-      title: "Gói đã bán",
+      title: "Số lượng gói",
       value: totalPackagesSold,
       icon: <ShoppingCartOutlined />,
       color: "#52c41a",
     },
     {
       title: "Doanh thu tháng",
-      value: totalRevenue / 1000000,
-      suffix: "M VND",
+      value: totalRevenue,
+      suffix: "VND",
       icon: <DollarOutlined />,
       color: "#722ed1",
     },
@@ -404,7 +392,7 @@ const RevenueManagement = () => {
       render: (amount) => `${amount.toLocaleString("vi-VN")} VND`,
     },
     {
-      title: "Username",
+      title: "Khách hàng",
       dataIndex: "accountId",
       key: "accountId",
       render: (accountId) => getUsernameById(accountId),
@@ -439,7 +427,7 @@ const RevenueManagement = () => {
     <div className="revenue-simple">
       {/* ✅ Header dashboard */}
       <div className="header">
-        <h2>📊 Dashboard Doanh Thu</h2>
+        <h2>Quản lý Doanh Thu</h2>
       </div>
 
       {/* ✅ Thống kê tổng quan */}
@@ -481,7 +469,7 @@ const RevenueManagement = () => {
         </Col>
       </Row>
 
-      {/* ✅ Phần gói dịch vụ chi tiết từ API */}
+      {/*  Phần gói dịch vụ chi tiết từ API */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col span={24}>
           <Title level={3}>Chi tiết theo gói dịch vụ</Title>
@@ -503,11 +491,7 @@ const RevenueManagement = () => {
                   value={revenue}
                   valueStyle={{ color: "#3f8600" }}
                   suffix="VND"
-                  formatter={(value) =>
-                    value >= 1000000
-                      ? `${(value / 1000000).toFixed(1)}M`
-                      : value.toLocaleString("vi-VN")
-                  }
+                  formatter={(value) => value.toLocaleString("vi-VN")}
                 />
                 <p style={{ margin: "8px 0", color: "#595959" }}>
                   Số đơn hàng: <strong>{planPayments.length}</strong>
@@ -525,7 +509,7 @@ const RevenueManagement = () => {
           );
         })}
 
-        {/* ✅ Card tổng doanh thu */}
+        {/*  Card tổng doanh thu */}
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ border: "2px solid #1890ff" }}>
             <Statistic
@@ -533,11 +517,7 @@ const RevenueManagement = () => {
               value={totalRevenue}
               valueStyle={{ color: "#cf1322", fontSize: "28px" }}
               suffix="VND"
-              formatter={(value) =>
-                value >= 1000000
-                  ? `${(value / 1000000).toFixed(1)}M`
-                  : value.toLocaleString("vi-VN")
-              }
+              formatter={(value) => value.toLocaleString("vi-VN")}
             />
             <p style={{ margin: "8px 0", color: "#595959" }}>
               Tổng đơn hàng: <strong>{payments.length}</strong>
@@ -546,7 +526,7 @@ const RevenueManagement = () => {
         </Col>
       </Row>
 
-      {/* ✅ Bảng đơn hàng gần đây - Mở rộng full width */}
+      {/*  Bảng đơn hàng gần đây - Mở rộng full width */}
       <Row gutter={[16, 16]}>
         <Col xs={24}>
           <Card title="🛍️ Đơn hàng gần đây">
@@ -560,13 +540,13 @@ const RevenueManagement = () => {
         </Col>
       </Row>
 
-      {/* ✅ Tóm tắt doanh thu đơn giản */}
+      {/* Tóm tắt doanh thu đơn giản */}
       <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
         <Col xs={24} lg={12}>
           <Card title="💰 Tóm tắt doanh thu">
             <div style={{ textAlign: "center" }}>
               <h3 style={{ color: "#52c41a", margin: 0 }}>
-                {(totalRevenue / 1000000).toFixed(1)}M VND
+                {totalRevenue.toLocaleString("vi-VN")} VND
               </h3>
               <p style={{ margin: 0, color: "#8c8c8c" }}>Tổng doanh thu</p>
             </div>
@@ -583,7 +563,7 @@ const RevenueManagement = () => {
         </Col>
       </Row>
 
-      {/* ✅ Modal chi tiết giao dịch */}
+      {/* Modal chi tiết giao dịch */}
       <Modal
         title={`Chi tiết giao dịch - ${selectedPlan?.name}`}
         open={modalVisible}

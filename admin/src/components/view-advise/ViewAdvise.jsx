@@ -74,7 +74,7 @@ function ViewAdvise() {
       // 3. Ghép avatar huấn luyện viên vào tư vấn
       const transformedData = data.map((item, index) => {
         const matchedCoach = users.find(
-          (u) => u.fullName === item.coachName // Hoặc dùng id nếu có
+          (u) => u.fullName === item.coachName 
         );
 
         return {

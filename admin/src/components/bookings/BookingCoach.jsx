@@ -24,7 +24,7 @@ const Booking = () => {
   // const navigate = useNavigate();
 
   const from = currentMonth.startOf("month").format("YYYY-MM-DD");
-  const to = currentMonth.add(1, "month").endOf("month").format("YYYY-MM-DD");
+  const to = currentMonth.endOf("month").format("YYYY-MM-DD");
 
 
   const fetchAvailableSlots = useCallback(

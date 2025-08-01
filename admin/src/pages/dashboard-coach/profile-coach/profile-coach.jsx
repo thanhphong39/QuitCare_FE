@@ -16,7 +16,7 @@ function ProfileCoach() {
     setLoading(true);
     try {
       const [coachRes] = await Promise.all([
-        api.get("/session/coaches"),
+        api.get("/admin/user"),
       ]);
 
       const coachList = coachRes.data;

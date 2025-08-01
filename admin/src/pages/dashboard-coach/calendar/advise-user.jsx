@@ -53,20 +53,12 @@ const AdviseUser = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-  
-  
-      const bookingRes = await api.get("/booking/coach");
-      const bookings = bookingRes.data;
-  
-      const userRes = await api.get("/admin/user");
-      const users = userRes.data;
-  
-    
-      const data = bookings.map((item) => {
+      const response = await api.get("/booking/coach", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = response.data.map((item) => {
         const start = moment(`${item.appointmentDate} ${item.startTime}`);
-  
-        const matchedUser = users.find((u) => u.fullName === item.customerName); 
-  
         return {
           id: item.id,
           memberName: item.customerName,
@@ -75,10 +67,10 @@ const AdviseUser = () => {
           endTime: start.clone().add(60, "minutes"),
           status: item.status.toLowerCase(),
           meetLink: item.googleMeetLink,
-          memberAvatar: matchedUser?.avatar || null,
+          memberAvatar: null,
         };
       });
-  
+
       setAppointments(data);
     } catch (error) {
       console.error(error);
@@ -87,7 +79,6 @@ const AdviseUser = () => {
       setLoading(false);
     }
   };
-  
 
   const updateAppointmentStatus = async (id, status) => {
     const token = localStorage.getItem("token");
@@ -185,13 +176,9 @@ const AdviseUser = () => {
       title: "Thành viên",
       dataIndex: "memberName",
       key: "memberName",
-      render: (text, record) => (
-        <div className="member-info" style={{ display: "flex", alignItems: "center" }}>
-          <Avatar
-            src={record.memberAvatar}
-            icon={!record.memberAvatar && <UserOutlined />}
-            size={40}
-          />
+      render: (text) => (
+        <div className="member-info">
+          <Avatar icon={<UserOutlined />} size={40} />
           <span style={{ marginLeft: 10 }}>{text}</span>
         </div>
       ),

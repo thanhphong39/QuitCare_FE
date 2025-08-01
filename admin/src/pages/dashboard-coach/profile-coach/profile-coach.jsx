@@ -26,9 +26,12 @@ function ProfileCoach() {
         message.warning("Không tìm thấy thông tin coach.");
         return;
       }
-
+      console.log("Thông tin coach:", matchedCoach);
       setCoachInfo(matchedCoach);
-      form.setFieldsValue(matchedCoach);
+      form.setFieldsValue({
+        ...matchedCoach,
+        username: matchedCoach.username || "Không xác định",
+      });
     } catch (err) {
       console.error("Lỗi khi lấy dữ liệu:", err);
       message.error("Đã xảy ra lỗi khi tải thông tin coach.");
@@ -104,6 +107,10 @@ function ProfileCoach() {
           <Input disabled />
         </Form.Item>
 
+        
+        <Form.Item label="Tên Người dùng" name="username">
+          <Input disabled />
+        </Form.Item>
         <Form.Item
           label="Họ và tên"
           name="fullName"

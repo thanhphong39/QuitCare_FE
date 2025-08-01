@@ -270,7 +270,7 @@ function ViewAdvise() {
           <Table
             columns={columns}
             dataSource={filteredConsultations}
-            rowKey="id"
+            rowKey="id"  
             loading={loading}
             pagination={{ pageSize: 10 }}
             locale={{

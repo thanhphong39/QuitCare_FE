@@ -76,7 +76,7 @@ function ViewAdvise() {
   
   useEffect(() => {
     fetchConsultations();
-    const interval = setInterval(fetchConsultations, 2*60*1000);
+    const interval = setInterval(fetchConsultations, 15000);
     return () => clearInterval(interval);
   }, []);
 

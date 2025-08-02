@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Table, Button, Spin, Typography, Space, message } from "antd";
 import api from "../../../configs/axios";
+import { useSelector } from "react-redux";
 
 const { Title, Text } = Typography;
 
 function LeaveDays() {
-  const [groupedLeaves, setGroupedLeaves] = useState({});
+  
   const [coachNameMap, setCoachNameMap] = useState({});
   const [loading, setLoading] = useState(false);
-
+  const currentUser = useSelector((state) => state.user);
+  const [leaveRequests, setLeaveRequests] = useState([]);
   const fetchCoaches = async () => {
     try {
       const res = await api.get("/session/coaches");
@@ -28,20 +30,14 @@ function LeaveDays() {
     try {
       const res = await api.get("/session/pending-leave-requests");
       const data = res.data || [];
-
-      const grouped = data.reduce((acc, item) => {
-        const dateKey = dayjs(item.date).format("YYYY-MM-DD");
-        if (!acc[dateKey]) acc[dateKey] = [];
-        acc[dateKey].push(item);
-        return acc;
-      }, {});
-      setGroupedLeaves(grouped);
+      setLeaveRequests(data);
     } catch (error) {
       console.error("Lỗi khi lấy đơn nghỉ:", error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleApprove = async (date, requests) => {
     try {
@@ -84,17 +80,14 @@ function LeaveDays() {
     fetchLeaveRequests();
   }, []);
 
-  const dataSource = Object.entries(groupedLeaves).map(([date, requests]) => {
-    const coachNames = requests
-      .map((item) => coachNameMap[item.coachId] || `Coach ${item.coachId}`)
-      .join(", ");
-    return {
-      key: date,
-      date,
-      coachNames,
-      requests,
-    };
-  });
+  const dataSource = [...leaveRequests]
+  .sort((a, b) => dayjs(a.date).unix() - dayjs(b.date).unix()) // sắp xếp giảm dần theo ngày
+  .map((item, index) => ({
+    key: index,
+    date: item.date,
+    coachName: coachNameMap[item.coachId] || `Coach ${item.coachId}`,
+    coachId: item.coachId,
+  }));
 
   const columns = [
     {
@@ -109,9 +102,9 @@ function LeaveDays() {
       width: "25%",
     },
     {
-      title: "Tên các Coach",
-      dataIndex: "coachNames",
-      key: "coachNames",
+      title: "Coach",
+      dataIndex: "coachName",
+      key: "coachName",
     },
     {
       title: "Thao tác",
@@ -120,13 +113,13 @@ function LeaveDays() {
         <Space>
           <Button
             type="primary"
-            onClick={() => handleApprove(record.date, record.requests)}
+            onClick={() => handleApprove(record.date, [record])}
           >
             Duyệt
           </Button>
           <Button
             danger
-            onClick={() => handleCancel(record.date, record.requests)}
+            onClick={() => handleCancel(record.date, [record])}
           >
             Huỷ
           </Button>
@@ -136,6 +129,7 @@ function LeaveDays() {
       align: "center",
     },
   ];
+
 
   return (
     <div style={{ padding: 24, maxWidth: 1000, margin: "0 auto" }}>

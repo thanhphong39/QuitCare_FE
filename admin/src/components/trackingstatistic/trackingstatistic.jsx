@@ -151,7 +151,7 @@ function TrackingStatistic() {
           <Col xs={24} md={12} lg={6}>
             <Card className="stat-box calendar">
               <Statistic
-                title="Ngày kết thúc"
+                title="Ngày hiện tại"
                 value={stat.endDate}
                 prefix={<CalendarOutlined />}
               />

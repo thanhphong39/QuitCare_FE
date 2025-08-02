@@ -46,8 +46,8 @@ const AdviseUser = () => {
 
   useEffect(() => {
     fetchAppointments();
-    const interval = setInterval(fetchAppointments, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    // const interval = setInterval(fetchAppointments, 15000);
+    // return () => clearInterval(interval);
   }, []);
 
   const fetchAppointments = async () => {

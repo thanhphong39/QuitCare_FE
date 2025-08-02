@@ -34,9 +34,17 @@ const LoginForm = ({ onLogin, errorMessage }) => {
       } else if (user.role === "COACH") {
         navigate("/dashboard-coach");
       }
-    } catch (error) {
-      console.log("login:" + error);
-      toast.error("Đăng nhập không thành công, vui lòng thử lại sau!");
+    }  catch (error) {
+      const errMsg = error.response?.data?.toString().toLowerCase() || "";
+  
+      if (errMsg.includes("invalid username") || errMsg.includes("invalid password")) {
+        toast.error("Tên đăng nhập hoặc mật khẩu không hợp lệ!");
+      } else {
+        toast.error("Đăng nhập không thành công, vui lòng thử lại sau!");
+        toast.error(error.response?.data || "Lỗi đăng nhập không xác định");
+      }
+  
+      console.error("login:", error);
     }
   };
 

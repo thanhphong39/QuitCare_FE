@@ -16,25 +16,7 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/userSlice";
 
-const { Header, Content, Footer, Sider } = Layout;
 
-function getItem(label, key, icon, children) {
-  return {
-    key,
-    icon,
-    children,
-    label: <Link to={`/dashboard/${key}`}> {label} </Link>,
-  };
-}
-
-const items = [
-  getItem("Quản lý người dùng", "users", <UserOutlined />),
-  getItem("Quản lý bình luận", "comments", <PieChartOutlined />),
-  getItem("Quản lý doanh thu", "revenue", <DesktopOutlined />),
-  getItem("Quản lý gói", "packages", <DesktopOutlined />),
-  getItem("Quản lý bài viết", "posts", <DesktopOutlined />),
-  getItem("Quản lý ngày nghỉ", "leavedays", <DesktopOutlined />),
-];
 
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -63,7 +45,29 @@ const Dashboard = () => {
     // Chuyển hướng về trang đăng nhập
     navigate("/login");
   };
+  const { Header, Content, Footer, Sider } = Layout;
 
+  function getItem(label, key, icon, children) {
+    return {
+      key,
+      icon,
+      children,
+      label: <Link to={`/dashboard/${key}`}> {label} </Link>,
+    };
+  }
+  
+  const items = [
+    getItem("Quản lý người dùng", "users", <UserOutlined />),
+    getItem("Quản lý bình luận", "comments", <PieChartOutlined />),
+    
+    getItem("Quản lý gói", "packages", <DesktopOutlined />),
+    getItem("Quản lý bài viết", "posts", <DesktopOutlined />),
+    ...(isStaff
+      ? [getItem("Quản lý ngày nghỉ", "leavedays", <DesktopOutlined />),
+        getItem("Quản lý doanh thu", "revenue", <DesktopOutlined />),
+      ]
+      : []),
+  ];
   return (
     <div className="qc-dashboard-root">
       <div className="qc-dashboard-layout">

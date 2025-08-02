@@ -141,7 +141,7 @@ Cảm ơn bạn đã thông báo sớm!</p>
         text: `Đã cập nhật ngày nghỉ cho tháng ${currentMonth.format("MM/YYYY")} thành công!`,
         confirmButtonText: "OK",
       });
-  
+      setLoading(false);
       await generateMonthSchedule();
     }  catch (error) {
       console.error("Đã gặp lỗi quá trời là nặng: ",error);

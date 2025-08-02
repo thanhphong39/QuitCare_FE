@@ -99,7 +99,16 @@ const HistoryPayment = () => {
           };
         });
         console.log("✅ paymentsWithStatus:", paymentsWithStatus);
-        setPayments(paymentsWithStatus);
+        const sortedByActiveStatus = [...paymentsWithStatus].sort((a, b) => {
+          const aStatus = a.membershipStatus?.status;
+          const bStatus = b.membershipStatus?.status;
+        
+          if (aStatus === "ACTIVE" && bStatus !== "ACTIVE") return -1;
+          if (aStatus !== "ACTIVE" && bStatus === "ACTIVE") return 1;
+          return 0;
+        });
+        
+        setPayments(sortedByActiveStatus);
       } catch (err) {
         console.error("❌ Lỗi khi lấy lịch sử thanh toán:", err);
       } finally {

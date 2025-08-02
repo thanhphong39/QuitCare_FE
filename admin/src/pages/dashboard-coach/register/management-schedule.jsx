@@ -143,15 +143,33 @@ Cảm ơn bạn đã thông báo sớm!</p>
       });
   
       await generateMonthSchedule();
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi!",
-        text: "Có lỗi xảy ra khi cập nhật ngày nghỉ.",
-      });
-    } finally {
-      setLoading(false);
+    }  catch (error) {
+      console.error("Đã gặp lỗi quá trời là nặng: ",error);
+    
+      const errorMsg = error.response?.data || "";
+    
+      if (errorMsg.includes("đã có lịch hẹn") || errorMsg.includes("already booked")) {
+        Swal.fire({
+          icon: "error",
+          title: "Ngày đã bị đặt lịch!",
+          text: "Ngày này đã được khách hàng đặt lịch. Vui lòng chọn ngày khác.",
+        });
+        setLoading(false);
+      } else if (errorMsg.includes("Không có lịch làm ") || errorMsg.includes("not in schedule")) {
+        Swal.fire({
+          icon: "error",
+          title: "Ngày bạn muốn nghỉ không hợp lệ!",
+          text: "Ngày này không nằm trong lịch làm việc của bạn. Bạn chỉ có thể đăng ký nghỉ trong tháng hiện tại.",
+        });
+        setLoading(false);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi không xác định!",
+          text: "Đã xảy ra lỗi khi cập nhật ngày nghỉ.",
+        });
+        setLoading(false);
+      }
     }
   };
   

@@ -117,81 +117,155 @@ const Booking = () => {
     setSelectedSlots((prev) => ({ ...prev, [coachId]: slotLabel }));
   };
 
+  const checkPremiumMembership = async () => {
+    if (!user?.id) {
+      console.log(" Không có accountId.");
+      return false;
+    }
+  
+    try {
+      const historyRes = await api.get(
+        `/v1/payments/history/account/${user.id}`
+      );
+      const transactions = historyRes.data || [];
+  
+      const successTransactions = transactions
+        .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      if (successTransactions.length === 0) {
+        console.log(" Không có giao dịch SUCCESS hợp lệ.");
+        return false;
+      }
+  
+      for (const tx of successTransactions) {
+        const { userMembershipId } = tx;
+  
+        try {
+          const membershipRes = await api.get(
+            `/user-memberships/${userMembershipId}`
+          );
+          const membershipData = membershipRes.data;
+          const { status, planId } = membershipData;
+  
+          if (status !== "ACTIVE") continue;
+  
+          const planRes = await api.get(`/membership-plans/${planId}`);
+          const plan = planRes.data;
+  
+          if (plan?.name === "Premium") {
+            console.log("✅ Gói Premium đang ACTIVE");
+            return true;
+          }
+        } catch (innerErr) {
+          console.warn("Lỗi xử lý userMembership/plan:", innerErr);
+          continue;
+        }
+      }
+  
+      console.log(" Không tìm thấy gói Premium đang ACTIVE.");
+      return false;
+    } catch (err) {
+      console.error(" Lỗi khi kiểm tra gói hội viên:", err);
+      return false;
+    }
+  };
+
   const handleBooking = async (coach) => {
     const date = selectedDates[coach.id];
     const slot = selectedSlots[coach.id];
     const slotKey = `${coach.id}-${date}-${slot}`;
-
+  
+    // 1. Kiểm tra gói Premium trước
+    const hasPremium = await checkPremiumMembership();
+    if (!hasPremium) {
+      toast.warning("Bạn cần đăng ký gói Premium để đặt lịch.");
+      return;
+    }
+  
+    // 2. Kiểm tra ngày và khung giờ
     if (!date || !slot) {
       message.warning("Vui lòng chọn ngày và khung giờ.");
       return;
     }
-
+  
     if (disabledSlots[slotKey]) {
       message.warning("Slot này đã được đặt!");
       return;
     }
-
+  
+    // 3. Kiểm tra số lượng lịch PENDING
     try {
-      setLoadingState((prev) => ({ ...prev, [coach.id]: true }));
-      console.log("role user", user.role);
-      if (!user?.role?.includes("CUSTOMER")) {
-        toast.warning("Bạn cần mua gói Premium để đặt lịch tư vấn.");
+      const pendingRes = await api.get("/booking/customer", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+  
+      const bookings = pendingRes.data || [];
+      const pendingCount = bookings.filter(
+        (booking) => booking.status === "PENDING"
+      ).length;
+  
+      if (pendingCount >= 1) {
+        toast.warning("Bạn đang có lịch tư vấn đang chờ .");
         return;
       }
+    } catch (err) {
+      console.error("Lỗi khi kiểm tra lịch pending:", err);
+      message.error("Không thể kiểm tra lịch hẹn.");
+      return;
+    }
+  
+    // 4. Tiếp tục đặt lịch
+    try {
+      setLoadingState((prev) => ({ ...prev, [coach.id]: true }));
+  
       const res = await api.post("/booking", {
         coachId: coach.id,
         appointmentDate: date,
         start: slot,
       });
+      
+  if(res.data || res.data.remainingAppointments) {
+
+    const remaining = res.data?.remainingAppointments;
+    if (remaining === 0) {
+      toast.success("Đặt lịch thành công . Bạn đã sử dụng hết lượt tư vấn!");
+    }
 
       toast.success(
         <div>
           <div>Đặt lịch thành công!</div>
-          {/* <button
-            onClick={() => navigate("/viewadvise")}
-            style={{
-              marginTop: 8,
-              backgroundColor: "#1890ff",
-              color: "#fff",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: 4,
-              cursor: "pointer",
-            }}
-          >
-            Xem Lịch Tư Vấn
-          </button> */}
+          <div style={{ fontSize: "12px", marginTop: "4px", color: "#52c41a" }}>
+            Còn lại:{" "}
+            {res.data?.remainingAppointments || remainingAppointments - 1} lượt
+            đặt lịch
+          </div>
+         
         </div>,
         { duration: 5000 }
       );
+    }
 
       const newDisabled = { ...disabledSlots, [slotKey]: true };
       setDisabledSlots(newDisabled);
       localStorage.setItem("disabledSlots", JSON.stringify(newDisabled));
-
       setSelectedSlots((prev) => ({ ...prev, [coach.id]: "" }));
     } catch (err) {
       if (err.response?.status === 409) {
-        toast.error("❌ Lịch này đã được đặt bởi người khác.");
+        toast.error("Lịch này đã được đặt bởi người khác.");
         const newDisabled = { ...disabledSlots, [slotKey]: true };
         setDisabledSlots(newDisabled);
         localStorage.setItem("disabledSlots", JSON.stringify(newDisabled));
       } else if (err.response?.status === 400) {
-        toast.error("❌ Xin lỗi! Bạn chỉ có thể đặt lịch 4 lần. Vui lòng đăng ký gói Premium mới để đặt lịch tiếp.", {
-          duration: 3000,
-        });
-
-        // const newDisabled = { ...disabledSlots, [slotKey]: true };
-        // setDisabledSlots(newDisabled);
-        // localStorage.setItem("disabledSlots", JSON.stringify(newDisabled));
+        toast.error("Bạn chỉ có thể đặt lịch 4 lần. Vui lòng đăng ký gói Premium.");
       } else {
-        message.error("❌ Đặt lịch thất bại. Vui lòng thử lại sau.");
+        message.error("Đặt lịch thất bại. Vui lòng thử lại sau.");
       }
     } finally {
       setLoadingState((prev) => ({ ...prev, [coach.id]: false }));
     }
   };
+  
 
   const isSlotDisabled = (coachId, slot, selectedDate) => {
     const slotLabel = typeof slot === "string" ? slot : slot.label;

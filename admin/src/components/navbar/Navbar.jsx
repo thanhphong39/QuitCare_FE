@@ -26,10 +26,10 @@ const Navbar = () => {
         if (currentUser) {
           setApiUser(currentUser);
         } else {
-          console.warn("❌ Không tìm thấy user với ID:", user?.id);
+          console.warn(" Không tìm thấy user với ID:", user?.id);
         }
       } catch (err) {
-        console.error("❌ Lỗi khi lấy danh sách user từ API:", err);
+        console.error(" Lỗi khi lấy danh sách user từ API:", err);
       }
     };
 
@@ -38,84 +38,23 @@ const Navbar = () => {
     }
   }, [user?.id]);
 
-  // 👉 Lấy và kiểm tra giao dịch
+  //  kiểm tra vai trò của user để hiển thị nút ĐẶT LỊCH
   useEffect(() => {
-    const fetchMembershipPlan = async () => {
-      try {
-        if (!user?.id) {
-          console.log("⚠️ Không có accountId.");
-          return;
-        }
-
-        console.log("📥 Gọi API lịch sử giao dịch với accountId:", user.id);
-        const historyRes = await api.get(
-          `/v1/payments/history/account/${user.id}`
-        );
-        const transactions = historyRes.data || [];
-
-        // Lọc các giao dịch SUCCESS và có userMembershipId
-        const successTransactions = transactions
-          .filter((tx) => tx.status === "SUCCESS" && tx.userMembershipId)
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Mới nhất trước
-
-        if (successTransactions.length === 0) {
-          console.log("⛔ Không có giao dịch SUCCESS hợp lệ.");
-          return;
-        }
-
-        // Duyệt các giao dịch thành công mới nhất
-        for (const tx of successTransactions) {
-          const { userMembershipId } = tx;
-
-          try {
-            // Lấy thông tin user-membership
-            const membershipRes = await api.get(
-              `/user-memberships/${userMembershipId}`
-            );
-            const membershipData = membershipRes.data;
-
-            const { status, planId } = membershipData;
-            console.log(" Thông tin user-membership:", membershipData);
-
-            if (status !== "ACTIVE") {
-              console.log(
-                " Gói này không còn hiệu lực, kiểm tra giao dịch tiếp theo..."
-              );
-              continue;
-            }
-
-            // Lấy thông tin gói
-            const planRes = await api.get(`/membership-plans/${planId}`);
-            const plan = planRes.data;
-
-            console.log("🎯 Gói hội viên:", plan);
-
-            if (plan?.name === "Premium") {
-              console.log("✅ Gói Premium đang ACTIVE, hiển thị nút ĐẶT LỊCH");
-              setShowBooking(true);
-              return;
-            } else {
-              console.log("ℹ️ Không phải gói Premium.");
-            }
-          } catch (innerErr) {
-            console.warn(
-              "⚠️ Lỗi khi xử lý userMembership hoặc plan:",
-              innerErr
-            );
-            continue; // Nếu lỗi thì bỏ qua và thử giao dịch tiếp theo
-          }
-        }
-
-        // Nếu không có gói Premium nào đang active
-        console.log("❌ Không tìm thấy gói Premium đang ACTIVE.");
-        setShowBooking(false);
-      } catch (err) {
-        console.error("❌ Lỗi khi kiểm tra gói hội viên:", err);
-      }
-    };
-
-    fetchMembershipPlan();
-  }, [user?.id]);
+    if (!user?.role) {
+      console.log("⚠️ Không có thông tin vai trò (role) của user.");
+      setShowBooking(false);
+      return;
+    }
+  
+    if (user.role === "CUSTOMER") {
+      console.log("✅ User là customer, hiển thị nút ĐẶT LỊCH");
+      setShowBooking(true);
+    } else {
+      console.log("❌ User không phải là customer, ẩn nút ĐẶT LỊCH");
+      setShowBooking(false);
+    }
+  }, [user?.role]);
+  
 
   // 👉 Scroll Lock cho Mobile Menu
   useEffect(() => {

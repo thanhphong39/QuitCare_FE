@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   Table,
@@ -12,7 +12,7 @@ import {
   Modal,
   Avatar,
   Empty,
-  message,
+  message,notification,
   Alert,
 } from "antd";
 import {
@@ -33,6 +33,7 @@ import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
 import api from "../../configs/axios";
 import "./ViewAdvise.css";
+import { toast } from "react-toastify";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -47,10 +48,35 @@ function ViewAdvise() {
   const [searchText, setSearchText] = useState("");
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-
+  // const hasNotifiedRef = useRef(false);
+  // const checkUpcomingPending = (consultations) => {
+  //   const now = dayjs();
+  //   const oneHourLater = now.add(1, "hour");
+  
+  //   const upcoming = consultations.find((item) => {
+  //     const start = dayjs(`${item.date} ${item.time}`);
+  //     const match =
+  //       item.status === "PENDING" &&
+  //       start.isAfter(now) &&
+  //       start.isBefore(oneHourLater);
+      
+  //     // console.log("⏰ CHECK:", item.coachName, start.format(), match);
+  //     return match;
+  //   });
+  
+  //   if (upcoming && !hasNotifiedRef.current) {
+  //     console.log(" SHOWING NOTIFICATION FOR:", upcoming);
+  //     hasNotifiedRef.current = true;
+  //      toast.success("Bạn có một buổi tư vấn sau 1 tiếng nữa. Xin hãy chú ý tham gia", {
+  //   duration: 8000, 
+  // });
+  //   }
+  // };
+  
+  
   useEffect(() => {
     fetchConsultations();
-    const interval = setInterval(fetchConsultations, 30000);
+    const interval = setInterval(fetchConsultations, 2*60*1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -99,8 +125,30 @@ function ViewAdvise() {
               : null,
         };
       });
+// // ⚠️ DỮ LIỆU GIẢ LẬP DÙNG ĐỂ TEST THÔNG BÁO
+// if (window.location.search.includes("test=true")) {
+//   const fakeUpcoming = {
+//     id: 9999,
+//     coachName: "Coach Demo",
+//     date: dayjs().format("YYYY-MM-DD"),
+//     time: dayjs().add(60 , "minute").format("HH:mm:ss"), // sau 30 phút
+//     endTime: dayjs().add(90, "minute").format("HH:mm:ss"),
+//     status: "PENDING",
+//     meetingLink: "https://meet.google.com/demo-link",
+//     platform: "Google Meet",
+//     coachAvatar: null,
+//     createdAt: new Date().toISOString(),
+//   };
 
+//   const demoData = [...transformedData, fakeUpcoming];
+//   setConsultations(demoData);
+//   checkUpcomingPending(demoData);
+// } else {
+//   setConsultations(transformedData);
+//   checkUpcomingPending(transformedData);
+// }
       setConsultations(transformedData);
+      checkUpcomingPending(transformedData);
     } catch (error) {
       console.error("Lỗi khi tải danh sách tư vấn:", error);
       message.error("Không thể tải danh sách tư vấn");

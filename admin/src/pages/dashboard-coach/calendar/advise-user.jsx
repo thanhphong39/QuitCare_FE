@@ -32,6 +32,7 @@ import moment from "moment";
 import "./advise-user.css";
 import api from "../../../configs/axios";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const { TabPane } = Tabs;
 const { Title, Text } = Typography;
@@ -53,12 +54,18 @@ const AdviseUser = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await api.get("/booking/coach", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = response.data.map((item) => {
+      const bookingRes = await api.get("/booking/coach");
+      const bookings = bookingRes.data;
+  
+      const userRes = await api.get("/admin/user");
+      const users = userRes.data;
+  
+    
+      const data = bookings.map((item) => {
         const start = moment(`${item.appointmentDate} ${item.startTime}`);
+      
+        const matchedUser = users.find((u) => u.fullName === item.customerName); 
+      
         return {
           id: item.id,
           memberName: item.customerName,
@@ -67,11 +74,14 @@ const AdviseUser = () => {
           endTime: start.clone().add(60, "minutes"),
           status: item.status.toLowerCase(),
           meetLink: item.googleMeetLink,
-          memberAvatar: null,
+          memberAvatar: matchedUser?.avatar || null,
+          isToday: start.isSame(moment(), "day"), // 🔥 kiểm tra xem có phải hôm nay
         };
       });
 
-      setAppointments(data);
+      setAppointments(
+        data.sort((a, b) => moment(b.startTime) - moment(a.startTime))
+      );
     } catch (error) {
       console.error(error);
       message.error("Không thể tải danh sách lịch hẹn");
@@ -123,23 +133,59 @@ const AdviseUser = () => {
   };
 
   const handleCancelConsultation = async (record) => {
+  const result = await Swal.fire({
+    title: "Xác nhận hủy buổi tư vấn?",
+    text: "Bạn sẽ không thể hoàn tác sau khi hủy!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Đồng ý",
+    cancelButtonText: "Hủy",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
     await updateAppointmentStatus(record.id, "CANCELLED");
     toast.error("Đã hủy buổi tư vấn thành công!");
+  } catch (error) {
+    console.error(error);
+    toast.error("Hủy buổi tư vấn thất bại. Vui lòng thử lại.");
+  }
+};
+
+
+  const statusPriority = {
+    in_progress: 1,
+    pending: 2,
+    cancelled: 3,
+    completed: 4,
   };
+  
+  const filteredAppointments = appointments
+    .filter((appointment) => {
+      const matchesTab =
+        activeTab === "all" ||
+        (activeTab === "pending" && appointment.status === "pending") ||
+        (activeTab === "completed" && appointment.status === "completed") ||
+        (activeTab === "cancelled" && appointment.status === "cancelled") ||
+        (activeTab === "in_progress" && appointment.status === "in_progress");
+  
+      const matchesSearch = appointment.memberName
+        .toLowerCase()
+        .includes(searchText.toLowerCase());
+  
+      return matchesTab && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (activeTab === "all") {  
+        const aPriority = statusPriority[a.status] || 99;
+        const bPriority = statusPriority[b.status] || 99;
+        return aPriority - bPriority;
+      }
+      return 0;
+    });
+  
 
-  const filteredAppointments = appointments.filter((appointment) => {
-    const matchesTab =
-      activeTab === "all" ||
-      (activeTab === "pending" && appointment.status === "pending") ||
-      (activeTab === "completed" && appointment.status === "completed") ||
-      (activeTab === "cancelled" && appointment.status === "cancelled");
-
-    const matchesSearch = appointment.memberName
-      .toLowerCase()
-      .includes(searchText.toLowerCase());
-
-    return matchesTab && matchesSearch;
-  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -176,16 +222,33 @@ const AdviseUser = () => {
       title: "Thành viên",
       dataIndex: "memberName",
       key: "memberName",
-      render: (text) => (
-        <div className="member-info">
-          <Avatar icon={<UserOutlined />} size={40} />
+      render: (text, record) => (
+        <div className="member-info" style={{ display: "flex", alignItems: "center" }}>
+          <Avatar
+            src={record.memberAvatar}
+            icon={!record.memberAvatar && <UserOutlined />}
+            size={40}
+          />
           <span style={{ marginLeft: 10 }}>{text}</span>
         </div>
       ),
     },
     {
+      title: "Hôm nay?",
+      dataIndex: "isToday",
+      key: "isToday",
+      render: (isToday) =>
+        isToday ? <Tag color="blue">Hôm nay</Tag> : <Tag>Không</Tag>,
+      filters: [
+        { text: "Hôm nay", value: true },
+        { text: "Không phải hôm nay", value: false },
+      ],
+      onFilter: (value, record) => record.isToday === value,
+    },
+    {
       title: "Thời gian",
       key: "time",
+      sorter: (a, b) => moment(a.startTime) - moment(b.startTime),
       render: (_, record) => (
         <div>
           <div>
@@ -226,9 +289,24 @@ const AdviseUser = () => {
               type="primary"
               icon={<VideoCameraOutlined />}
               size="small"
-              onClick={() => {
+              onClick={async() => {
+                const today = moment().startOf("day");
+                const appointmentDay = moment(record.startTime).startOf("day");
+              
+                if (!appointmentDay.isSame(today)) {
+                  const result = await Swal.fire({
+                    title: "Chưa đến ngày hẹn!",
+                    text: "Bạn có chắc chắn muốn bắt đầu cuộc họp trước ngày hẹn?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Vẫn bắt đầu",
+                    cancelButtonText: "Hủy",
+                  });
+              
+                  if (!result.isConfirmed) return;
+                }
+              
                 window.open(record.meetLink, "_blank");
-                // ✅ Cập nhật trạng thái sang "in_progress"
                 setAppointments((prev) =>
                   prev.map((item) =>
                     item.id === record.id
@@ -322,6 +400,7 @@ const AdviseUser = () => {
               }
               key="pending"
             />
+           
             <TabPane
               tab={
                 <Badge
@@ -346,6 +425,7 @@ const AdviseUser = () => {
               }
               key="cancelled"
             />
+            
             <TabPane
               tab={<Badge count={appointments.length}>Tất cả</Badge>}
               key="all"

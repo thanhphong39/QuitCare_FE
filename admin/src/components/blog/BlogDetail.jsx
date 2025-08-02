@@ -23,13 +23,6 @@ function BlogDetail() {
         toast.error("Bài viết này chưa được phê duyệt hoặc không tồn tại!");
         return;
       }
-
-      // Nếu có custom description cho bài này thì dùng, còn không thì giữ nguyên từ API
-      // const custom = customDescriptions[post.id];
-      // setBlog({
-      //   ...post,
-      //   description: custom || post.description,
-      // });
       setBlog(post);
     } catch (err) {
       console.error("Lỗi khi tải bài viết:", err);
@@ -78,9 +71,9 @@ function BlogDetail() {
     }
   };
 
-  const relatedBlogs = useMemo(() => {
-    return [];
-  }, [id]);
+  // const relatedBlogs = useMemo(() => {
+  //   return [];
+  // }, [id]);
 
   if (loading)
     return <div className="blog-detail-loading">Đang tải bài viết...</div>;

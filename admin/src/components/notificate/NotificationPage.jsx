@@ -20,7 +20,7 @@ function NotificationPage() {
   const [totalStats, setTotalStats] = useState({
     totalPoints: 0,
     totalMoneySaved: 0,
-    totalCigarettesSmoked: 0, // Thêm cột này
+    totalCigarettesSmoked: 0,
     totalNotifications: 0,
   });
 
@@ -40,11 +40,7 @@ function NotificationPage() {
       isLoadingRef.current = true;
       setLoading(true);
 
-      console.log("🔍 AccountId hiện tại:", accountId);
-
-      // Gọi API đúng - /message-notifications (BE tự filter theo account)
       const notificationResponse = await api.get("/message-notifications");
-      console.log("📨 Thông báo từ API:", notificationResponse.data);
 
       if (
         !notificationResponse.data ||
@@ -54,7 +50,7 @@ function NotificationPage() {
         setTotalStats({
           totalPoints: 0,
           totalMoneySaved: 0,
-          totalCigarettesSmoked: 0, // Reset về 0
+          totalCigarettesSmoked: 0, 
           totalNotifications: 0,
         });
         console.log("ℹ️ Không có thông báo nào");
@@ -71,7 +67,7 @@ function NotificationPage() {
       const progressMap = new Map();
       let totalPoints = 0;
       let totalMoneySaved = 0;
-      let totalCigarettesSmoked = 0; // Thêm biến này
+      let totalCigarettesSmoked = 0; 
 
       // Sử dụng Promise.all để tối ưu performance
       const progressPromises = uniqueProgressIds.map(async (progressId) => {
@@ -86,9 +82,8 @@ function NotificationPage() {
           // Cộng dồn stats (chỉ cộng 1 lần cho mỗi progress)
           totalPoints += progressData.point || 0;
           totalMoneySaved += progressData.money_saved || 0;
-          totalCigarettesSmoked += progressData.cigarettes_smoked || 0; // Thêm dòng này
+          totalCigarettesSmoked += progressData.cigarettes_smoked || 0; 
 
-          console.log(`✅ Progress ${progressId}:`, progressData);
           return { progressId, data: progressData };
         } catch (error) {
           console.error(`❌ Lỗi lấy progress ${progressId}:`, error);

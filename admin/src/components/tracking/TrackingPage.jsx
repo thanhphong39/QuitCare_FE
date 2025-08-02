@@ -607,8 +607,7 @@ const TrackingPage = () => {
     const today = format(now, "yyyy-MM-dd");
     const dayDate = format(date, "yyyy-MM-dd");
 
-    // Production mode: chỉ cho phép edit ngày hiện tại và trong giờ cho phép (trước 22h)
-    return dayDate === today && now.getHours() < 22 && isDateInPlan(date);
+    return dayDate === today && now.getHours() < 21 && isDateInPlan(date);
   };
 
   // Thêm hàm getDayStatus
@@ -663,7 +662,7 @@ const TrackingPage = () => {
       if (now.getHours() >= 22) {
         return {
           canEdit: false,
-          message: "Quá 22h - không thể chỉnh sửa",
+          message: "Quá 22h - không thể nộp dữ liệu",
           type: "late",
         };
       } else {

@@ -54,21 +54,27 @@ function TrackingStatistic() {
         const planRes = await api.get(`/v1/customers/${accountId}/quit-plans`);
         const plan = planRes.data;
         if (!plan || !plan.stages || plan.stages.length === 0) {
-          setLoading(false);
+          setStat(null); // Đảm bảo hiển thị đúng thông báo khi không có plan
           return;
         }
-        const lastStage = plan.stages[plan.stages.length - 1];
         const response = await api.get(
           `/quit-progress/user/${accountId}/summary`
         );
         setStat(response.data);
       } catch (err) {
         message.error("Không thể lấy thống kê hoàn thành.");
+        setStat(null);
       } finally {
         setLoading(false);
       }
     }
-    if (accountId) fetchStatistic();
+
+    if (accountId) {
+      fetchStatistic();
+    } else {
+      setLoading(false);
+      setStat(null);
+    }
   }, [accountId]);
 
   if (loading) {

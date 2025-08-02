@@ -22,7 +22,6 @@ function Ranking() {
   const loadRankingFromAPI = async () => {
     try {
       setLoading(true);
-      console.log("🔍 Đang tải bảng xếp hạng từ API...");
 
       const response = await api.get("/auth/ranking");
 
@@ -32,11 +31,10 @@ function Ranking() {
         return;
       }
 
-      // Xử lý dữ liệu từ API - SỬA LẠI LOGIC
       const processedUsers = response.data.map((user, index) => ({
         id: user.userId,
         name: user.fullName || user.username || `User ${user.userId}`,
-        score: user.totalPoint || 0, // Lấy từ totalPoint
+        score: user.totalPoint || 0, 
         avatar:
           user.avatar ||
           `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.userId}`,
@@ -44,7 +42,7 @@ function Ranking() {
         rank: index + 1,
       }));
 
-      // Sắp xếp theo điểm cao nhất (API có thể đã sắp xếp rồi nhưng đảm bảo)
+      // Sắp xếp theo điểm cao nhất 
       const sortedUsers = processedUsers.sort((a, b) => b.score - a.score);
 
       // Cập nhật rank sau khi sắp xếp
@@ -56,9 +54,7 @@ function Ranking() {
       setUsers(rankedUsers);
       setLoading(false);
 
-      console.log("✅ Đã tải xong bảng xếp hạng:", rankedUsers);
 
-      // Hiệu ứng confetti nếu có dữ liệu (chỉ lần đầu)
       if (rankedUsers.length > 0 && users.length === 0) {
         setTimeout(() => {
           setShowConfetti(true);
@@ -99,7 +95,6 @@ function Ranking() {
       <div className="ranking-content">
         <div className="ranking-header">
           <h2 className="ranking-title">🏆 Bảng Xếp Hạng Cai Thuốc</h2>
-          {/* Đã bỏ nút refresh */}
           {loading && (
             <span className="auto-refresh-indicator">🔄 Đang cập nhật...</span>
           )}

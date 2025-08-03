@@ -76,7 +76,7 @@ const RevenueManagement = () => {
   const getPaymentsByPlan = (planId) => {
     return payments.filter((p) => {
       const membership = plans.find((plan) => plan.id === planId);
-      return p.amountPaid === membership?.price;
+      return p.amountPaid === membership?.price && p.status === "SUCCESS";
     });
   };
 
@@ -101,7 +101,10 @@ const RevenueManagement = () => {
       .filter((p) => {
         const paymentDate = new Date(p.createdAt);
         const today = new Date();
-        return paymentDate.toDateString() === today.toDateString();
+        return (
+          paymentDate.toDateString() === today.toDateString() &&
+          p.status === "SUCCESS"
+        );
       })
       .reduce((acc, p) => acc + p.amountPaid, 0),
 
@@ -110,7 +113,7 @@ const RevenueManagement = () => {
         const paymentDate = new Date(p.createdAt);
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
-        return paymentDate >= weekAgo;
+        return paymentDate >= weekAgo && p.status === "SUCCESS";
       })
       .reduce((acc, p) => acc + p.amountPaid, 0),
 
@@ -119,11 +122,14 @@ const RevenueManagement = () => {
         const paymentDate = new Date(p.createdAt);
         const monthAgo = new Date();
         monthAgo.setMonth(monthAgo.getMonth() - 1);
-        return paymentDate >= monthAgo;
+        return paymentDate >= monthAgo && p.status === "SUCCESS";
       })
       .reduce((acc, p) => acc + p.amountPaid, 0),
 
-    averageOrderValue: payments.length > 0 ? totalRevenue / payments.length : 0,
+    averageOrderValue:
+      payments.filter((p) => p.status === "SUCCESS").length > 0
+        ? totalRevenue / payments.filter((p) => p.status === "SUCCESS").length
+        : 0,
 
     completedPayments: payments.filter((p) => p.status === "SUCCESS").length,
     pendingPayments: payments.filter((p) => p.status !== "SUCCESS").length,
@@ -520,7 +526,10 @@ const RevenueManagement = () => {
               formatter={(value) => value.toLocaleString("vi-VN")}
             />
             <p style={{ margin: "8px 0", color: "#595959" }}>
-              Tổng đơn hàng: <strong>{payments.length}</strong>
+              Tổng đơn hàng:{" "}
+              <strong>
+                {payments.filter((p) => p.status === "SUCCESS").length}
+              </strong>
             </p>
           </Card>
         </Col>
@@ -556,8 +565,10 @@ const RevenueManagement = () => {
         <Col xs={24} lg={12}>
           <Card title="📈 Tổng giao dịch">
             <div style={{ textAlign: "center" }}>
-              <h3 style={{ color: "#722ed1", margin: 0 }}>{payments.length}</h3>
-              <p style={{ margin: 0, color: "#8c8c8c" }}>Đơn hàng đã xử lý</p>
+              <h3 style={{ color: "#722ed1", margin: 0 }}>
+                {payments.filter((p) => p.status === "SUCCESS").length}
+              </h3>
+              <p style={{ margin: 0, color: "#8c8c8c" }}>Đơn hàng thành công</p>
             </div>
           </Card>
         </Col>

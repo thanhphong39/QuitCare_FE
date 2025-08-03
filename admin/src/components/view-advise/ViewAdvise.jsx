@@ -76,7 +76,7 @@ function ViewAdvise() {
   
   useEffect(() => {
     fetchConsultations();
-    const interval = setInterval(fetchConsultations, 15000);
+    const interval = setInterval(fetchConsultations, 2*60*1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -197,7 +197,11 @@ function ViewAdvise() {
       .includes(searchText.toLowerCase());
     return statusMatch && searchMatch;
   });
-
+  const sortedConsultations = [...filteredConsultations].sort((a, b) => {
+    if (a.status === "PENDING" && b.status !== "PENDING") return -1;
+    if (a.status !== "PENDING" && b.status === "PENDING") return 1;
+    return 0; // giữ nguyên thứ tự nếu cả hai đều là PENDING hoặc không
+  });
   const columns = [
     {
       title: "Huấn luyện viên",
@@ -220,6 +224,12 @@ function ViewAdvise() {
     {
       title: "Ngày giờ",
       key: "datetime",
+      sorter: (a, b) => {
+        const aDateTime = dayjs(`${a.date} ${a.time}`);
+        const bDateTime = dayjs(`${b.date} ${b.time}`);
+        return aDateTime - bDateTime;
+      },
+      sortDirections: ["ascend", "descend"],
       render: (_, record) => (
         <div>
           <div>
@@ -317,7 +327,7 @@ function ViewAdvise() {
 
           <Table
             columns={columns}
-            dataSource={filteredConsultations}
+            dataSource={sortedConsultations}
             rowKey="id"  
             loading={loading}
             pagination={{ pageSize: 10 }}

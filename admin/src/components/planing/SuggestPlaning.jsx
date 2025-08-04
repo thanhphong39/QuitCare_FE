@@ -5,12 +5,12 @@ import Footer from "../footer/Footer";
 import "./SuggestPlaning.css";
 import { useNavigate, Link } from "react-router-dom";
 import { Modal, Button } from "antd";
-import dayjs from "dayjs"; // ✅ Thêm import dayjs
+import dayjs from "dayjs"; 
 
 function SuggestPlaning() {
   // Đọc trạng thái xác nhận từ localStorage khi khởi tạo
   const accountId = localStorage.getItem("accountId");
-  const [isConfirmed, setIsConfirmed] = useState(
+  const [isConfirmed, setIsConfirmed] = useState( //Xác định người dùng đã có kế hoạch hay chưa
     () => localStorage.getItem(`plan_confirmed_${accountId}`) === "true"
   );
   const [plan, setPlan] = useState(null);
@@ -22,16 +22,16 @@ function SuggestPlaning() {
   const [countdown, setCountdown] = useState(10);
   const navigate = useNavigate();
 
-  // ✅ Sửa lại hàm tính toán ngày bắt đầu và kết thúc
+  // Kiểm tra xem kế hoạch có tồn tại hay không
   const getPlanDates = (plan) => {
     if (!plan || !plan.stages || plan.stages.length === 0) {
       return { startDate: null, endDate: null };
     }
 
-    // Lấy ngày bắt đầu từ backend hoặc dùng ngày hiện tại
+    // Nếu có ngày bắt đầu trong kế hoạch, sử dụng nó, nếu không thì dùng ngày hiện tại
     const startDate = plan.startDate ? dayjs(plan.startDate) : dayjs();
 
-    // ✅ Tính ngày kết thúc = ngày kết thúc của giai đoạn cuối cùng
+    // Tính ngày kết thúc = ngày kết thúc của giai đoạn cuối cùng
     const lastStageIndex = plan.stages.length - 1;
     const lastStageStart = startDate.add(lastStageIndex * 4, "week");
     const endDate = lastStageStart.add(4, "week").subtract(1, "day");
@@ -67,7 +67,7 @@ function SuggestPlaning() {
           }
           return prev - 1;
         });
-      }, 1000);
+      }, 1000); 
 
       // Cleanup interval khi component unmount hoặc dependency thay đổi
       return () => clearInterval(countdownInterval);
@@ -88,8 +88,8 @@ function SuggestPlaning() {
       try {
         // Kiểm tra xem có kế hoạch đã được lưu trong backend không
         const res = await api.get(`/v1/customers/${accountId}/quit-plans`);
-        if (res.data && !Array.isArray(res.data)) {
-          setPlan(res.data);
+        if (res.data && !Array.isArray(res.data)) {  // Kiểm tra nếu dữ liệu là một object
+          setPlan(res.data); 
           // Kiểm tra xem đã xác nhận chưa
           if (res.data.isAgreedPlan) {
             setIsConfirmed(true);
@@ -152,7 +152,7 @@ function SuggestPlaning() {
         `/v1/customers/${accountId}/quit-plans`,
         {
           systemPlan: true,
-          startDate: dayjs().format("YYYY-MM-DD"), // ✅ Thêm ngày bắt đầu
+          startDate: dayjs().format("YYYY-MM-DD"),
         }
       );
 

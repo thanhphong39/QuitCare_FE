@@ -24,16 +24,16 @@ const initialState = {
 };
 
 // ================ LOCALSTORAGE UTILITIES ================
-const FORM_STORAGE_KEY = "planningFormData";
+const FORM_STORAGE_KEY = "planningFormData";  // Key lưu dữ liệu form
 const FORM_TIMESTAMP_KEY = "planningFormTimestamp";
-const FORM_EXPIRY_HOURS = 24; // Form data expires after 24 hours
+const FORM_EXPIRY_HOURS = 24;
 
 // Lưu form data vào localStorage
 const saveFormToStorage = (formData) => {
   try {
     const timestamp = new Date().getTime();
-    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
-    localStorage.setItem(FORM_TIMESTAMP_KEY, timestamp.toString());
+    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData)); //object chứa dữ liệu người dùng , chuyển thành chuỗi
+    localStorage.setItem(FORM_TIMESTAMP_KEY, timestamp.toString()); 
   } catch (error) {
     console.warn("Không thể lưu form vào localStorage:", error);
   }
@@ -42,25 +42,25 @@ const saveFormToStorage = (formData) => {
 // Load form data từ localStorage
 const loadFormFromStorage = () => {
   try {
-    const savedData = localStorage.getItem(FORM_STORAGE_KEY);
-    const savedTimestamp = localStorage.getItem(FORM_TIMESTAMP_KEY);
+    const savedData = localStorage.getItem(FORM_STORAGE_KEY); // Dữ liệu form lưu
+    const savedTimestamp = localStorage.getItem(FORM_TIMESTAMP_KEY); // Thời gian lưu form
 
     if (!savedData || !savedTimestamp) {
       return null;
     }
 
-    // Kiểm tra expiry
+    // Kiểm tra thời gian lưu có quá hạn không
     const currentTime = new Date().getTime();
-    const savedTime = parseInt(savedTimestamp);
-    const hoursDiff = (currentTime - savedTime) / (1000 * 60 * 60);
+    const savedTime = parseInt(savedTimestamp); 
+    const hoursDiff = (currentTime - savedTime) / (1000 * 60 * 60); // Tính số giờ đã trôi qua kể từ khi lưu
 
     if (hoursDiff > FORM_EXPIRY_HOURS) {
-      // Data đã expired, xóa khỏi localStorage
+      // Data quá hạn, xóa khỏi localStorage
       clearFormFromStorage();
       return null;
     }
 
-    return JSON.parse(savedData);
+    return JSON.parse(savedData); 
   } catch (error) {
     console.warn("Không thể load form từ localStorage:", error);
     return null;
@@ -78,6 +78,7 @@ const clearFormFromStorage = () => {
 };
 
 // ================ MAPPING FUNCTIONS ================
+// mapTime chuyển đổi giá trị thời gian từ chuỗi sang enum
 const mapTime = (value) => {
   const timeMap = {
     "≤5 phút": "LESS_THAN_5_MIN",
@@ -85,7 +86,7 @@ const mapTime = (value) => {
     "31–60 phút": "BETWEEN_31_AND_60_MIN",
     ">60 phút": "MORE_THAN_60_MIN",
   };
-  return timeMap[value] || "";
+  return timeMap[value] || ""; 
 };
 
 const mapQuitAttempts = (value) => {
@@ -175,8 +176,8 @@ function calcAddictionLevel(form) {
 
 // Hàm tính toán kế hoạch đề xuất
 const generateSuggestedPlan = (form) => {
-  const cigarettesPerDay = parseInt(form.cigarettes_per_day);
-  const addictionLevel = calcAddictionLevel(form);
+  const cigarettesPerDay = parseInt(form.cigarettes_per_day); 
+  const addictionLevel = calcAddictionLevel(form); 
   const stages = [];
 
   // Giai đoạn 1: Giảm 50% số điếu ban đầu
@@ -250,7 +251,7 @@ function PlanPage() {
   const [addictionInfo, setAddictionInfo] = useState(null);
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [showAddictionResult, setShowAddictionResult] = useState(false);
-  const [formLoaded, setFormLoaded] = useState(false); // Track if form is loaded from storage
+  const [formLoaded, setFormLoaded] = useState(false); 
   const [fieldErrors, setFieldErrors] = useState({}); // <--- Thêm state cho lỗi từng trường
 
   // ================ HOOKS ================
@@ -305,7 +306,7 @@ function PlanPage() {
       // GUEST hoặc STAFF không cần check plan
       setLoading(false);
     }
-  }, [accountId, navigate, user]);
+  }, [accountId, navigate, user]); //Thay đổi để kiểm tra phân quyền 
 
   // Auto-save form data khi form thay đổi
   useEffect(() => {
@@ -313,7 +314,7 @@ function PlanPage() {
     if (formLoaded && Object.values(form).some((value) => value !== "")) {
       const saveTimeout = setTimeout(() => {
         saveFormToStorage(form);
-      }, 500); // Debounce 500ms
+      }, 500); // Thời gian trễ 500ms để tránh lưu quá nhiều lần
 
       return () => clearTimeout(saveTimeout);
     }
@@ -352,18 +353,18 @@ function PlanPage() {
     }
 
     setForm({ ...form, [name]: value });
-    setFieldErrors((prev) => ({ ...prev, [name]: errorMsg })); // <--- Lưu lỗi cho từng trường
+    setFieldErrors((prev) => ({ ...prev, [name]: errorMsg })); // Cập nhật lỗi cho trường hiện tại
 
     // Nếu có lỗi chung (ví dụ thiếu thông tin), vẫn giữ lại
     setError("");
 
-    // Mark form as loaded if user starts typing
+    // Kiểm tra nếu form đã được load
     if (!formLoaded) {
       setFormLoaded(true);
     }
   };
 
-  // Handler cho Radio Group (Ant Design)
+  // Handler cho Radio Group
   const handleRadioChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -433,15 +434,15 @@ function PlanPage() {
     }
 
     try {
-      setError("");
-      setShowChoice(false);
-      setLoading(true);
+      setError(""); 
+      setShowChoice(false); 
+      setLoading(true); 
 
       if (type === "recommend") {
         // Kế hoạch đề xuất từ hệ thống
-        const suggestedPlan = generateSuggestedPlan(form);
-        localStorage.setItem("planSurvey", JSON.stringify(form));
-        localStorage.setItem("suggestedPlan", JSON.stringify(suggestedPlan));
+        const suggestedPlan = generateSuggestedPlan(form); 
+        localStorage.setItem("planSurvey", JSON.stringify(form)); 
+        localStorage.setItem("suggestedPlan", JSON.stringify(suggestedPlan)); 
 
         navigate("/suggest-planing");
       } else {
@@ -466,7 +467,7 @@ function PlanPage() {
           systemPlan: false,
         });
 
-        localStorage.setItem("quitPlanId", res.data.id);
+        localStorage.setItem("quitPlanId", res.data.id); 
         localStorage.setItem("planSurvey", JSON.stringify(payload));
 
         // Xóa form data vì đã submit thành công

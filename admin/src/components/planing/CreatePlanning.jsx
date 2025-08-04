@@ -7,11 +7,11 @@ import "./CreatePlanning.css";
 import create1 from "../../assets/images/create1.png";
 
 // ================ CONSTANTS ================
-const initialStage = () => ({
+const initialStage = () => ({ // Mỗi stage có thể có nhiều weeks
   weeks: [{ week: "", cigarettes: "" }],
 });
 
-const LOCAL_KEY = "quitcare_planning_draft";
+const LOCAL_KEY = "quitcare_planning_draft"; 
 
 // ================ MAIN COMPONENT ================
 function CreatePlanning() {
@@ -42,14 +42,14 @@ function CreatePlanning() {
       /^Tuần\s+\d+\s*-\s*Tuần\s+\d+$/i, // Tuần 1 - Tuần 3
     ];
 
-    const isValid = patterns.some((pattern) => pattern.test(weekValue.trim()));
+    const isValid = patterns.some((pattern) => pattern.test(weekValue.trim())); // Kiểm tra có khớp mẫu nào không
 
     if (!isValid) {
       return "Định dạng không hợp lệ. Ví dụ: 'Tuần 1 - 2', 'Tuần 3', 'Tuần 1 đến 3'";
     }
 
     // Kiểm tra logic số tuần
-    const weekNumbers = weekValue.match(/\d+/g);
+    const weekNumbers = weekValue.match(/\d+/g); //Tìm tất cả các số trong chuỗi
     if (weekNumbers && weekNumbers.length === 2) {
       const start = parseInt(weekNumbers[0]);
       const end = parseInt(weekNumbers[1]);
@@ -91,7 +91,7 @@ function CreatePlanning() {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors = {}; // Object lưu trữ tất cả lỗi tìm được
     let hasError = false;
 
     stages.forEach((stage, stageIdx) => {
@@ -158,8 +158,8 @@ function CreatePlanning() {
   const handleDeleteRow = async (stageIdx, rowIdx) => {
     if (mode === "view") return;
     const newStages = [...stages];
-    const removed = newStages[stageIdx].weeks.splice(rowIdx, 1)[0];
-    setStages(newStages);
+    const removed = newStages[stageIdx].weeks.splice(rowIdx, 1)[0]; // Xóa 1 phần tử tại rowIdx
+    setStages(newStages); // Cập nhật state với mảng mới
     if (removed && removed.id) {
       try {
         await api.delete(
@@ -211,8 +211,9 @@ function CreatePlanning() {
     setLoading(true);
     try {
       // Xóa các week đã bị xóa trên UI
-      const uniqueDeletedIds = [...new Set(deletedIds)];
+      const uniqueDeletedIds = [...new Set(deletedIds)]; // Loại bỏ các id trùng lặp
       for (const id of uniqueDeletedIds) {
+        //gửi request DELETE từng tuần khỏi backend
         await api.delete(
           `/v1/customers/${accountId}/quit-plans/${quitPlanId}/stages/${id}`
         );
@@ -325,8 +326,8 @@ function CreatePlanning() {
 
   // Lưu ngày tạo kế hoạch vào localStorage khi lần đầu tiên truy cập trang tạo kế hoạch
   useEffect(() => {
-    const createdDate = localStorage.getItem("plan_created_date");
-    const todayStr = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+    const createdDate = localStorage.getItem("plan_created_date"); // Lấy ngày tạo từ localStorage
+    const todayStr = new Date().toISOString().slice(0, 10); // Lấy ngày hôm nay dưới dạng chuỗi YYYY-MM-DD
     if (createdDate && createdDate !== todayStr) {
       setCanEdit(false);
     } else {
@@ -334,10 +335,10 @@ function CreatePlanning() {
     }
   }, []);
 
-  // ================ RENDER HELPERS ================
+  // Hiển thị bảng các giai đoạn 
   const renderStageTable = (stage, stageIdx) => {
     const dataSource = stage.weeks.map((row, rowIdx) => {
-      const weekErrorKey = `${stageIdx}-${rowIdx}-week`;
+      const weekErrorKey = `${stageIdx}-${rowIdx}-week`; //xác định lỗi hiển thị đúng ô (tuần hoặc số điếu)
       const cigarettesErrorKey = `${stageIdx}-${rowIdx}-cigarettes`;
 
       return {

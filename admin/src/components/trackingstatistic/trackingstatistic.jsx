@@ -116,12 +116,12 @@ function TrackingStatistic() {
     percent = 100;
   }
 
-  const showBadge = percent >= 100;
+  // const showBadge = percent >= 100;
 
-  const pieData = [
-    { name: "Đã theo dõi", value: stat.daysWithoutSmoking },
-    { name: "Chưa theo dõi", value: stat.daysNotTracked },
-  ];
+  // const pieData = [
+  //   { name: "Đã theo dõi", value: stat.daysWithoutSmoking },
+  //   { name: "Chưa theo dõi", value: stat.daysNotTracked },
+  // ];
 
   const barData = [
     {

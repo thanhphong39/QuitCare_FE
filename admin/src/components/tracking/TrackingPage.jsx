@@ -96,7 +96,7 @@ const TrackingPage = () => {
   const [showlinkBooking, setShowBooking] = useState(false);
   const BOOKING_LINK = "http://localhost:5173/booking";
 
-  //keiemr tra user có gói thanh viên để Booking không
+  //kiểm tra user có gói thanh viên để Booking không
   useEffect(() => {
     const fetchMembershipPlan = async () => {
       try {
@@ -178,7 +178,7 @@ const TrackingPage = () => {
   // Script tự động điền dữ liệu
   const [isAutoFilling, setIsAutoFilling] = useState(false);
 
-  // Script tự động điền dữ liệu tracking cho kế hoạch 2 tuần
+  // Script tự động điền dữ liệu tracking cho kế hoạch
   const autoFillTrackingData = async () => {
     if (!plan || isAutoFilling) return;
 
@@ -345,60 +345,6 @@ const TrackingPage = () => {
     }
   };
 
-  // Xóa tất cả dữ liệu tracking (để test lại)
-  const clearAllTrackingData = () => {
-    // Debug log để kiểm tra
-    Modal.confirm({
-      title: "🗑️ Xóa tất cả dữ liệu tracking?",
-      content: (
-        <div>
-          <p>
-            ⚠️{" "}
-            <strong>
-              Hành động này sẽ xóa TOÀN BỘ dữ liệu tracking đã lưu!
-            </strong>
-          </p>
-          <p>• Tất cả dữ liệu theo dõi hàng ngày sẽ bị xóa</p>
-          <p>• Thống kê và tiến độ sẽ được reset về 0</p>
-          <p>
-            • Hành động này <strong>KHÔNG THỂ HOÀN TÁC</strong>
-          </p>
-          <br />
-          <p>
-            🎯 <strong>Bạn có chắc chắn muốn xóa không?</strong>
-          </p>
-        </div>
-      ),
-      okText: "🗑️ XÓA TẤT CẢ",
-      cancelText: "❌ Hủy bỏ",
-      okType: "danger",
-      width: 500,
-      centered: true,
-      onOk: () => {
-        // Đếm số dữ liệu sẽ xóa
-        let deletedCount = 0;
-        Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith(`tracking_${accountId}_`)) {
-            localStorage.removeItem(key);
-            deletedCount++;
-          }
-        });
-
-        // Reset state
-        setTrackingData({});
-        calculateStats({});
-
-        message.success({
-          content: `🗑️ Đã xóa thành công ${deletedCount} dữ liệu tracking!`,
-          duration: 3,
-        });
-      },
-      onCancel: () => {
-        message.info("❌ Đã hủy thao tác xóa");
-      },
-    });
-  };
-
   const handleInputChange = (field, value) => {
     setTodayData((prev) => ({
       ...prev,
@@ -421,38 +367,21 @@ const TrackingPage = () => {
       return 7;
     }
 
-    const cleanRange = weekRange.trim();
+    let processedRange = weekRange.trim();
 
-    // ✅ Xử lý định dạng từ CreatePlanning: "Tuần 1 - 2", "Tuần 3", etc.
-    if (cleanRange.toLowerCase().includes("tuần")) {
+    //  Xử lý định dạng từ CreatePlanning: "Tuần 1 - 2", "Tuần 3", etc.
+    if (processedRange.toLowerCase().includes("tuần")) {
       // Loại bỏ từ "tuần" và các ký tự không cần thiết
-      const numbersOnly = cleanRange
+      processedRange = processedRange
         .toLowerCase()
         .replace(/tuần\s*/gi, "")
         .replace(/\s*đến\s*/gi, "-")
         .replace(/\s*-\s*/g, "-")
         .trim();
-
-      // Sau khi clean, xử lý như bình thường
-      const rangeMatch = numbersOnly.match(/^(\d+)-(\d+)$/);
-      if (rangeMatch) {
-        const startWeek = parseInt(rangeMatch[1]);
-        const endWeek = parseInt(rangeMatch[2]);
-        const totalWeeks = Math.max(1, endWeek - startWeek + 1);
-        const totalDays = totalWeeks * 7;
-        return totalDays;
-      }
-
-      const numberMatch = numbersOnly.match(/^(\d+)$/);
-      if (numberMatch) {
-        return 7; // 1 tuần = 7 ngày
-      }
-
-      return 7; // Default nếu không parse được
     }
 
-    // ✅ Xử lý định dạng cũ: "1-2", "3", etc.
-    const rangeMatch = cleanRange.match(/^(\d+)-(\d+)$/);
+    //  Xử lý range pattern "1-2" hoặc "3-5"
+    const rangeMatch = processedRange.match(/^(\d+)-(\d+)$/);
     if (rangeMatch) {
       const startWeek = parseInt(rangeMatch[1]);
       const endWeek = parseInt(rangeMatch[2]);
@@ -461,9 +390,10 @@ const TrackingPage = () => {
       return totalDays;
     }
 
-    const numberMatch = cleanRange.match(/^(\d+)$/);
+    // Xử lý single number "1", "2", "3"
+    const numberMatch = processedRange.match(/^(\d+)$/);
     if (numberMatch) {
-      return 7;
+      return 7; // 1 tuần = 7 ngày
     }
 
     return 7; // Default fallback
@@ -486,7 +416,7 @@ const TrackingPage = () => {
 
       let currentDayCount = 0;
 
-      // ✅ Sort stages an toàn hơn - xử lý cả định dạng mới và cũ
+      //  Sort stages an toàn hơn - xử lý cả định dạng mới và cũ
       const sortedStages = [...plan.stages].sort((a, b) => {
         const getFirstWeekNumber = (weekRange) => {
           if (!weekRange) return 0;
@@ -547,7 +477,7 @@ const TrackingPage = () => {
       // Kế hoạch tự tạo: tính tổng số ngày từ tất cả các stage entries
       let totalDays = 0;
 
-      // ✅ Sort stages an toàn như getCurrentStage
+      //  Sort stages an toàn như getCurrentStage
       const sortedStages = [...plan.stages].sort((a, b) => {
         const getFirstWeekNumber = (weekRange) => {
           if (!weekRange) return 0;
@@ -576,7 +506,9 @@ const TrackingPage = () => {
       const endDate = totalDays > 0 ? addDays(startDate, totalDays - 1) : null;
       return endDate;
     }
-  }; // Kiểm tra ngày có trong kế hoạch không
+  };
+
+  // Kiểm tra ngày có trong kế hoạch không
   const isDateInPlan = (date) => {
     if (!plan) return false;
 
@@ -586,7 +518,7 @@ const TrackingPage = () => {
 
     if (!endDate) return false;
 
-    // Kiểm tra ngày có trong khoảng từ startDate đến endDate (bao gồm cả 2 ngày)
+    // Kiểm tra ngày có trong khoảng từ startDate đến endDate
     return (
       !isBefore(checkDate, startDate) &&
       !isAfter(checkDate, startOfDay(endDate))
@@ -597,17 +529,6 @@ const TrackingPage = () => {
   const getSelectedDateData = () => {
     const dateStr = format(selectedDate, "yyyy-MM-dd");
     return trackingData[dateStr] || null;
-  };
-
-  // Sửa lại hàm canEdit
-  const canEdit = (date) => {
-    if (isTestMode) return isDateInPlan(date); // Test mode: chỉ cần trong kế hoạch
-
-    const now = new Date();
-    const today = format(now, "yyyy-MM-dd");
-    const dayDate = format(date, "yyyy-MM-dd");
-
-    return dayDate === today && now.getHours() < 21 && isDateInPlan(date);
   };
 
   // Thêm hàm getDayStatus
@@ -625,6 +546,15 @@ const TrackingPage = () => {
     const dayDate = format(date, "yyyy-MM-dd");
     const dateStr = format(date, "yyyy-MM-dd");
     const isSubmitted = trackingData[dateStr]?.submitted;
+
+    if (isSubmitted) {
+      return {
+        canEdit: false,
+        message: "Đã nộp",
+        type: "submitted",
+        showSubmitted: true,
+      };
+    }
 
     if (!isDateInPlan(date)) {
       return {
@@ -659,10 +589,10 @@ const TrackingPage = () => {
       };
     } else {
       // Ngày hiện tại
-      if (now.getHours() >= 22) {
+      if (now.getHours() >= 21) {
         return {
           canEdit: false,
-          message: "Quá 22h - không thể nộp dữ liệu",
+          message: "Quá 21h - không thể nộp dữ liệu",
           type: "late",
         };
       } else {
@@ -680,6 +610,7 @@ const TrackingPage = () => {
     const symptomsToday = todayData.symptoms || [];
     const checkedSymptoms = symptomsToday.filter((symptom) => symptom);
     const showlink = showlinkBooking; // Đảm bảo showBooking là boolean
+
     // Logic 1: Kiểm tra >= 3 triệu chứng trong ngày hiện tại
     if (checkedSymptoms.length >= 3) {
       return {
@@ -698,7 +629,7 @@ const TrackingPage = () => {
         </div>`,
       };
     }
-    console.log("👁️ showBooking hiện tại:", showBooking);
+
     // Logic 2: Kiểm tra triệu chứng kéo dài qua nhiều ngày
     const dayKeys = Object.keys(trackingData).sort(
       (a, b) => new Date(a) - new Date(b)
@@ -716,9 +647,9 @@ const TrackingPage = () => {
         }
       }
 
-      if (checkedSymptoms.includes(symptom)) {
-        consecutive++;
-      }
+      // if (checkedSymptoms.includes(symptom)) {
+      //   consecutive++;
+      // }
 
       if (consecutive >= 3) {
         return {
@@ -744,39 +675,24 @@ const TrackingPage = () => {
   };
 
   // Hiển thị popup thành công
-  const showSuccessPopup = (smoked, target, isTestData = false) => {
+  const showSuccessPopup = (smoked, target) => {
     const savedCigs = Math.max(0, target - smoked);
     const savedMoney = savedCigs * 1000;
 
     let content = "";
 
-    if (isTestData) {
-      content += `
-        <div class="quit-tracking-test-notice">
-          <h4>🔧 Chế độ Test - Dữ liệu mẫu</h4>
-          <p>Dữ liệu này chỉ để test giao diện, không ảnh hưởng đến kết quả thật.</p>
-        </div>
-      `;
-    }
-
     if (smoked <= target) {
       content += `
         <div class="quit-tracking-success-popup">
-          <h3>🎉 Chúc mừng! Bạn đã hoàn thành mục tiêu ${
-            isTestData ? "mẫu" : "hôm nay"
-          }!</h3>
+          <h3>🎉 Chúc mừng! Bạn đã hoàn thành mục tiêu hôm nay!</h3>
           <p>Bạn đã tiết kiệm được ${savedCigs} điếu thuốc và ${savedMoney.toLocaleString()} VNĐ!</p>
         </div>
       `;
     } else {
       content += `
         <div class="quit-tracking-warning-popup">
-          <h3>⚠️ ${
-            isTestData ? "Dữ liệu mẫu:" : "Hôm nay"
-          } bạn đã hút nhiều hơn kế hoạch</h3>
-          <p>Đừng nản lòng! ${
-            isTestData ? "Đây chỉ là test." : "Ngày mai hãy cố gắng hơn nhé!"
-          }</p>
+          <h3>⚠️ Hôm nay bạn đã hút nhiều hơn kế hoạch</h3>
+          <p>Đừng nản lòng! Ngày mai hãy cố gắng hơn nhé!</p>
         </div>
       `;
     }
@@ -784,7 +700,7 @@ const TrackingPage = () => {
     if (todayData.symptoms.length > 0) {
       content += `
         <div class="quit-tracking-symptoms-popup">
-          <h4>🌟 Triệu chứng ${isTestData ? "mẫu" : "hôm nay"}:</h4>
+          <h4>🌟 Triệu chứng hôm nay:</h4>
           ${todayData.symptoms
             .map(
               (symptom) => `
@@ -807,11 +723,7 @@ const TrackingPage = () => {
 
     content += `
       <div class="quit-tracking-motivation-popup">
-        <p><strong>💪 ${
-          isTestData
-            ? "Test hoàn tất!"
-            : "Bạn đang làm rất tốt! Hãy tiếp tục kiên trì!"
-        }</strong></p>
+        <p><strong>💪 Bạn đang làm rất tốt! Hãy tiếp tục kiên trì!</strong></p>
       </div>
     `;
 
@@ -820,21 +732,21 @@ const TrackingPage = () => {
   };
 
   // Thêm hàm tạo thông báo tự động
-  const generateNotification = async (progressId) => {
-    try {
-      const response = await api.post(
-        `/quit-progress/generate-notification/${progressId}`
-      );
+  // const generateNotification = async (progressId) => {
+  //   try {
+  //     const response = await api.post(
+  //       `/quit-progress/generate-notification/${progressId}`
+  //     );
 
-      // Hiển thị thông báo thành công nhẹ nhàng
-      message.success("📢 Đã tạo thông báo theo dõi!");
+  //     // Hiển thị thông báo thành công nhẹ nhàng
+  //     message.success("📢 Đã tạo thông báo theo dõi!");
 
-      return response.data;
-    } catch (error) {
-      // Không hiển thị lỗi để không làm phiền user
-      return null;
-    }
-  };
+  //     return response.data;
+  //   } catch (error) {
+  //     // Không hiển thị lỗi để không làm phiền user
+  //     return null;
+  //   }
+  // };
 
   // Hiển thị modal xác nhận trước khi lưu
   const showConfirmModal = () => {
@@ -865,9 +777,7 @@ const TrackingPage = () => {
     setIsConfirmModalVisible(true);
   };
 
-  // Sửa lại hàm handleSubmit để tránh double submit và double notification
   const handleSubmit = async () => {
-    // Protection tránh double submit
     if (submitting) {
       return;
     }
@@ -932,15 +842,11 @@ const TrackingPage = () => {
 
       if (isLastDay) {
         setTimeout(() => {
-          setIsModalVisible(false); // Đóng modal thường
-          showCompletionModal(newTrackingData); // Hiện modal hoàn thành
+          setIsModalVisible(false);
+          showCompletionModal(newTrackingData);
         }, 2000);
       } else {
-        showSuccessPopup(
-          cigarettes_smoked,
-          currentStage.targetCigarettes,
-          false
-        );
+        showSuccessPopup(cigarettes_smoked, currentStage.targetCigarettes);
       }
     } catch (error) {
       message.error(
@@ -972,9 +878,9 @@ const TrackingPage = () => {
     return isLast;
   };
 
-  // Thêm hàm hiển thị modal hoàn thành với API mới
+  // Thêm hàm hiển thị modal hoàn thành
   const showCompletionModal = async () => {
-    // Chỉ dùng dữ liệu từ API, không dùng localStorage nữa
+    // dữ liệu từ API,
     try {
       const planEndDate = getPlanEndDate();
       const currentStage = getCurrentStage(planEndDate);
@@ -985,7 +891,7 @@ const TrackingPage = () => {
       );
       const apiData = response.data;
 
-      // Chỉ lấy các trường cần thiết từ API
+      // lấy các trường  từ API
       const completionData = {
         startDate: format(
           new Date(apiData.startDate + "T00:00:00"),
@@ -1087,30 +993,29 @@ const TrackingPage = () => {
       return;
     }
 
-    // 📅 TỔNG SỐ NGÀY: Tính từ lịch kế hoạch (ngày bắt đầu → ngày kết thúc)
+    // TỔNG SỐ NGÀY
     const planStartDate = new Date(plan.localDateTime);
     const planEndDate = getPlanEndDate();
 
     let totalPlanDays = 0;
     if (planEndDate) {
-      // Tổng số ngày trên lịch = ngày kết thúc - ngày bắt đầu + 1 (bao gồm cả 2 ngày)
       totalPlanDays = differenceInDays(planEndDate, planStartDate) + 2;
     }
 
-    // ✅ NGÀY HOÀN THÀNH: Đếm những ngày người dùng đã nhập xong form (submitted = true)
+    // NGÀY HOÀN THÀNH: Đếm những ngày người dùng đã nhập xong form (submitted = true)
     const allEntries = Object.entries(data);
     const completedDays = allEntries.filter(
       ([_, value]) => value.submitted === true
     ).length;
 
-    // 📈 TIẾN ĐỘ: Tính % hoàn thành = (ngày đã nhập form / tổng ngày trên lịch) * 100
+    //  TIẾN ĐỘ: Tính % hoàn thành = (ngày đã nhập form / tổng ngày trên lịch) * 100
     const averageProgress =
       totalPlanDays > 0 ? (completedDays / totalPlanDays) * 100 : 0;
 
     setStats({
-      totalDays: totalPlanDays, // 📅 Tổng số ngày trên LỊCH kế hoạch
-      completedDays, // ✅ Số ngày đã NHẬP FORM xong
-      averageProgress: Math.round(averageProgress), // 📈 % tiến độ hoàn thành
+      totalDays: totalPlanDays, // Tổng số ngày trên LỊCH kế hoạch
+      completedDays, // Số ngày đã NHẬP FORM xong
+      averageProgress: Math.round(averageProgress), // % hoàn thành
     });
   };
 
@@ -1247,7 +1152,6 @@ const TrackingPage = () => {
               onChange={(e) => {
                 const value = e.target.value;
 
-                // ✅ Validation đơn giản: chỉ cho phép 0-50
                 if (
                   value === "" ||
                   (parseInt(value) >= 0 && parseInt(value) <= 50)
@@ -1259,7 +1163,7 @@ const TrackingPage = () => {
               className="quit-tracking-form-input"
             />
 
-            {/* ✅ Hiển thị lỗi validation */}
+            {/* Hiển thị lỗi validation */}
             {todayData.cigarettes_smoked &&
               (parseInt(todayData.cigarettes_smoked) < 0 ||
                 parseInt(todayData.cigarettes_smoked) > 50) && (
@@ -1554,29 +1458,8 @@ const TrackingPage = () => {
                   disabled={!plan || !smokingStatusId}
                   size="small"
                 >
-                  Điền dữ liệu
+                  Test
                 </Button>
-                {/* <Button
-                  danger
-                  onClick={clearAllTrackingData}
-                  disabled={isAutoFilling}
-                  size="small"
-                >
-                  🗑️ Xóa tất cả dữ liệu
-                </Button> */}
-                {/* <span style={{ fontSize: "12px", color: "#666" }}>
-                  Script sẽ tạo dữ liệu mẫu cho{" "}
-                  {plan && getPlanEndDate()
-                    ? (() => {
-                        const planStartDate = new Date(plan.localDateTime);
-                        const planEndDate = getPlanEndDate();
-                        const totalDays =
-                          differenceInDays(planEndDate, planStartDate) + 2;
-                        return totalDays;
-                      })()
-                    : "?"}{" "}
-                  ngày
-                </span> */}
               </div>
             </div>
           )}
@@ -1785,7 +1668,6 @@ const TrackingPage = () => {
                       width: "80px",
                       height: "80px",
                       objectFit: "contain",
-                      // Bỏ filter trắng để hiển thị logo màu gốc
                     }}
                   />
                 </div>
@@ -2044,72 +1926,6 @@ const TrackingPage = () => {
                   />
                 </div>
 
-                {/* Thông tin bổ sung */}
-                {/* <div
-                  style={{
-                    padding: "20px",
-                    background:
-                      "linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)",
-                    borderRadius: "12px",
-                    border: "1px solid #e0e0e0",
-                    marginBottom: "24px",
-                  }}
-                >
-                  <Row gutter={24}>
-                    <Col xs={12}>
-                      <div style={{ textAlign: "center" }}>
-                        <div
-                          style={{
-                            fontSize: "24px",
-                            fontWeight: "700",
-                            color: "#424242",
-                            marginBottom: "4px",
-                          }}
-                        >
-                          {completionData.totalDays}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            color: "#757575",
-                            fontWeight: "500",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.5px",
-                          }}
-                        >
-                          Tổng số ngày
-                        </div>
-                      </div>
-                    </Col>
-                    <Col xs={12}>
-                      <div style={{ textAlign: "center" }}>
-                        <div
-                          style={{
-                            fontSize: "24px",
-                            fontWeight: "700",
-                            color: "#424242",
-                            marginBottom: "4px",
-                          }}
-                        >
-                          {completionData.completedDays}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            color: "#757575",
-                            fontWeight: "500",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.5px",
-                          }}
-                        >
-                          Ngày đã hoàn thành
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                </div> */}
-
-                {/* Thông điệp động viên */}
                 <div
                   style={{
                     padding: "20px",

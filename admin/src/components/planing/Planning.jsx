@@ -25,8 +25,8 @@ const initialState = {
 
 // ================ LOCALSTORAGE UTILITIES ================
 const FORM_STORAGE_KEY = "planningFormData";  // Key lưu dữ liệu form
-const FORM_TIMESTAMP_KEY = "planningFormTimestamp";
-const FORM_EXPIRY_HOURS = 24;
+const FORM_TIMESTAMP_KEY = "planningFormTimestamp"; // Key lưu thời gian lưu form
+const FORM_EXPIRY_HOURS = 24; // Thời gian hết hạn form (24 giờ)
 
 // Lưu form data vào localStorage
 const saveFormToStorage = (formData) => {
@@ -86,7 +86,7 @@ const mapTime = (value) => {
     "31–60 phút": "BETWEEN_31_AND_60_MIN",
     ">60 phút": "MORE_THAN_60_MIN",
   };
-  return timeMap[value] || ""; 
+  return timeMap[value] || ""; // Trả về giá trị mặc định nếu không tìm thấy
 };
 
 const mapQuitAttempts = (value) => {
